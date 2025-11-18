@@ -10,9 +10,10 @@ interface AgreementState {
 
 interface SignupStep1Props {
   onNext: () => void;
+  onBack: () => void;
 }
 
-export default function SignupStep1({ onNext }: SignupStep1Props) {
+export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
   const [agreements, setAgreements] = useState<AgreementState>({
     age14: false,
     terms: false,
@@ -50,7 +51,7 @@ export default function SignupStep1({ onNext }: SignupStep1Props) {
           <div className="flex flex-row items-center size-full">
             <div className="box-border content-stretch flex h-[68.976px] items-center justify-between px-[23.99px] py-0 relative w-full">
               {/* Back Button */}
-              <button className="relative shrink-0 size-[19.992px]" data-name="Button" onClick={() => window.history.back()}>
+              <button className="relative shrink-0 size-[19.992px] cursor-pointer z-10" data-name="Button" onClick={onBack}>
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start relative size-[19.992px]">
                   <div className="h-[19.992px] overflow-clip relative shrink-0 w-full" data-name="Icon">
                     <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">

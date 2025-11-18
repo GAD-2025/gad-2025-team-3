@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import svgPaths from "../imports/svg-etunpzbgmu";
+import ShareExhibitionModal from "./ShareExhibitionModal";
 
 interface MyExhibitionPageProps {
   onBack: () => void;
@@ -14,12 +16,20 @@ interface ExhibitionCard {
 }
 
 export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPageProps) {
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionCard | null>(null);
+
   const exhibitions: ExhibitionCard[] = [
     { id: '101', room: '101', title: 'BTS 월드 투어 2024', views: 1234, likes: 567 },
     { id: '102', room: '102', title: '아이유 콘서트 추억', views: 890, likes: 234 },
     { id: '103', room: '103', title: 'Seventeen 팬미팅', views: 2345, likes: 890 },
     { id: '104', room: '104', title: 'NewJeans 컴백선', views: 1567, likes: 432 },
   ];
+
+  const handleShareClick = (exhibition: ExhibitionCard) => {
+    setSelectedExhibition(exhibition);
+    setShareModalOpen(true);
+  };
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -184,48 +194,52 @@ export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPa
                         </div>
 
                         {/* Share Button */}
-                        <div className="relative shrink-0 size-[29.6px]" data-name="Button">
+                        <button 
+                          onClick={() => handleShareClick(exhibition)}
+                          className="relative shrink-0 size-[29.6px] cursor-pointer hover:bg-[#F360C0] transition-colors group" 
+                          data-name="Button"
+                        >
                           <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
                           <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-[0.8px] pt-[8.8px] px-[8.8px] relative size-[29.6px]">
                             <div className="h-[12px] overflow-clip relative shrink-0 w-full" data-name="Icon">
                               <div className="absolute inset-[8.33%_12.5%_66.67%_62.5%]" data-name="Vector">
                                 <div className="absolute inset-[-16.67%]">
                                   <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 4 4">
-                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="absolute inset-[37.5%_62.5%_37.5%_12.5%]" data-name="Vector">
                                 <div className="absolute inset-[-16.67%]">
                                   <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 4 4">
-                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="absolute inset-[66.67%_12.5%_8.33%_62.5%]" data-name="Vector">
                                 <div className="absolute inset-[-16.67%]">
                                   <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 4 4">
-                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d={svgPaths.peae880} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="absolute inset-[56.29%_35.75%_27.12%_35.79%]" data-name="Vector">
                                 <div className="absolute inset-[-25.13%_-14.64%]">
                                   <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 5 3">
-                                    <path d={svgPaths.p27b6c800} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d={svgPaths.p27b6c800} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
                                   </svg>
                                 </div>
                               </div>
                               <div className="absolute inset-[27.13%_35.79%_56.29%_35.79%]" data-name="Vector">
                                 <div className="absolute inset-[-25.13%_-14.67%]">
                                   <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 5 3">
-                                    <path d={svgPaths.p1973d000} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d={svgPaths.p1973d000} id="Vector" stroke="black" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
                                   </svg>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -235,6 +249,19 @@ export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPa
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {selectedExhibition && (
+        <ShareExhibitionModal
+          isOpen={shareModalOpen}
+          onClose={() => setShareModalOpen(false)}
+          exhibition={{
+            room: selectedExhibition.room,
+            title: selectedExhibition.title,
+            author: 'me'
+          }}
+        />
+      )}
     </div>
   );
 }

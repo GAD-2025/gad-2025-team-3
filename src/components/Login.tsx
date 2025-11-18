@@ -4,6 +4,8 @@ import svgPaths from "../imports/svg-cnim5xb21f";
 interface LoginProps {
   onLogin: () => void;
   onSignup: () => void;
+  onFindId: () => void;
+  onFindPassword: () => void;
 }
 
 function Showcase() {
@@ -25,7 +27,7 @@ function Showcase() {
   );
 }
 
-export default function Login({ onLogin, onSignup }: LoginProps) {
+export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -134,19 +136,19 @@ export default function Login({ onLogin, onSignup }: LoginProps) {
               {/* Bottom Links */}
               <div className="absolute h-[48px] left-0 top-[275.6px] w-[342px]" data-name="Container">
                 <div className="absolute content-stretch flex items-center justify-between left-[calc(50%-0.17px)] top-[24px] translate-x-[-50%] w-[326.9px]">
-                  <button className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer" data-name="Button">
+                  <button onClick={onFindId} className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer hover:opacity-70 transition-opacity" data-name="Button">
                     <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">아이디 찾기</p>
                   </button>
                   <div className="content-stretch flex flex-col gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
                     <p className="font-['Apple_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#99a1af] text-[12px] tracking-[0.3px] w-full">|</p>
                   </div>
-                  <button className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer" data-name="Button">
+                  <button onClick={onFindPassword} className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer hover:opacity-70 transition-opacity" data-name="Button">
                     <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">비밀번호 찾기</p>
                   </button>
                   <div className="content-stretch flex flex-col gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
                     <p className="font-['Apple_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#99a1af] text-[12px] tracking-[0.3px] w-full">|</p>
                   </div>
-                  <button onClick={onSignup} className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer" data-name="Button">
+                  <button onClick={onSignup} className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer hover:opacity-70 transition-opacity" data-name="Button">
                     <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">회원가입</p>
                   </button>
                 </div>
