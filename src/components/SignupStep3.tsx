@@ -2,7 +2,7 @@ import { useState } from 'react';
 import svgPaths from "../imports/svg-qgj2slx6tc";
 
 interface SignupStep3Props {
-  onNext: (nickname: string) => void;
+  onNext: (nickname: string, bio: string) => void;
   onBack: () => void;
 }
 
@@ -23,7 +23,7 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
 
   const handleNext = () => {
     if (isFormValid) {
-      onNext(nickname);
+      onNext(nickname, bio);
     }
   };
 

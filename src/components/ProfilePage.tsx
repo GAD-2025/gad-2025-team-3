@@ -1,0 +1,399 @@
+import svgPaths from "../imports/svg-cv3j1aafl9";
+
+interface ProfilePageProps {
+  username: string;
+  bio: string;
+  profileType: 'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l';
+  onBack: () => void;
+  onNavigateToBadges: () => void;
+  onNavigateToSettings: () => void;
+  onNavigateToMyExhibition: () => void;
+}
+
+export default function ProfilePage({ username, bio, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition }: ProfilePageProps) {
+  // Render profile icon based on type
+  const renderProfileIcon = () => {
+    // SVG path for profile icon (same as in SignupComplete)
+    const profilePath = "M108.359 0H100.63L0 57.6602V70.9411L100.001 128.251L100.453 128.514H108.193L208.835 70.8534V57.5725L108.359 0Z";
+    
+    if (profileType === 'profile_1_l') {
+      return (
+        <div className="absolute flex inset-[-12%_-62.49%_-56.53%_-29%] items-center justify-center">
+          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
+            <div className="relative size-full">
+              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
+                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (profileType === 'profile_2_l') {
+      return (
+        <div className="absolute flex inset-[-68.5%_-35.49%_-0.03%_-56%] items-center justify-center">
+          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
+            <div className="relative size-full">
+              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
+                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (profileType === 'profile_3_l') {
+      return (
+        <div className="absolute flex inset-[-12%_15.01%_-56.53%_-106.5%] items-center justify-center">
+          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
+            <div className="relative size-full">
+              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
+                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // profile_4_l
+    return (
+      <div className="absolute flex inset-[-68.5%_-102.99%_-0.03%_11.5%] items-center justify-center">
+        <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
+          <div className="relative size-full">
+            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
+              <path d={profilePath} fill="var(--fill-0, #F360C0)" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
+      {/* Header */}
+      <div className="h-[70.083px] relative shrink-0 w-full" data-name="Container">
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
+        <div className="flex flex-row items-center size-full">
+          <div className="box-border content-stretch flex h-[70.083px] items-center justify-between px-[20px] py-0 relative w-full">
+            {/* Back Button */}
+            <button 
+              onClick={onBack}
+              className="content-stretch flex flex-col items-start relative shrink-0 size-[19.992px] cursor-pointer" 
+              data-name="Button"
+            >
+              <div className="h-[19.992px] overflow-clip relative shrink-0 w-full" data-name="Icon">
+                <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">
+                  <div className="absolute inset-[-7.14%_-14.29%]">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 14">
+                      <path d={svgPaths.p63e1620} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute bottom-1/2 left-[20.83%] right-[20.83%] top-1/2" data-name="Vector">
+                  <div className="absolute inset-[-0.83px_-7.14%]">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 14 2">
+                      <path d="M12.4948 0.832986H0.832986" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </button>
+            <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
+            {/* Settings Button */}
+            <button 
+              onClick={onNavigateToSettings}
+              className="content-stretch flex flex-col items-start relative shrink-0 size-[20px] cursor-pointer" 
+              data-name="Button"
+            >
+              <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
+                <div className="absolute inset-[8.41%_12.68%]" data-name="Vector">
+                  <div className="absolute inset-[-5.01%_-5.58%]">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17 19">
+                      <path d={svgPaths.p2322a380} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute inset-[37.5%]" data-name="Vector">
+                  <div className="absolute inset-[-16.67%]">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 7">
+                      <path d={svgPaths.p2314a170} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Section */}
+      <div className="h-[232.8px] relative shrink-0 w-full" data-name="Container">
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
+        <div className="size-full">
+          <div className="box-border content-stretch flex flex-col gap-[24px] h-[232.8px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+            {/* Profile Info */}
+            <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
+              {/* Profile Image */}
+              <div className="relative shrink-0 size-[80px] bg-[#fef7fc] overflow-clip" data-name="profile">
+                {renderProfileIcon()}
+              </div>
+
+              {/* Profile Details */}
+              <div className="content-stretch flex flex-col items-start justify-between relative self-stretch shrink-0 w-[246px]" data-name="Container">
+                {/* Username and Bio */}
+                <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
+                  {/* Username with Edit Button */}
+                  <div className="content-stretch flex gap-[8px] h-[30px] items-center relative shrink-0 w-full" data-name="Container">
+                    <div className="h-[30px] relative shrink-0" data-name="Heading 2" style={{ maxWidth: '200px' }}>
+                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[30px] relative">
+                        <p className="font-['Pretendard',sans-serif] font-semibold leading-[28px] not-italic text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre overflow-hidden text-ellipsis">{username || 'fan_user_123'}</p>
+                      </div>
+                    </div>
+                    {/* Edit Icon */}
+                    <div className="relative shrink-0 size-[24px]" data-name="Button">
+                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[4px] px-[4px] relative size-[24px]">
+                        <div className="h-[16px] overflow-clip relative shrink-0 w-full" data-name="Icon">
+                          <div className="absolute inset-[8.33%_8.33%_8.34%_8.33%]" data-name="Vector">
+                            <div className="absolute inset-[-5%]">
+                              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
+                                <path d={svgPaths.p4290a20} id="Vector" stroke="var(--stroke-0, #99A1AF)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Bio */}
+                  <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
+                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{bio || 'K-POP을 사랑하는 팬입니다 ❤️'}</p>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="content-stretch flex gap-[20px] items-start relative shrink-0 w-full" data-name="Container">
+                  {/* 전시관 */}
+                  <div className="relative shrink-0" data-name="Container">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
+                      </div>
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">12</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* 팔로워 */}
+                  <div className="relative shrink-0" data-name="Container">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로워</p>
+                      </div>
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">156</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* 팔로잉 */}
+                  <div className="relative shrink-0" data-name="Container">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로잉</p>
+                      </div>
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">89</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="gap-[12px] grid grid-cols-[repeat(3,_minmax(0px,_1fr))] grid-rows-[repeat(1,_minmax(0px,_1fr))] h-[74.7px] relative shrink-0 w-full" data-name="Container">
+              {/* 전체 조회수 */}
+              <div className="[grid-area:1_/_1] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
+                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                <div className="relative shrink-0 w-full" data-name="Container">
+                  <div className="flex flex-row items-center justify-center size-full">
+                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[18px] py-px relative w-full">
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">2,847</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
+                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 조회수</p>
+                </div>
+              </div>
+              {/* 전체 좋아요수 */}
+              <div className="[grid-area:1_/_2] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
+                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                <div className="relative shrink-0 w-full" data-name="Container">
+                  <div className="flex flex-row items-center justify-center size-full">
+                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[25px] py-px relative w-full">
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">567</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
+                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 좋아요수</p>
+                </div>
+              </div>
+              {/* 전체 공유수 */}
+              <div className="[grid-area:1_/_3] bg-[#f360c0] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
+                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                <div className="relative shrink-0 w-full" data-name="Container">
+                  <div className="flex flex-row items-center justify-center size-full">
+                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[30px] py-px relative w-full">
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-center text-nowrap text-white whitespace-pre">89</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="content-stretch flex items-start opacity-90 relative shrink-0" data-name="Container">
+                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-center text-white tracking-[-0.24px] w-[78.8px]">전체 공유수</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Section */}
+      <div className="h-[330.8px] relative shrink-0 w-full" data-name="Container">
+        <div className="absolute content-stretch flex gap-[10px] items-center left-[24px] top-[24.12px] w-[342px]" data-name="Heading 3">
+          <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Menu</p>
+        </div>
+        {/* 나의 전시관 */}
+        <button 
+          onClick={onNavigateToMyExhibition}
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer" 
+          data-name="Button"
+        >
+          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">나의 전시관</p>
+            </div>
+          </div>
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">12개</p>
+            </div>
+          </div>
+        </button>
+        {/* 받은 배지 */}
+        <button 
+          onClick={onNavigateToBadges}
+          className="absolute box-border content-stretch flex gap-[12px] h-[56.2px] items-center left-[24px] pl-[17.6px] pr-[1.6px] py-[1.6px] top-[122.2px] w-[342px] cursor-pointer" 
+          data-name="Button"
+        >
+          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+          <div className="relative shrink-0 size-[20px]" data-name="Icon">
+            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+              <g id="Icon">
+                <path d={svgPaths.p27e2e0c0} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                <path d={svgPaths.p809b580} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+              </g>
+            </svg>
+          </div>
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">받은 배지</p>
+            </div>
+          </div>
+        </button>
+        {/* 활동 통계 */}
+        <button 
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] pl-[17.6px] pr-[266.812px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer" 
+          data-name="Button"
+        >
+          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">활동 통계</p>
+            </div>
+          </div>
+        </button>
+        {/* 즐겨찾기 */}
+        <button 
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[250.6px] w-[342px] cursor-pointer" 
+          data-name="Button"
+        >
+          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">즐겨찾기</p>
+            </div>
+          </div>
+          <div className="relative shrink-0" data-name="Text">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[10px] items-center justify-center relative">
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px] w-full">3개</p>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* Settings Section */}
+      <div className="h-[178.4px] relative shrink-0 w-full" data-name="Container">
+        <div className="size-full">
+          <div className="box-border content-stretch flex flex-col gap-[16px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
+            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
+              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Settings</p>
+            </div>
+            {/* 계정 설정 */}
+            <button 
+              onClick={onNavigateToSettings}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
+              <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+              <div className="flex flex-row items-center size-full">
+                <div className="box-border content-stretch flex gap-[12px] h-[56.2px] items-center pl-[17.6px] pr-[1.6px] py-[1.6px] relative w-full">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+                      <g id="Icon">
+                        <path d={svgPaths.p1f78d2b0} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d={svgPaths.p3b27f100} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div className="h-[21px] relative shrink-0 w-[57.588px]" data-name="Text">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[57.588px]">
+                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">계정 설정</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+            {/* 로그아웃 */}
+            <button 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
+              <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+              <div className="flex flex-row items-center size-full">
+                <div className="box-border content-stretch flex gap-[12px] h-[56.2px] items-center pl-[17.6px] pr-[1.6px] py-[1.6px] relative w-full">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+                      <g id="Icon">
+                        <path d={svgPaths.p14ca9100} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M17.5 10H7.5" id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d={svgPaths.p38966ca0} id="Vector_3" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
+                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">로그아웃</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
