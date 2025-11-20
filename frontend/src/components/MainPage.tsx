@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import svgPaths from "../imports/svg-hpi4lmxewj";
 
 interface MainPageProps {
