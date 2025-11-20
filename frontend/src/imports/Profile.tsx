@@ -1,4 +1,4 @@
-import { imgVector, imgVector1 } from "./svg-dpbci";
+import { imgVector, imgVector1 } from "./svg-43sg0";
 type ProfileProps = {
   className?: string;
   prop1?: "profile_1_l" | "profile_2_l" | "profile_3_l" | "profile_4_l" | "profile_4_s" | "profile_3_s" | "profile_2_s" | "profile_1_s";
@@ -113,5 +113,5 @@ function Profile({ className, prop1 = "profile_1_l" }: ProfileProps) {
 }
 
 export default function Profile1() {
-  return <Profile prop1="profile_4_l" className="bg-[#fef7fc] relative size-full" />;
+  return <Profile prop1="profile_2_l" className="bg-[#fef7fc] relative size-full" />;
 }

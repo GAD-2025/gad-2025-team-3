@@ -1,4 +1,7 @@
 import svgPaths from "../imports/svg-cv3j1aafl9";
+import iconPaths from "../imports/svg-0l1y3hgd5b";
+import { useState } from "react";
+import DeleteAccountModal from "./DeleteAccountModal";
 
 interface ProfilePageProps {
   username: string;
@@ -8,9 +11,18 @@ interface ProfilePageProps {
   onNavigateToBadges: () => void;
   onNavigateToSettings: () => void;
   onNavigateToMyExhibition: () => void;
+  onLogout: () => void;
+  onDeleteAccount: (reason: string) => void;
 }
 
-export default function ProfilePage({ username, bio, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition }: ProfilePageProps) {
+export default function ProfilePage({ username, bio, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition, onLogout, onDeleteAccount }: ProfilePageProps) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteAccount = (reason: string) => {
+    setIsDeleteModalOpen(false);
+    onDeleteAccount(reason);
+  };
+
   // Render profile icon based on type
   const renderProfileIcon = () => {
     // SVG path for profile icon (same as in SignupComplete)
@@ -241,17 +253,17 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                 </div>
               </div>
               {/* 전체 공유수 */}
-              <div className="[grid-area:1_/_3] bg-[#f360c0] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
+              <div className="[grid-area:1_/_3] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
                 <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                 <div className="relative shrink-0 w-full" data-name="Container">
                   <div className="flex flex-row items-center justify-center size-full">
                     <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[30px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-center text-nowrap text-white whitespace-pre">89</p>
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">89</p>
                     </div>
                   </div>
                 </div>
-                <div className="content-stretch flex items-start opacity-90 relative shrink-0" data-name="Container">
-                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-center text-white tracking-[-0.24px] w-[78.8px]">전체 공유수</p>
+                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
+                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 공유수</p>
                 </div>
               </div>
             </div>
@@ -271,9 +283,18 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
           data-name="Button"
         >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">나의 전시관</p>
+          <div className="relative shrink-0 w-[181.9px]">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] items-center relative w-[181.9px]">
+              <div className="relative shrink-0 size-[20px]" data-name="Icon">
+                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+                  <g id="Icon">
+                    <path d={iconPaths.p2ac52300} fill="var(--stroke-0, black)" id="Union" />
+                  </g>
+                </svg>
+              </div>
+              <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
+                <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">나의 전시관</p>
+              </div>
             </div>
           </div>
           <div className="relative shrink-0" data-name="Text">
@@ -305,10 +326,17 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
         </button>
         {/* 활동 통계 */}
         <button 
-          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] pl-[17.6px] pr-[266.812px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer" 
+          className="absolute box-border content-stretch flex gap-[12px] h-[56.2px] items-center left-[24px] pl-[17.6px] pr-[266.812px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer" 
           data-name="Button"
         >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+          <div className="relative shrink-0 size-[20px]" data-name="Icon">
+            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+              <g id="Icon">
+                <path d={iconPaths.p391f8480} fill="var(--fill-0, black)" id="Union" />
+              </g>
+            </svg>
+          </div>
           <div className="relative shrink-0" data-name="Text">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
               <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">활동 통계</p>
@@ -321,9 +349,18 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
           data-name="Button"
         >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">즐겨찾기</p>
+          <div className="relative shrink-0 w-[176.9px]">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] items-center relative w-[176.9px]">
+              <div className="relative shrink-0 size-[20px]" data-name="Icon">
+                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+                  <g id="Icon">
+                    <path d={iconPaths.p28ca6b00} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                  </g>
+                </svg>
+              </div>
+              <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
+                <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">즐겨찾기</p>
+              </div>
             </div>
           </div>
           <div className="relative shrink-0" data-name="Text">
@@ -335,9 +372,9 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
       </div>
 
       {/* Settings Section */}
-      <div className="h-[178.4px] relative shrink-0 w-full" data-name="Container">
+      <div className="h-[122.2px] relative shrink-0 w-full" data-name="Container">
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[16px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[16px] h-[122.2px] items-start px-[24px] py-0 relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Settings</p>
             </div>
@@ -366,26 +403,66 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                 </div>
               </div>
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Danger Zone Section */}
+      <div className="h-[178.4px] relative shrink-0 w-full mb-8" data-name="Container">
+        <div className="size-full">
+          <div className="box-border content-stretch flex flex-col gap-[16px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
+            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
+              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
+            </div>
             {/* 로그아웃 */}
             <button 
+              onClick={onLogout}
               className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
               data-name="Button"
             >
-              <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+              <div aria-hidden="true" className="absolute border-[1.6px] border-[#f44336] border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex gap-[12px] h-[56.2px] items-center pl-[17.6px] pr-[1.6px] py-[1.6px] relative w-full">
                   <div className="relative shrink-0 size-[20px]" data-name="Icon">
                     <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                       <g id="Icon">
-                        <path d={svgPaths.p14ca9100} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        <path d="M17.5 10H7.5" id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        <path d={svgPaths.p38966ca0} id="Vector_3" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d={svgPaths.p14ca9100} id="Vector" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M17.5 10H7.5" id="Vector_2" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d={svgPaths.p38966ca0} id="Vector_3" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                       </g>
                     </svg>
                   </div>
                   <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
-                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">로그아웃</p>
+                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">로그아웃</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+            {/* 회원 탈퇴 */}
+            <button 
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
+              <div aria-hidden="true" className="absolute border-[1.6px] border-[#f44336] border-solid inset-0 pointer-events-none" />
+              <div className="flex flex-row items-center size-full">
+                <div className="box-border content-stretch flex gap-[12px] h-[56.2px] items-center pl-[17.6px] pr-[1.6px] py-[1.6px] relative w-full">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon">
+                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
+                      <g id="Icon">
+                        <path d="M2.5 5.83333H17.5" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M8.33333 9.16667V14.1667" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M11.6667 9.16667V14.1667" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M3.33333 5.83333L4.16667 15.8333C4.16667 16.2754 4.34226 16.6993 4.65482 17.0118C4.96738 17.3244 5.39131 17.5 5.83333 17.5H14.1667C14.6087 17.5 15.0326 17.3244 15.3452 17.0118C15.6577 16.6993 15.8333 16.2754 15.8333 15.8333L16.6667 5.83333" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                        <path d="M7.5 5.83333V3.33333C7.5 3.11232 7.5878 2.90036 7.74408 2.74408C7.90036 2.5878 8.11232 2.5 8.33333 2.5H11.6667C11.8877 2.5 12.0996 2.5878 12.2559 2.74408C12.4122 2.90036 12.5 3.11232 12.5 3.33333V5.83333" stroke="#f44336" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div className="h-[21px] relative shrink-0 w-[57.588px]" data-name="Text">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[57.588px]">
+                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">회원 탈퇴</p>
                     </div>
                   </div>
                 </div>
@@ -394,6 +471,14 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
           </div>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {isDeleteModalOpen && (
+        <DeleteAccountModal
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleDeleteAccount}
+        />
+      )}
     </div>
   );
 }
