@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import svgPaths from "../imports/svg-0is11x6gea";
 
 interface ExhibitionDetailPageProps {
