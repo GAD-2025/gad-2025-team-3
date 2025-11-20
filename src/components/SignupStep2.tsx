@@ -15,15 +15,47 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
   });
   const [isUsernameChecked, setIsUsernameChecked] = useState(false);
   const [usernameValid, setUsernameValid] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
 
-  const handleUsernameCheck = () => {
-    if (formData.username) {
-      setIsUsernameChecked(true);
-      setUsernameValid(true);
+  // 아이디 유효성 검사 함수
+  const isValidUsername = (username: string) => {
+    // 2-12자 길이 체크
+    if (username.length < 2 || username.length > 12) {
+      return { valid: false, message: '아이디는 2-12자로 입력해주세요.' };
     }
+    // 영문, 특수문자 _ 와 . 만 허용
+    const regex = /^[a-zA-Z_.]+$/;
+    if (!regex.test(username)) {
+      return { valid: false, message: '영문과 특수문자 _ . 만 사용 가능합니다.' };
+    }
+    return { valid: true, message: '' };
   };
 
-  const isFormValid = formData.username && formData.password && formData.passwordConfirm && formData.email && isUsernameChecked;
+  const handleUsernameCheck = () => {
+    const validation = isValidUsername(formData.username);
+    if (!validation.valid) {
+      setUsernameError(validation.message);
+      setIsUsernameChecked(false);
+      setUsernameValid(false);
+      return;
+    }
+    
+    // 유효성 검사 통과 시 중복 확인
+    setUsernameError('');
+    setIsUsernameChecked(true);
+    setUsernameValid(true);
+  };
+
+  // 이메일 유효성 검사 함수
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // 비밀번호 일치 여부
+  const isPasswordMatch = formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm;
+
+  const isFormValid = formData.username && formData.password && formData.passwordConfirm && formData.email && isUsernameChecked && isValidEmail(formData.email) && isPasswordMatch;
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -145,6 +177,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                           setFormData({ ...formData, username: e.target.value });
                           setIsUsernameChecked(false);
                           setUsernameValid(false);
+                          setUsernameError('');
                         }}
                         placeholder="아이디를 입력하세요"
                         className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
@@ -165,9 +198,17 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                     </div>
                   </button>
                 </div>
-                {isUsernameChecked && usernameValid && (
+                {isUsernameChecked && usernameValid ? (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
                     <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#15c440] text-[12px] tracking-[-0.24px]">사용할 수 있는 아이디입니다.</p>
+                  </div>
+                ) : usernameError ? (
+                  <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">{usernameError}</p>
+                  </div>
+                ) : (
+                  <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">2-12자, 영문과 특수문자 _ . 가능</p>
                   </div>
                 )}
               </div>
@@ -192,7 +233,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
               </div>
 
               {/* Password Confirm */}
-              <div className="content-stretch flex flex-col gap-[7.997px] h-[70.187px] items-start relative shrink-0 w-full" data-name="Container">
+              <div className="content-stretch flex flex-col gap-[7.997px] items-start relative shrink-0 w-full" data-name="Container">
                 <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
                   <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">비밀번호 확인</p>
                 </div>
@@ -208,10 +249,15 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   </div>
                   <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
                 </div>
+                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                  <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">비밀번호가 일치하지 않습니다.</p>
+                  </div>
+                )}
               </div>
 
               {/* Email */}
-              <div className="content-stretch flex flex-col gap-[7.997px] h-[70.187px] items-start relative shrink-0 w-full" data-name="Container">
+              <div className="content-stretch flex flex-col gap-[7.997px] items-start relative shrink-0 w-full" data-name="Container">
                 <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
                   <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">이메일</p>
                 </div>
@@ -227,6 +273,11 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   </div>
                   <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
                 </div>
+                {formData.email && !isValidEmail(formData.email) && (
+                  <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">올바른 이메일 형식을 입력해주세요. (예: example@email.com)</p>
+                  </div>
+                )}
               </div>
             </div>
 

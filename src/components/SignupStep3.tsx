@@ -2,7 +2,7 @@ import { useState } from 'react';
 import svgPaths from "../imports/svg-qgj2slx6tc";
 
 interface SignupStep3Props {
-  onNext: (nickname: string) => void;
+  onNext: (nickname: string, bio: string) => void;
   onBack: () => void;
 }
 
@@ -11,19 +11,42 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
   const [bio, setBio] = useState('');
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const [nicknameValid, setNicknameValid] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
+
+  // 닉네임 유효성 검사 함수
+  const isValidNickname = (name: string) => {
+    // 2-12자 길이 체크
+    if (name.length < 2 || name.length > 12) {
+      return { valid: false, message: '닉네임은 2-12자로 입력해주세요.' };
+    }
+    // 한글/영문/숫자만 허용
+    const regex = /^[가-힣a-zA-Z0-9]+$/;
+    if (!regex.test(name)) {
+      return { valid: false, message: '한글, 영문, 숫자만 사용 가능합니다.' };
+    }
+    return { valid: true, message: '' };
+  };
 
   const handleNicknameCheck = () => {
-    if (nickname) {
-      setIsNicknameChecked(true);
-      setNicknameValid(true);
+    const validation = isValidNickname(nickname);
+    if (!validation.valid) {
+      setNicknameError(validation.message);
+      setIsNicknameChecked(false);
+      setNicknameValid(false);
+      return;
     }
+    
+    // 유효성 검사 통과 시 중복 확인
+    setNicknameError('');
+    setIsNicknameChecked(true);
+    setNicknameValid(true);
   };
 
   const isFormValid = nickname && isNicknameChecked && nicknameValid;
 
   const handleNext = () => {
     if (isFormValid) {
-      onNext(nickname);
+      onNext(nickname, bio);
     }
   };
 
@@ -149,6 +172,7 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                               setNickname(e.target.value);
                               setIsNicknameChecked(false);
                               setNicknameValid(false);
+                              setNicknameError('');
                             }}
                             placeholder="닉네임을 입력하세요"
                             className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
@@ -176,7 +200,11 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                 </div>
                 {isNicknameChecked && nicknameValid ? (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#15c440] text-[12px] tracking-[-0.24px]">사용할 수 있는 아이디입니다.</p>
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#15c440] text-[12px] tracking-[-0.24px]">사용할 수 있는 닉네임입니다.</p>
+                  </div>
+                ) : nicknameError ? (
+                  <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">{nicknameError}</p>
                   </div>
                 ) : (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">

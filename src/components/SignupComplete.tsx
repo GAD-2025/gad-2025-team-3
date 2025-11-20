@@ -4,15 +4,19 @@ import svgPaths from "../imports/svg-75d091w3ip";
 
 interface SignupCompleteProps {
   username: string;
-  onNext: () => void;
+  onNext: (profileType: 'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l') => void;
 }
 
 export default function SignupComplete({ username, onNext }: SignupCompleteProps) {
   // Randomly select one of 4 profile types (profile_1_l, profile_2_l, profile_3_l, profile_4_l)
   const profileType = useMemo(() => {
-    const types = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+    const types: Array<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'> = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
     return types[Math.floor(Math.random() * types.length)];
   }, []);
+
+  const handleNext = () => {
+    onNext(profileType);
+  };
 
   // Render profile icon based on selected type
   const renderProfileIcon = () => {
@@ -148,7 +152,7 @@ export default function SignupComplete({ username, onNext }: SignupCompleteProps
 
       {/* Button */}
       <motion.button 
-        onClick={onNext}
+        onClick={handleNext}
         className="absolute bg-black box-border content-stretch flex flex-col gap-[10px] items-start justify-center left-[calc(50%-163.5px)] pl-[24px] pr-px py-[20px] top-[636px] w-[327px] cursor-pointer"
         data-name="Button"
         initial={{ opacity: 0, y: 20 }}
