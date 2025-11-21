@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import svgPaths from "../imports/svg-tsuwfqrjtp";
 
+export interface SignupStep2Data {
+  username: string;
+  password: string;
+  email: string;
+}
+
 interface SignupStep2Props {
-  onNext: () => void;
+  onNext: (data: SignupStep2Data) => void;
   onBack: () => void;
 }
 
@@ -56,6 +62,13 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
   const isPasswordMatch = formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm;
 
   const isFormValid = formData.username && formData.password && formData.passwordConfirm && formData.email && isUsernameChecked && isValidEmail(formData.email) && isPasswordMatch;
+
+  const handleNext = () => {
+    if (isFormValid) {
+      const { username, password, email } = formData;
+      onNext({ username, password, email });
+    }
+  };
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -286,7 +299,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
               disabled={!isFormValid}
               className={`relative shrink-0 w-full ${isFormValid ? 'bg-black' : 'bg-[#99a1af]'} transition-colors cursor-pointer disabled:cursor-not-allowed`}
               data-name="Button"
-              onClick={onNext}
+              onClick={handleNext}
             >
               <div className="flex flex-col justify-center size-full">
                 <div className="box-border content-stretch flex flex-col gap-[10px] items-start justify-center pl-[24px] pr-px py-[20px] relative w-full">

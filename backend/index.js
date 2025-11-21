@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 
 // 1. 🟢 필수 수정: .env 파일 경로 명시
-require('dotenv').config({ path: './backend/.env' }); 
+require('dotenv').config(); 
 
 const app = express();
 app.use(cors());

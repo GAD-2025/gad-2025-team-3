@@ -3,7 +3,7 @@ import svgPaths from "../imports/svg-q1ym24wvoh";
 
 interface SignupStep4Props {
   username: string;
-  onNext: () => void;
+  onNext: (selectedArtists: string[]) => void;
   onBack: () => void;
 }
 
@@ -52,6 +52,12 @@ export default function SignupStep4({ username, onNext, onBack }: SignupStep4Pro
   };
 
   const isFormValid = selectedArtists.length > 0;
+
+  const handleNext = () => {
+    if (isFormValid) {
+      onNext(selectedArtists);
+    }
+  };
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -189,7 +195,7 @@ export default function SignupStep4({ username, onNext, onBack }: SignupStep4Pro
       <div className="fixed bottom-0 left-0 right-0 max-w-[393px] mx-auto px-[23.99px] pb-[23.99px] bg-white">
         <button 
           disabled={!isFormValid}
-          onClick={onNext}
+          onClick={handleNext}
           className={`relative w-full ${isFormValid ? 'bg-black' : 'bg-[#99a1af]'} transition-colors cursor-pointer disabled:cursor-not-allowed`}
           data-name="Button"
         >

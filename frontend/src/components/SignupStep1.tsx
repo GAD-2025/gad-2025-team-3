@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import svgPaths from "../imports/svg-pbzr8ku87j";
 
-interface AgreementState {
+export interface AgreementState {
   age14: boolean;
   terms: boolean;
   privacy: boolean;
@@ -9,7 +9,7 @@ interface AgreementState {
 }
 
 interface SignupStep1Props {
-  onNext: () => void;
+  onNext: (agreements: AgreementState) => void;
   onBack: () => void;
 }
 
@@ -41,6 +41,12 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
 
   const allRequiredChecked = agreements.age14 && agreements.terms && agreements.privacy;
   const allChecked = agreements.age14 && agreements.terms && agreements.privacy && agreements.marketing;
+
+  const handleNext = () => {
+    if (allRequiredChecked) {
+      onNext(agreements);
+    }
+  };
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="��자인 페이지 생성">
@@ -346,7 +352,7 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
             {/* Next Button */}
             <button 
               disabled={!allRequiredChecked}
-              onClick={onNext}
+              onClick={handleNext}
               className={`relative shrink-0 w-full ${allRequiredChecked ? 'bg-black' : 'bg-[#99a1af]'} transition-colors cursor-pointer disabled:cursor-not-allowed`}
               data-name="Button"
             >

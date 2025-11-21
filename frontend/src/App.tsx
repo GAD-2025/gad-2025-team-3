@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import SignupStep1 from './components/SignupStep1';
-import SignupStep2 from './components/SignupStep2';
+import SignupStep1, { AgreementState } from './components/SignupStep1';
+import SignupStep2, { SignupStep2Data } from './components/SignupStep2';
 import SignupStep3 from './components/SignupStep3';
 import SignupComplete from './components/SignupComplete';
 import SignupStep4 from './components/SignupStep4';
@@ -23,10 +23,27 @@ import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 export default function App() {
   const [currentView, setCurrentView] = useState<'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail'>('login');
   const [signupStep, setSignupStep] = useState(1);
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [profileType, setProfileType] = useState<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'>('profile_1_l');
   
+  const [signupData, setSignupData] = useState({
+    // Step 1
+    age14: false,
+    terms: false,
+    privacy: false,
+    marketing: false,
+    // Step 2
+    username: '',
+    password: '',
+    email: '',
+    // Step 3
+    nickname: '',
+    bio: '',
+    // Step 4
+    selectedArtists: [] as string[],
+  });
+  
+  // This state is for the final profile page, separate from signup data
+  const [profileType, setProfileType] = useState<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'>('profile_1_l');
+
   // Exhibition creation state
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [exhibitionTitle, setExhibitionTitle] = useState('');
@@ -47,6 +64,39 @@ export default function App() {
     likes: '567',
     shares: '89'
   });
+
+  const handleSignupSubmit = async (artists: string[]) => {
+    const finalSignupData = { ...signupData, selectedArtists: artists };
+    
+    // Note: The backend expects 'nickname' from our step 3 to be the 'nickname' field,
+    // and 'username' from our step 2 to be the 'username' field.
+    // The state variable names already match this, so no re-mapping is needed here.
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(finalSignupData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Signup failed');
+      }
+
+      const result = await response.json();
+      console.log('Signup successful:', result);
+      setSignupStep(5); // Move to complete page on success
+
+    } catch (error) {
+      console.error('An error occurred during signup:', error);
+      // Here you could set an error state to show a message to the user
+      alert('회원가입 중 오류가 발생했습니다.');
+    }
+  };
+
 
   if (currentView === 'login') {
     return (
@@ -74,8 +124,8 @@ export default function App() {
   if (currentView === 'profile') {
     return (
       <ProfilePage 
-        username={username}
-        bio={bio}
+        username={signupData.nickname} // Use nickname from signup
+        bio={signupData.bio}
         profileType={profileType}
         onBack={() => setCurrentView('main')}
         onNavigateToBadges={() => setCurrentView('badges')}
@@ -195,11 +245,11 @@ export default function App() {
   // Signup flow
   return (
     <>
-      {signupStep === 1 && <SignupStep1 onNext={() => setSignupStep(2)} />}
-      {signupStep === 2 && <SignupStep2 onNext={() => setSignupStep(3)} onBack={() => setSignupStep(1)} />}
-      {signupStep === 3 && <SignupStep3 onNext={(nickname, userBio) => { setUsername(nickname); setBio(userBio); setSignupStep(4); }} onBack={() => setSignupStep(2)} />}
-      {signupStep === 4 && <SignupStep4 username={username} onNext={() => setSignupStep(5)} onBack={() => setSignupStep(3)} />}
-      {signupStep === 5 && <SignupComplete username={username} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); setCurrentView('main'); }} />}
+      {signupStep === 1 && <SignupStep1 onNext={(data) => { setSignupData(prev => ({...prev, ...data})); setSignupStep(2); }} onBack={() => setCurrentView('login')} />}
+      {signupStep === 2 && <SignupStep2 onNext={(data) => { setSignupData(prev => ({...prev, ...data})); setSignupStep(3); }} onBack={() => setSignupStep(1)} />}
+      {signupStep === 3 && <SignupStep3 onNext={(nickname, userBio) => { setSignupData(prev => ({...prev, nickname, bio: userBio})); setSignupStep(4); }} onBack={() => setSignupStep(2)} />}
+      {signupStep === 4 && <SignupStep4 username={signupData.nickname} onNext={handleSignupSubmit} onBack={() => setSignupStep(3)} />}
+      {signupStep === 5 && <SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); setCurrentView('main'); }} />}
     </>
   );
 }
