@@ -38,10 +38,9 @@ interface User {
 
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail'>('login');
+  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail'>('loading');
   const [signupStep, setSignupStep] = useState(1);
   
-  // State for the currently logged-in user
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   
   // Effect to load user from localStorage on initial render
@@ -55,7 +54,10 @@ export default function App() {
       } catch (error) {
         console.error("Failed to parse user from localStorage", error);
         localStorage.removeItem('currentUser');
+        setCurrentView('login'); // Fallback to login if stored data is corrupt
       }
+    } else {
+      setCurrentView('login'); // Go to login if no user is stored
     }
   }, []); // The empty dependency array ensures this runs only once on mount
 
@@ -112,10 +114,6 @@ export default function App() {
   const handleSignupSubmit = async (artists: string[]) => {
     const finalSignupData = { ...signupData, selectedArtists: artists };
     
-    // Note: The backend expects 'nickname' from our step 3 to be the 'nickname' field,
-    // and 'username' from our step 2 to be the 'username' field.
-    // The state variable names already match this, so no re-mapping is needed here.
-    
     try {
       const response = await fetch('http://localhost:3001/api/signup', {
         method: 'POST',
@@ -136,7 +134,6 @@ export default function App() {
 
     } catch (error) {
       console.error('An error occurred during signup:', error);
-      // Here you could set an error state to show a message to the user
       alert('회원가입 중 오류가 발생했습니다.');
     }
   };
@@ -152,7 +149,10 @@ export default function App() {
     setCurrentView('login');
   };
 
-
+  if (currentView === 'loading') {
+    return <div>Loading...</div>;
+  }
+  
   if (currentView === 'login') {
     return (
       <Login 
