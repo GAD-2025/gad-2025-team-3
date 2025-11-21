@@ -21,7 +21,7 @@ let pool;
 
 // 🎯 메인 API 로직: DB 연결 풀(pool)을 사용하도록 수정
 app.post('/api/signup', async (req, res) => {
-    // ... (req.body 변수 선언 부분은 동일) ...
+    const { username, password, email, nickname, bio, age14, terms, privacy, marketing, selectedArtists } = req.body;
 
     if (!username || !password || !email || !nickname) {
         return res.status(400).json({ message: 'Please fill in all required fields.' });
