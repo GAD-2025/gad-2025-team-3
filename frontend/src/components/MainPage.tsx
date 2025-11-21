@@ -20,9 +20,6 @@ export default function MainPage({
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
-      <pre style={{ position: 'absolute', top: 80, left: 10, zIndex: 9999, backgroundColor: 'lightgray', padding: '10px', fontSize: '10px' }}>
-        {JSON.stringify(currentUser, null, 2)}
-      </pre>
       {/* Header */}
       <div className="h-[70.083px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />

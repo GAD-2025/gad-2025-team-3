@@ -69,9 +69,49 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
-// [DIAGNOSTIC] Temporarily changing to GET to test routing
-app.get('/api/login', async (req, res) => {
-    res.status(200).json({ message: "Login route is working" });
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT * FROM users WHERE username = ?',
+                [username]
+            );
+
+            if (rows.length === 0) {
+                connection.release();
+                return res.status(401).json({ message: 'Invalid credentials.' });
+            }
+
+            const user = rows[0];
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                connection.release();
+                return res.status(401).json({ message: 'Invalid credentials.' });
+            }
+
+            connection.release();
+
+            // Do not send the password hash to the client
+            const { password: _, ...userWithoutPassword } = user;
+            res.status(200).json(userWithoutPassword);
+
+        } catch (error) {
+            connection.release();
+            console.error('Login error:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    } catch (error) {
+        console.error('DB connection error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
 
 // ----------------------------------------------------------------------------------
