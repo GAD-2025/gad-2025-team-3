@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SignupStep1, { AgreementState } from './components/SignupStep1';
 import SignupStep2, { SignupStep2Data } from './components/SignupStep2';
 import SignupStep3 from './components/SignupStep3';
@@ -20,9 +20,53 @@ import ExploreSearchResultsPage from './components/ExploreSearchResultsPage';
 import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 
+// Define a type for the user object for better type safety
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  nickname: string;
+  bio: string;
+  exhibition_count: number;
+  follower_count: number;
+  following_count: number;
+  total_views: number;
+  total_likes: number;
+  total_shares: number;
+  // Add any other fields your user object has
+}
+
+
 export default function App() {
   const [currentView, setCurrentView] = useState<'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail'>('login');
   const [signupStep, setSignupStep] = useState(1);
+  
+  // State for the currently logged-in user
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  
+  // Effect to load user from localStorage on initial render
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setCurrentUser(user);
+        setCurrentView('main'); // Go to main page if logged in
+      } catch (error) {
+        console.error("Failed to parse user from localStorage", error);
+        localStorage.removeItem('currentUser');
+      }
+    }
+  }, []); // The empty dependency array ensures this runs only once on mount
+
+  // Effect to save/remove user from localStorage when currentUser state changes
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('currentUser');
+    }
+  }, [currentUser]);
   
   const [signupData, setSignupData] = useState({
     // Step 1
@@ -98,10 +142,21 @@ export default function App() {
   };
 
 
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user);
+    setCurrentView('main');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentView('login');
+  };
+
+
   if (currentView === 'login') {
     return (
       <Login 
-        onLogin={() => setCurrentView('main')}
+        onLogin={handleLoginSuccess}
         onSignup={() => {
           setCurrentView('signup');
           setSignupStep(1);
@@ -121,11 +176,10 @@ export default function App() {
     );
   }
 
-  if (currentView === 'profile') {
+  if (currentView === 'profile' && currentUser) {
     return (
       <ProfilePage 
-        username={signupData.nickname} // Use nickname from signup
-        bio={signupData.bio}
+        user={currentUser}
         profileType={profileType}
         onBack={() => setCurrentView('main')}
         onNavigateToBadges={() => setCurrentView('badges')}
@@ -143,7 +197,7 @@ export default function App() {
     return (
       <SettingsPage 
         onBack={() => setCurrentView('profile')}
-        onLogout={() => setCurrentView('login')}
+        onLogout={handleLogout}
       />
     );
   }
@@ -220,15 +274,6 @@ export default function App() {
           setSelectedExhibition(data);
           setCurrentView('exhibitiondetail');
         }}
-      />
-    );
-  }
-
-  if (currentView === 'exploremain') {
-    return (
-      <ExploreMainPage 
-        onBack={() => setCurrentView('main')} 
-        onSearch={() => setCurrentView('exploretrending')}
       />
     );
   }

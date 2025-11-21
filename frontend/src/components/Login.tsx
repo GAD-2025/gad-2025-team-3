@@ -2,7 +2,7 @@ import { useState } from 'react';
 import svgPaths from "../imports/svg-cnim5xb21f";
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (user: any) => void; // Allow passing user data on login
   onSignup: () => void;
   onFindId: () => void;
   onFindPassword: () => void;
@@ -33,9 +33,31 @@ export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: L
 
   const isFormValid = username && password;
 
-  const handleLogin = () => {
-    if (isFormValid) {
-      onLogin();
+  const handleLogin = async () => {
+    if (!isFormValid) return;
+
+    try {
+      const response = await fetch('http://localhost:3001/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful:', data.user);
+        alert('로그인에 성공했습니다!');
+        onLogin(data.user); // Pass user data to the parent component
+      } else {
+        // 백엔드에서 보낸 에러 메시지를 표시
+        alert(data.message || '로그인에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Login request failed:', error);
+      alert('로그인 요청 중 오류가 발생했습니다. 서버 상태를 확인해주세요.');
     }
   };
 

@@ -9,6 +9,12 @@ CREATE TABLE users (
     terms BOOLEAN NOT NULL,
     privacy BOOLEAN NOT NULL,
     marketing BOOLEAN,
+    exhibition_count INT NOT NULL DEFAULT 0,
+    follower_count INT NOT NULL DEFAULT 0,
+    following_count INT NOT NULL DEFAULT 0,
+    total_views INT NOT NULL DEFAULT 0,
+    total_likes INT NOT NULL DEFAULT 0,
+    total_shares INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

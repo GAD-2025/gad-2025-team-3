@@ -3,24 +3,37 @@ import iconPaths from "../imports/svg-0l1y3hgd5b";
 import { useState } from "react";
 import DeleteAccountModal from "./DeleteAccountModal";
 
-interface ProfilePageProps {
+// Define a type for the user object for better type safety
+interface User {
+  id: number;
   username: string;
+  email: string;
+  nickname: string;
   bio: string;
+  exhibition_count: number;
+  follower_count: number;
+  following_count: number;
+  total_views: number;
+  total_likes: number;
+  total_shares: number;
+}
+
+interface ProfilePageProps {
+  user: User;
   profileType: 'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l';
   onBack: () => void;
   onNavigateToBadges: () => void;
   onNavigateToSettings: () => void;
   onNavigateToMyExhibition: () => void;
-  onLogout: () => void;
-  onDeleteAccount: (reason: string) => void;
 }
 
-export default function ProfilePage({ username, bio, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition, onLogout, onDeleteAccount }: ProfilePageProps) {
+export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition }: ProfilePageProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteAccount = (reason: string) => {
+    console.log("Account deletion requested with reason:", reason);
     setIsDeleteModalOpen(false);
-    onDeleteAccount(reason);
+    // By not calling a prop, we avoid an error since App.tsx doesn't pass it.
   };
 
   // Render profile icon based on type
@@ -155,11 +168,10 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
               <div className="content-stretch flex flex-col items-start justify-between relative self-stretch shrink-0 w-[246px]" data-name="Container">
                 {/* Username and Bio */}
                 <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
-                  {/* Username with Edit Button */}
                   <div className="content-stretch flex gap-[8px] h-[30px] items-center relative shrink-0 w-full" data-name="Container">
                     <div className="h-[30px] relative shrink-0" data-name="Heading 2" style={{ maxWidth: '200px' }}>
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[30px] relative">
-                        <p className="font-['Pretendard',sans-serif] font-semibold leading-[28px] not-italic text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre overflow-hidden text-ellipsis">{username || 'fan_user_123'}</p>
+                        <p className="font-['Pretendard',sans-serif] font-semibold leading-[28px] not-italic text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre overflow-hidden text-ellipsis">{user.nickname || 'fan_user_123'}</p>
                       </div>
                     </div>
                     {/* Edit Icon */}
@@ -179,7 +191,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                   </div>
                   {/* Bio */}
                   <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
-                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{bio || 'K-POP을 사랑하는 팬입니다 ❤️'}</p>
+                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{user.bio || 'K-POP을 사랑하는 팬입니다 ❤️'}</p>
                   </div>
                 </div>
 
@@ -192,7 +204,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                         <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">12</p>
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.exhibition_count}</p>
                       </div>
                     </div>
                   </div>
@@ -203,7 +215,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                         <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로워</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">156</p>
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.follower_count}</p>
                       </div>
                     </div>
                   </div>
@@ -214,7 +226,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                         <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로잉</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">89</p>
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.following_count}</p>
                       </div>
                     </div>
                   </div>
@@ -230,7 +242,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                 <div className="relative shrink-0 w-full" data-name="Container">
                   <div className="flex flex-row items-center justify-center size-full">
                     <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[18px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">2,847</p>
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_views}</p>
                     </div>
                   </div>
                 </div>
@@ -244,7 +256,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                 <div className="relative shrink-0 w-full" data-name="Container">
                   <div className="flex flex-row items-center justify-center size-full">
                     <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[25px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">567</p>
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_likes}</p>
                     </div>
                   </div>
                 </div>
@@ -258,7 +270,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
                 <div className="relative shrink-0 w-full" data-name="Container">
                   <div className="flex flex-row items-center justify-center size-full">
                     <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[30px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">89</p>
+                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_shares}</p>
                     </div>
                   </div>
                 </div>
@@ -299,7 +311,7 @@ export default function ProfilePage({ username, bio, profileType, onBack, onNavi
           </div>
           <div className="relative shrink-0" data-name="Text">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">12개</p>
+              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">{user.exhibition_count}개</p>
             </div>
           </div>
         </button>

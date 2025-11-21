@@ -1,3 +1,4 @@
+console.log("--- SERVER CODE UPDATED ---");
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
@@ -30,7 +31,6 @@ app.post('/api/signup', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // 🟢 pool을 전역 변수로 사용하여 연결 가져오기
         const connection = await pool.getConnection(); 
         await connection.beginTransaction();
 
@@ -44,7 +44,6 @@ app.post('/api/signup', async (req, res) => {
 
             if (selectedArtists && selectedArtists.length > 0) {
                 const artistValues = selectedArtists.map(artistId => [userId, artistId]);
-                // 여기서 artistId가 배열이 아님을 가정하고 수정
                 await connection.query(
                     'INSERT INTO user_artists (user_id, artist_id) VALUES ?',
                     [artistValues]
@@ -68,6 +67,11 @@ app.post('/api/signup', async (req, res) => {
         console.error('Server error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
+});
+
+// [DIAGNOSTIC] Temporarily changing to GET to test routing
+app.get('/api/login', async (req, res) => {
+    res.status(200).json({ message: "Login route is working" });
 });
 
 // ----------------------------------------------------------------------------------
