@@ -1,52 +1,34 @@
-import { useState } from 'react';
+import React from 'react';
 import svgPaths from "../imports/svg-qgj2slx6tc";
+import { SignupData } from '../App';
 
 interface SignupStep3Props {
-  onNext: (nickname: string, bio: string) => void;
+  onNext: () => void;
   onBack: () => void;
+  formData: SignupData;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleNicknameCheck: () => void;
+  isNicknameChecked: boolean;
+  nicknameValid: boolean;
+  nicknameError: string;
 }
 
-export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
-  const [nickname, setNickname] = useState('');
-  const [bio, setBio] = useState('');
-  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
-  const [nicknameValid, setNicknameValid] = useState(false);
-  const [nicknameError, setNicknameError] = useState('');
+export default function SignupStep3({
+  onNext,
+  onBack,
+  formData,
+  handleInputChange,
+  handleNicknameCheck,
+  isNicknameChecked,
+  nicknameValid,
+  nicknameError
+}: SignupStep3Props) {
 
-  // 닉네임 유효성 검사 함수
-  const isValidNickname = (name: string) => {
-    // 2-12자 길이 체크
-    if (name.length < 2 || name.length > 12) {
-      return { valid: false, message: '닉네임은 2-12자로 입력해주세요.' };
-    }
-    // 한글/영문/숫자만 허용
-    const regex = /^[가-힣a-zA-Z0-9]+$/;
-    if (!regex.test(name)) {
-      return { valid: false, message: '한글, 영문, 숫자만 사용 가능합니다.' };
-    }
-    return { valid: true, message: '' };
-  };
-
-  const handleNicknameCheck = () => {
-    const validation = isValidNickname(nickname);
-    if (!validation.valid) {
-      setNicknameError(validation.message);
-      setIsNicknameChecked(false);
-      setNicknameValid(false);
-      return;
-    }
-    
-    // 유효성 검사 통과 시 중복 확인
-    setNicknameError('');
-    setIsNicknameChecked(true);
-    setNicknameValid(true);
-  };
-
-  const isFormValid = nickname && isNicknameChecked && nicknameValid;
+  const isFormValid = formData.nickname && isNicknameChecked && nicknameValid;
 
   const handleNext = () => {
     if (isFormValid) {
-      onNext(nickname, bio);
+      onNext();
     }
   };
 
@@ -167,13 +149,9 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                         <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                           <input
                             type="text"
-                            value={nickname}
-                            onChange={(e) => {
-                              setNickname(e.target.value);
-                              setIsNicknameChecked(false);
-                              setNicknameValid(false);
-                              setNicknameError('');
-                            }}
+                            name="nickname"
+                            value={formData.nickname}
+                            onChange={handleInputChange}
                             placeholder="닉네임을 입력하세요"
                             className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                           />
@@ -182,16 +160,16 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                       </div>
                       <button
                         onClick={handleNicknameCheck}
-                        disabled={!nickname}
-                        className={`h-[47.184px] relative shrink-0 w-[85.765px] cursor-pointer ${nickname ? 'bg-black' : 'bg-gray-200'}`}
+                        disabled={!formData.nickname}
+                        className={`h-[47.184px] relative shrink-0 w-[85.765px] cursor-pointer ${formData.nickname ? 'bg-black' : 'bg-gray-200'}`}
                         data-name="Button"
                       >
-                        {nickname && (
+                        {formData.nickname && (
                           <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
                         )}
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[47.184px] items-center justify-center relative w-[85.765px]">
                           <div className="content-stretch flex items-center justify-center relative shrink-0" data-name="Text">
-                            <p className={`font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre ${nickname ? 'text-white' : 'text-[#99a1af]'}`}>중복확인</p>
+                            <p className={`font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre ${formData.nickname ? 'text-white' : 'text-[#99a1af]'}`}>중복확인</p>
                           </div>
                         </div>
                       </button>
@@ -221,12 +199,9 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                 <div className="h-[110.119px] relative shrink-0 w-full" data-name="Text Area">
                   <div className="overflow-clip rounded-[inherit] size-full">
                     <textarea
-                      value={bio}
-                      onChange={(e) => {
-                        if (e.target.value.length <= 100) {
-                          setBio(e.target.value);
-                        }
-                      }}
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleInputChange}
                       placeholder="자신을 소개해주세요 (선택)"
                       className="bg-transparent border-0 box-border content-stretch flex h-[110.119px] items-start px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic resize-none text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                     />
@@ -234,7 +209,7 @@ export default function SignupStep3({ onNext, onBack }: SignupStep3Props) {
                   <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
                 </div>
                 <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">
-                  <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] text-right tracking-[-0.24px]">{bio.length} / 100</p>
+                  <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] text-right tracking-[-0.24px]">{formData.bio.length} / 100</p>
                 </div>
               </div>
             </div>

@@ -61,7 +61,7 @@ app.post('/api/signup', async (req, res) => {
             if (error.code === 'ER_DUP_ENTRY') {
                 return res.status(409).json({ message: 'Username, email, or nickname already exists.' });
             }
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ message: 'Internal server error: ' + error.message });
         }
     } catch (error) {
         console.error('Server error:', error);
@@ -117,7 +117,7 @@ app.post('/api/login', async (req, res) => {
 // ----------------------------------------------------------------------------------
 
 // 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     try {

@@ -1,55 +1,30 @@
 import { useState } from 'react';
 import svgPaths from "../imports/svg-pbzr8ku87j";
-
-export interface AgreementState {
-  age14: boolean;
-  terms: boolean;
-  privacy: boolean;
-  marketing: boolean;
-}
+import { SignupData } from '../App'; // Import SignupData from App.tsx
 
 interface SignupStep1Props {
-  onNext: (agreements: AgreementState) => void;
+  onNext: () => void;
   onBack: () => void;
+  formData: SignupData; // Receive formData from App.tsx
+  handleCheckboxChange: (name: keyof SignupData) => void;
+  handleAllAgree: () => void;
 }
 
-export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
-  const [agreements, setAgreements] = useState<AgreementState>({
-    age14: false,
-    terms: false,
-    privacy: false,
-    marketing: false
-  });
+export default function SignupStep1({ onNext, onBack, formData, handleCheckboxChange, handleAllAgree }: SignupStep1Props) {
   const [modalOpen, setModalOpen] = useState<string | null>(null);
 
-  const handleAllAgree = () => {
-    const allChecked = agreements.age14 && agreements.terms && agreements.privacy && agreements.marketing;
-    setAgreements({
-      age14: !allChecked,
-      terms: !allChecked,
-      privacy: !allChecked,
-      marketing: !allChecked
-    });
-  };
-
-  const handleSingleAgree = (key: keyof AgreementState) => {
-    setAgreements(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  const allRequiredChecked = agreements.age14 && agreements.terms && agreements.privacy;
-  const allChecked = agreements.age14 && agreements.terms && agreements.privacy && agreements.marketing;
+  // Directly use formData from props
+  const allRequiredChecked = formData.age14 && formData.terms && formData.privacy;
+  const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
 
   const handleNext = () => {
     if (allRequiredChecked) {
-      onNext(agreements);
+      onNext();
     }
   };
 
   return (
-    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="��자인 페이지 생성">
+    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="자인 페이지 생성">
       {/* Header */}
       <div className="box-border content-stretch flex flex-col h-[70.083px] items-start pb-[1.108px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
@@ -181,7 +156,7 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                       )}
                     </div>
                     <div className="h-[20.996px] relative shrink-0 w-[57.483px]" data-name="Text">
-                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex h-[20.996px] items-start relative w-[57.483px]">
+                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex h-[20px] items-start relative w-[57.483px]">
                         <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">전체 동의</p>
                       </div>
                     </div>
@@ -194,11 +169,11 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                 {/* Age 14+ */}
                 <div className="content-stretch flex gap-[11.995px] h-[43.982px] items-center relative shrink-0 w-full" data-name="Button">
                   <button
-                    onClick={() => handleSingleAgree('age14')}
+                    onClick={() => handleCheckboxChange('age14')}
                     className="relative shrink-0 size-[19.992px] cursor-pointer"
                     data-name="Container"
                   >
-                    {agreements.age14 ? (
+                    {formData.age14 ? (
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                         <g id="Container">
                           <rect fill="#F360C0" height="19.9917" width="19.9917" />
@@ -233,11 +208,11 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                 {/* Terms of Service */}
                 <div className="content-stretch flex gap-[11.995px] h-[43.982px] items-center relative shrink-0 w-full" data-name="Button">
                   <button
-                    onClick={() => handleSingleAgree('terms')}
+                    onClick={() => handleCheckboxChange('terms')}
                     className="relative shrink-0 size-[19.992px] cursor-pointer"
                     data-name="Container"
                   >
-                    {agreements.terms ? (
+                    {formData.terms ? (
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                         <g id="Container">
                           <rect fill="#F360C0" height="19.9917" width="19.9917" />
@@ -272,11 +247,11 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                 {/* Privacy Policy */}
                 <div className="content-stretch flex gap-[11.995px] h-[43.982px] items-center relative shrink-0 w-full" data-name="Button">
                   <button
-                    onClick={() => handleSingleAgree('privacy')}
+                    onClick={() => handleCheckboxChange('privacy')}
                     className="relative shrink-0 size-[19.992px] cursor-pointer"
                     data-name="Container"
                   >
-                    {agreements.privacy ? (
+                    {formData.privacy ? (
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                         <g id="Container">
                           <rect fill="#F360C0" height="19.9917" width="19.9917" />
@@ -311,11 +286,11 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                 {/* Marketing */}
                 <div className="content-stretch flex gap-[11.995px] h-[43.982px] items-center relative shrink-0 w-full" data-name="Button">
                   <button
-                    onClick={() => handleSingleAgree('marketing')}
+                    onClick={() => handleCheckboxChange('marketing')}
                     className="relative shrink-0 size-[19.992px] cursor-pointer"
                     data-name="Container"
                   >
-                    {agreements.marketing ? (
+                    {formData.marketing ? (
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                         <g id="Container">
                           <rect fill="#F360C0" height="19.9917" width="19.9917" />
@@ -410,7 +385,7 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                         <div className="absolute inset-1/4" data-name="Vector">
                           <div className="absolute inset-[-8.33%]">
                             <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                              <path d="M0.832986 0.832986L10.8288 10.8288" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
+                              <path d="M0.832986 0.832986L10.8288 10.8288" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66597" />
                             </svg>
                           </div>
                         </div>
@@ -424,10 +399,10 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
             {/* Modal Content */}
             <div className="box-border content-stretch flex flex-col font-['Pretendard',sans-serif] gap-[6px] items-center not-italic px-0 py-[14px] relative shrink-0 max-h-[60vh] overflow-y-auto">
               <p className="h-[24px] leading-[24px] relative shrink-0 text-[16px] text-black tracking-[-0.32px] w-[305px]">
-                {modalOpen === 'age14' && '[필수] 만 14세 이상입니다'}
-                {modalOpen === 'terms' && '[필수] 서비스 이용약관 동의'}
-                {modalOpen === 'privacy' && '[필수] 개인정보 처리방침 동의'}
-                {modalOpen === 'marketing' && '[선택] 마케팅 정보 수신 동의'}
+                {modalOpen === 'age14' && '이용 약관'}
+                {modalOpen === 'terms' && '서비스 이용약관'}
+                {modalOpen === 'privacy' && '개인정보 처리방침'}
+                {modalOpen === 'marketing' && '마케팅 정보 수신'}
               </p>
               <div className="leading-[18px] relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[305px]">
                 {modalOpen === 'age14' && (
@@ -535,7 +510,7 @@ export default function SignupStep1({ onNext, onBack }: SignupStep1Props) {
                 )}
                 {modalOpen === 'marketing' && (
                   <>
-                    <p className="leading-[18px] mb-0">GAD_3은 SHOWCASE의 신규 서비스, 이벤트, 할인 혜택 등 유용한 정보를 제공하기 위해 아래와 같이 마케팅 정보를 수신하는 데 동의를 받고자 합니다.</p>
+                    <p className="leading-[18px] mb-0">GAD_3은 SHOWCASE 서비스의 신규 서비스, 이벤트, 할인 혜택 등 유용한 정보를 제공하기 위해 아래와 같이 마케팅 정보를 수신하는 데 동의를 받고자 합니다.</p>
                     <ol className="list-decimal mb-0" start="1">
                       <li className="mb-0 ms-[18px]">
                         <span className="leading-[18px]">수집·이용 목적: 신규 서비스, 이벤트, 프로모션, 할인 혜택 등 광고성 정보 제공 및 맞춤형 광고 제공</span>

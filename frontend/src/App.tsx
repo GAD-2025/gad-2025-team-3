@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import SignupStep1, { AgreementState } from './components/SignupStep1';
-import SignupStep2, { SignupStep2Data } from './components/SignupStep2';
+import SignupStep1 from './components/SignupStep1';
+import SignupStep2 from './components/SignupStep2';
 import SignupStep3 from './components/SignupStep3';
 import SignupComplete from './components/SignupComplete';
 import SignupStep4 from './components/SignupStep4';
@@ -19,6 +19,7 @@ import ExploreTrendingPage from './components/ExploreTrendingPage';
 import ExploreSearchResultsPage from './components/ExploreSearchResultsPage';
 import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
+// Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
 interface User {
@@ -34,6 +35,20 @@ interface User {
   total_likes: number;
   total_shares: number;
   // Add any other fields your user object has
+}
+
+// Re-defining SignupData directly in App.tsx as context is being removed for this flow
+interface SignupData {
+  age14: boolean;
+  terms: boolean;
+  privacy: boolean;
+  marketing: boolean;
+  username: string;
+  password: string;
+  email: string;
+  nickname: string;
+  bio: string;
+  selectedArtists: string[];
 }
 
 
@@ -70,7 +85,7 @@ export default function App() {
     }
   }, [currentUser]);
   
-  const [signupData, setSignupData] = useState({
+  const [signupData, setSignupData] = useState<SignupData>({
     // Step 1
     age14: false,
     terms: false,
@@ -86,36 +101,138 @@ export default function App() {
     // Step 4
     selectedArtists: [] as string[],
   });
-  
-  // This state is for the final profile page, separate from signup data
-  const [profileType, setProfileType] = useState<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'>('profile_1_l');
 
-  // Exhibition creation state
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
-  const [exhibitionTitle, setExhibitionTitle] = useState('');
-  
-  // Selected exhibition data
-  const [selectedExhibition, setSelectedExhibition] = useState<{
-    title: string;
-    author: string;
-    room: string;
-    views: string;
-    likes: string;
-    shares: string;
-  }>({
-    title: 'NCT 127 팬아트 갤러리',
-    author: 'nctzen_art',
-    room: '204',
-    views: '4,327',
-    likes: '567',
-    shares: '89'
-  });
+  // State for SignupStep2 (username validation and password confirmation)
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isUsernameChecked, setIsUsernameChecked] = useState(false);
+  const [usernameValid, setUsernameValid] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
 
-  const handleSignupSubmit = async (artists: string[]) => {
-    const finalSignupData = { ...signupData, selectedArtists: artists };
+  // State for SignupStep3 (nickname validation)
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+  const [nicknameValid, setNicknameValid] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
+
+  // General input change handler for text/email/password inputs
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (name === 'passwordConfirm') {
+      setPasswordConfirm(value);
+    } else {
+      setSignupData(prev => ({ ...prev, [name]: value }));
+      // Reset validation flags if the relevant field changes
+      if (name === 'username') {
+        setIsUsernameChecked(false);
+        setUsernameValid(false);
+        setUsernameError('');
+      } else if (name === 'nickname') {
+        setIsNicknameChecked(false);
+        setNicknameValid(false);
+        setNicknameError('');
+      }
+    }
+  };
+
+  // Checkbox change handler for Step1
+  const handleCheckboxChange = (name: keyof SignupData) => {
+    setSignupData(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  // Handle "All Agree" button in Step1
+  const handleAllAgree = () => {
+    const allChecked = signupData.age14 && signupData.terms && signupData.privacy && signupData.marketing;
+    setSignupData(prev => ({
+      ...prev,
+      age14: !allChecked,
+      terms: !allChecked,
+      privacy: !allChecked,
+      marketing: !allChecked
+    }));
+  };
+
+  // Username validation logic (moved from SignupStep2)
+  const isValidUsername = (username: string) => {
+    if (username.length < 2 || username.length > 12) {
+      return { valid: false, message: '아이디는 2-12자로 입력해주세요.' };
+    }
+    const regex = /^[a-zA-Z_.]+$/;
+    if (!regex.test(username)) {
+      return { valid: false, message: '영문과 특수문자 _ . 만 사용 가능합니다.' };
+    }
+    return { valid: true, message: '' };
+  };
+
+  const handleUsernameCheck = () => {
+    const validation = isValidUsername(signupData.username);
+    if (!validation.valid) {
+      setUsernameError(validation.message);
+      setIsUsernameChecked(false);
+      setUsernameValid(false);
+      return;
+    }
+    setUsernameError('');
+    setIsUsernameChecked(true);
+    setUsernameValid(true);
+  };
+
+  // Nickname validation logic (moved from SignupStep3)
+  const isValidNickname = (name: string) => {
+    if (name.length < 2 || name.length > 12) {
+      return { valid: false, message: '닉네임은 2-12자로 입력해주세요.' };
+    }
+    const regex = /^[가-힣a-zA-Z0-9]+$/;
+    if (!regex.test(name)) {
+      return { valid: false, message: '한글, 영문, 숫자만 사용 가능합니다.' };
+    }
+    return { valid: true, message: '' };
+  };
+
+  const handleNicknameCheck = () => {
+    const validation = isValidNickname(signupData.nickname);
+    if (!validation.valid) {
+      setNicknameError(validation.message);
+      setIsNicknameChecked(false);
+      setNicknameValid(false);
+      return;
+    }
+    setNicknameError('');
+    setIsNicknameChecked(true);
+    setNicknameValid(true);
+  };
+
+  // Artist selection logic (moved from SignupStep4)
+  const handleArtistToggle = (artistId: string) => {
+    setSignupData(prev => {
+      const currentSelectedArtists = prev.selectedArtists || [];
+      if (currentSelectedArtists.includes(artistId)) {
+        return { ...prev, selectedArtists: currentSelectedArtists.filter(id => id !== artistId) };
+      } else {
+        if (currentSelectedArtists.length < 5) {
+          return { ...prev, selectedArtists: [...currentSelectedArtists, artistId] };
+        }
+      }
+      return prev;
+    });
+  };
+
+  const handleSignupSubmit = async () => { // No longer takes artists as prop directly
+    // The latest signupData is already in state
+    const finalSignupData = { ...signupData, passwordConfirm }; // Include passwordConfirm if needed for backend validation, though it usually isn't sent
+    console.log('Submitting signup data:', JSON.stringify(finalSignupData, null, 2));
+
+    // Explicitly check for required fields on the frontend
+    if (!finalSignupData.username || !finalSignupData.password || !finalSignupData.email || !finalSignupData.nickname) {
+      alert(`Error: One or more required fields are missing. Please check your input.
+        Username: ${finalSignupData.username}
+        Password: ${finalSignupData.password ? '******' : '(empty)'}
+        Email: ${finalSignupData.email}
+        Nickname: ${finalSignupData.nickname}
+      `);
+      return;
+    }
     
     try {
-      const response = await fetch('http://localhost:3001/api/signup', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,9 +249,9 @@ export default function App() {
       console.log('Signup successful:', result);
       setSignupStep(5); // Move to complete page on success
 
-    } catch (error) {
+    } catch (error: any) { // Use 'any' for error type for now
       console.error('An error occurred during signup:', error);
-      alert('회원가입 중 오류가 발생했습니다.');
+      alert(error.message);
     }
   };
 
@@ -287,14 +404,64 @@ export default function App() {
     );
   }
 
-  // Signup flow
+  if (currentView === 'signup') {
+    return (
+      <> {/* Removed SignupProvider */}
+        {signupStep === 1 && (
+          <SignupStep1 
+            onNext={() => setSignupStep(2)} 
+            onBack={() => setCurrentView('login')}
+            formData={signupData} // Pass signupData
+            handleCheckboxChange={handleCheckboxChange} // Pass handler
+            handleAllAgree={handleAllAgree} // Pass handler
+          />
+        )}
+        {signupStep === 2 && (
+          <SignupStep2 
+            onNext={() => setSignupStep(3)} 
+            onBack={() => setSignupStep(1)}
+            formData={signupData} // Pass signupData
+            handleInputChange={handleInputChange} // Pass handler
+            passwordConfirm={passwordConfirm} // Pass passwordConfirm
+            handleUsernameCheck={handleUsernameCheck} // Pass handler
+            isUsernameChecked={isUsernameChecked} // Pass state
+            usernameValid={usernameValid} // Pass state
+            usernameError={usernameError} // Pass state
+          />
+        )}
+        {signupStep === 3 && (
+          <SignupStep3 
+            onNext={() => setSignupStep(4)} 
+            onBack={() => setSignupStep(2)}
+            formData={signupData} // Pass signupData
+            handleInputChange={handleInputChange} // Pass handler
+            handleNicknameCheck={handleNicknameCheck} // Pass handler
+            isNicknameChecked={isNicknameChecked} // Pass state
+            nicknameValid={nicknameValid} // Pass state
+            nicknameError={nicknameError} // Pass state
+          />
+        )}
+        {signupStep === 4 && (
+          <SignupStep4 
+            username={signupData.nickname} 
+            onNext={() => handleSignupSubmit()} // No longer takes artists as prop directly
+            onBack={() => setSignupStep(3)}
+            formData={signupData} // Pass signupData
+            handleArtistToggle={handleArtistToggle} // Pass handler
+          />
+        )}
+        {signupStep === 5 && <SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); setCurrentView('main'); }} />}
+      </>
+    );
+  }
+  
   return (
-    <>
-      {signupStep === 1 && <SignupStep1 onNext={(data) => { setSignupData(prev => ({...prev, ...data})); setSignupStep(2); }} onBack={() => setCurrentView('login')} />}
-      {signupStep === 2 && <SignupStep2 onNext={(data) => { setSignupData(prev => ({...prev, ...data})); setSignupStep(3); }} onBack={() => setSignupStep(1)} />}
-      {signupStep === 3 && <SignupStep3 onNext={(nickname, userBio) => { setSignupData(prev => ({...prev, nickname, bio: userBio})); setSignupStep(4); }} onBack={() => setSignupStep(2)} />}
-      {signupStep === 4 && <SignupStep4 username={signupData.nickname} onNext={handleSignupSubmit} onBack={() => setSignupStep(3)} />}
-      {signupStep === 5 && <SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); setCurrentView('main'); }} />}
-    </>
+    <Login 
+      onLogin={handleLoginSuccess}
+      onSignup={() => {
+        setCurrentView('signup');
+        setSignupStep(1);
+      }}
+    />
   );
 }

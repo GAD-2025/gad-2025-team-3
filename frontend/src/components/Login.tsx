@@ -37,7 +37,7 @@ export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: L
     if (!isFormValid) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: L
               </div>
               <div className="content-stretch flex items-start relative shrink-0 w-full" data-name="Paragraph">
                 <div className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">
-                  <p className="mb-0">로그인 / 회원가입을 통해</p>
+                  <p className="mb-0">로그인 또는 회원가입을 통해</p>
                   <p>나만의 쇼케이스를 열어 보세요.</p>
                 </div>
               </div>

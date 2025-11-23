@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import React from 'react';
 import svgPaths from "../imports/svg-q1ym24wvoh";
+import { SignupData } from '../App';
 
 interface SignupStep4Props {
   username: string;
-  onNext: (selectedArtists: string[]) => void;
+  onNext: () => void;
   onBack: () => void;
+  formData: SignupData;
+  handleArtistToggle: (artistId: string) => void;
 }
 
 const ARTISTS = [
@@ -38,24 +41,13 @@ const ARTISTS = [
   { id: 'artist9', name: '(아티스트)들' },
 ];
 
-export default function SignupStep4({ username, onNext, onBack }: SignupStep4Props) {
-  const [selectedArtists, setSelectedArtists] = useState<string[]>([]);
+export default function SignupStep4({ username, onNext, onBack, formData, handleArtistToggle }: SignupStep4Props) {
 
-  const toggleArtist = (artistId: string) => {
-    if (selectedArtists.includes(artistId)) {
-      setSelectedArtists(selectedArtists.filter(id => id !== artistId));
-    } else {
-      if (selectedArtists.length < 5) {
-        setSelectedArtists([...selectedArtists, artistId]);
-      }
-    }
-  };
-
-  const isFormValid = selectedArtists.length > 0;
+  const isFormValid = formData.selectedArtists.length > 0;
 
   const handleNext = () => {
     if (isFormValid) {
-      onNext(selectedArtists);
+      onNext();
     }
   };
 
@@ -165,11 +157,11 @@ export default function SignupStep4({ username, onNext, onBack }: SignupStep4Pro
             {/* Artist Grid */}
             <div className="grid grid-cols-2 gap-[12px] w-full" data-name="Artist Grid">
               {ARTISTS.map((artist) => {
-                const isSelected = selectedArtists.includes(artist.id);
+                const isSelected = formData.selectedArtists.includes(artist.id);
                 return (
                   <button
                     key={artist.id}
-                    onClick={() => toggleArtist(artist.id)}
+                    onClick={() => handleArtistToggle(artist.id)}
                     className={`h-[47.184px] relative shrink-0 cursor-pointer transition-colors ${
                       isSelected ? 'bg-[#F360C0]' : 'bg-white'
                     }`}

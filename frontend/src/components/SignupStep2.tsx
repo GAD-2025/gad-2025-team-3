@@ -1,78 +1,43 @@
-import { useState } from 'react';
+import React from 'react';
 import svgPaths from "../imports/svg-tsuwfqrjtp";
-
-export interface SignupStep2Data {
-  username: string;
-  password: string;
-  email: string;
-}
+import { SignupData } from '../App';
 
 interface SignupStep2Props {
-  onNext: (data: SignupStep2Data) => void;
+  onNext: () => void;
   onBack: () => void;
+  formData: SignupData;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  passwordConfirm: string;
+  handleUsernameCheck: () => void;
+  isUsernameChecked: boolean;
+  usernameValid: boolean;
+  usernameError: string;
 }
 
-export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    passwordConfirm: '',
-    email: ''
-  });
-  const [isUsernameChecked, setIsUsernameChecked] = useState(false);
-  const [usernameValid, setUsernameValid] = useState(false);
-  const [usernameError, setUsernameError] = useState('');
+export default function SignupStep2({
+  onNext,
+  onBack,
+  formData,
+  handleInputChange,
+  passwordConfirm,
+  handleUsernameCheck,
+  isUsernameChecked,
+  usernameValid,
+  usernameError
+}: SignupStep2Props) {
 
-  // 아이디 유효성 검사 함수
-  const isValidUsername = (username: string) => {
-    // 2-12자 길이 체크
-    if (username.length < 2 || username.length > 12) {
-      return { valid: false, message: '아이디는 2-12자로 입력해주세요.' };
-    }
-    // 영문, 특수문자 _ 와 . 만 허용
-    const regex = /^[a-zA-Z_.]+$/;
-    if (!regex.test(username)) {
-      return { valid: false, message: '영문과 특수문자 _ . 만 사용 가능합니다.' };
-    }
-
-    // TODO: 중복된 아이디 체크 필요 
-    
-    // 1) 서버에 중복된 아이디가 있는지 검사 요청
-    // 2) 있으면 return { valid: false, message: '이미 사용 중인 아이디입니다.' };
-    
-    return { valid: true, message: '' };
-  };
-
-  const handleUsernameCheck = () => {
-    const validation = isValidUsername(formData.username);
-    if (!validation.valid) {
-      setUsernameError(validation.message);
-      setIsUsernameChecked(false);
-      setUsernameValid(false);
-      return;
-    }
-    
-    // 유효성 검사 통과 시 중복 확인
-    setUsernameError('');
-    setIsUsernameChecked(true);
-    setUsernameValid(true);
-  };
-
-  // 이메일 유효성 검사 함수
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // 비밀번호 일치 여부
-  const isPasswordMatch = formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm;
+  const isPasswordMatch = formData.password && passwordConfirm && formData.password === passwordConfirm;
 
-  const isFormValid = formData.username && formData.password && formData.passwordConfirm && formData.email && isUsernameChecked && isValidEmail(formData.email) && isPasswordMatch;
+  const isFormValid = formData.username && formData.password && passwordConfirm && formData.email && isUsernameChecked && usernameValid && isValidEmail(formData.email) && isPasswordMatch;
 
   const handleNext = () => {
     if (isFormValid) {
-      const { username, password, email } = formData;
-      onNext({ username, password, email });
+      onNext();
     }
   };
 
@@ -191,13 +156,9 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                     <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                       <input
                         type="text"
+                        name="username"
                         value={formData.username}
-                        onChange={(e) => {
-                          setFormData({ ...formData, username: e.target.value });
-                          setIsUsernameChecked(false);
-                          setUsernameValid(false);
-                          setUsernameError('');
-                        }}
+                        onChange={handleInputChange}
                         placeholder="아이디를 입력하세요"
                         className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                       />
@@ -241,8 +202,9 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                     <input
                       type="password"
+                      name="password"
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={handleInputChange}
                       placeholder="비밀번호를 입력하세요"
                       className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                     />
@@ -260,15 +222,16 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                     <input
                       type="password"
-                      value={formData.passwordConfirm}
-                      onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
+                      name="passwordConfirm"
+                      value={passwordConfirm}
+                      onChange={handleInputChange}
                       placeholder="비밀번호를 다시 입력하세요"
                       className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                     />
                   </div>
                   <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
                 </div>
-                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                {passwordConfirm && formData.password !== passwordConfirm && (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
                     <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#eb210f] text-[12px] tracking-[-0.24px]">비밀번호가 일치하지 않습니다.</p>
                   </div>
@@ -284,8 +247,9 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                     <input
                       type="email"
+                      name="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={handleInputChange}
                       placeholder="example@email.com"
                       className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                     />
