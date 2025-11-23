@@ -34,6 +34,12 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
     if (!regex.test(username)) {
       return { valid: false, message: '영문과 특수문자 _ . 만 사용 가능합니다.' };
     }
+
+    // TODO: 중복된 아이디 체크 필요 
+    
+    // 1) 서버에 중복된 아이디가 있는지 검사 요청
+    // 2) 있으면 return { valid: false, message: '이미 사용 중인 아이디입니다.' };
+    
     return { valid: true, message: '' };
   };
 
@@ -217,7 +223,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                   </div>
                 ) : usernameError ? (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">{usernameError}</p>
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#eb210f] text-[12px] tracking-[-0.24px]">{usernameError}</p>
                   </div>
                 ) : (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">
@@ -264,7 +270,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                 </div>
                 {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">비밀번호가 일치하지 않습니다.</p>
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#eb210f] text-[12px] tracking-[-0.24px]">비밀번호가 일치하지 않습니다.</p>
                   </div>
                 )}
               </div>
@@ -288,7 +294,7 @@ export default function SignupStep2({ onNext, onBack }: SignupStep2Props) {
                 </div>
                 {formData.email && !isValidEmail(formData.email) && (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">올바른 이메일 형식을 입력해주세요. (예: example@email.com)</p>
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#eb210f] text-[12px] tracking-[-0.24px]">올바른 이메일 형식을 입력해주세요. (예: example@email.com)</p>
                   </div>
                 )}
               </div>
