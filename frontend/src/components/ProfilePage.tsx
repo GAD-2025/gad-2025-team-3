@@ -25,9 +25,10 @@ interface ProfilePageProps {
   onNavigateToBadges: () => void;
   onNavigateToSettings: () => void;
   onNavigateToMyExhibition: () => void;
+  onLogout: () => void;
 }
 
-export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition }: ProfilePageProps) {
+export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToSettings, onNavigateToMyExhibition, onLogout }: ProfilePageProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteAccount = (reason: string) => {

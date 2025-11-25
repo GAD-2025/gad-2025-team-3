@@ -48,9 +48,9 @@ export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: L
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful:', data.user);
+        console.log('Login successful:', data);
         alert('로그인에 성공했습니다!');
-        onLogin(data.user); // Pass user data to the parent component
+        onLogin(data); // Pass user data to the parent component
       } else {
         // 백엔드에서 보낸 에러 메시지를 표시
         alert(data.message || '로그인에 실패했습니다.');

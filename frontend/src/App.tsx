@@ -333,14 +333,18 @@ export default function App() {
   }
 
   if (currentView === 'profile' && currentUser) {
+    // If profileType is not set (e.g., after a refresh), try to get it from localStorage or default
+    const finalProfileType = profileType || localStorage.getItem('profileType') || 'profile_1_l';
+
     return (
       <ProfilePage 
         user={currentUser}
-        profileType={profileType}
+        profileType={finalProfileType as any}
         onBack={() => setCurrentView('main')}
         onNavigateToBadges={() => setCurrentView('badges')}
         onNavigateToSettings={() => setCurrentView('settings')}
         onNavigateToMyExhibition={() => setCurrentView('myexhibition')}
+        onLogout={handleLogout}
       />
     );
   }
