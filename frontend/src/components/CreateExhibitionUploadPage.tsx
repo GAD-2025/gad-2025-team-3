@@ -175,8 +175,8 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
               </div>
             ) : (
               /* Uploaded Files Grid */
-              <div className="box-border content-stretch flex h-[358px] items-start pb-0 pt-[16px] px-0 relative shrink-0 w-full" data-name="Container">
-                <div className="basis-0 box-border content-start flex flex-wrap gap-[16px] grow h-full items-start justify-center min-h-px min-w-px pb-[1.6px] pt-[21.6px] px-[1.6px] relative shrink-0 overflow-y-auto" data-name="Container">
+              <div className="box-border content-stretch flex min-h-[358px] items-start pb-0 pt-[16px] px-0 relative shrink-0 w-full" data-name="Container">
+                <div className="basis-0 box-border content-start flex flex-wrap gap-[16px] grow min-h-full items-start justify-center min-w-px pb-[24px] pt-[21.6px] px-[1.6px] relative shrink-0 overflow-y-auto" data-name="Container">
                   <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                   
                   {/* Uploaded Images */}

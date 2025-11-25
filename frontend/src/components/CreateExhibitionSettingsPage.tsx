@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import svgPaths from "../imports/svg-d9kg8os1tu";
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 interface CreateExhibitionSettingsPageProps {
   onBack: () => void;
@@ -10,10 +13,21 @@ interface CreateExhibitionSettingsPageProps {
 
 export default function CreateExhibitionSettingsPage({ onBack, onComplete, exhibitionTitle, setExhibitionTitle }: CreateExhibitionSettingsPageProps) {
   const [description, setDescription] = useState('');
-  const [period, setPeriod] = useState('');
-  const [visibility, setVisibility] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [isPublic, setIsPublic] = useState(true);
 
-  const isButtonEnabled = exhibitionTitle.trim() !== '' && description.trim() !== '' && period.trim() !== '' && visibility.trim() !== '';
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return '';
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const isButtonEnabled = 
+    exhibitionTitle.trim() !== '' && 
+    description.trim() !== '' && 
+    startDate !== undefined && 
+    endDate !== undefined &&
+    startDate <= endDate; // 시작일이 종료일보다 이르거나 같아야 함
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -153,45 +167,108 @@ export default function CreateExhibitionSettingsPage({ onBack, onComplete, exhib
                 </div>
               </div>
 
-              {/* Period Field */}
-              <div className="content-stretch flex flex-col gap-[8px] h-[70.2px] items-start relative shrink-0 w-full" data-name="Container">
+              {/* Period Field - Calendar Selection */}
+              <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Container">
                 <div className="content-stretch flex items-start relative shrink-0 w-full" data-name="Label">
                   <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">전시 기간</p>
                 </div>
-                <div className="h-[48.2px] relative shrink-0 w-full" data-name="Text Input">
-                  <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
-                    <div className="box-border content-stretch flex h-[48.2px] items-center px-[16px] py-[12px] relative w-full">
-                      <input
-                        type="text"
-                        value={period}
-                        onChange={(e) => setPeriod(e.target.value)}
-                        placeholder="예: 2025-10-26 부터 2025-12-25 까지"
-                        className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[14px] tracking-[-0.28px] bg-transparent border-none outline-none placeholder:text-[#99a1af] text-[#4a5565]"
+                <div className="flex gap-[8px] w-full">
+                  {/* Start Date */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex-1 h-[48.2px] relative" data-name="Date Picker">
+                        <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
+                          <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
+                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${startDate ? 'text-[#4a5565]' : 'text-[#99a1af]'}`}>
+                              {startDate ? formatDate(startDate) : '시작일'}
+                            </span>
+                            <CalendarIcon className="size-4 text-[#4a5565]" />
+                          </div>
+                        </div>
+                        <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white z-[100]" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
                       />
-                    </div>
-                  </div>
-                  <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  {/* End Date */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex-1 h-[48.2px] relative" data-name="Date Picker">
+                        <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
+                          <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
+                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${endDate ? 'text-[#4a5565]' : 'text-[#99a1af]'}`}>
+                              {endDate ? formatDate(endDate) : '종료일'}
+                            </span>
+                            <CalendarIcon className="size-4 text-[#4a5565]" />
+                          </div>
+                        </div>
+                        <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white z-[100]" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => {
+                          // 시작일이 선택되어 있으면, 시작일보다 이른 날짜는 비활성화
+                          if (startDate) {
+                            return date < startDate;
+                          }
+                          return false;
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
 
-              {/* Visibility Field */}
-              <div className="content-stretch flex flex-col gap-[8px] h-[70.2px] items-start relative shrink-0 w-full" data-name="Container">
+              {/* Visibility Field - Toggle */}
+              <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Container">
                 <div className="content-stretch flex items-start relative shrink-0 w-full" data-name="Label">
                   <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">공개 범위</p>
                 </div>
-                <div className="h-[48.2px] relative shrink-0 w-full" data-name="Text Input">
-                  <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
-                    <div className="box-border content-stretch flex h-[48.2px] items-center px-[16px] py-[12px] relative w-full">
-                      <input
-                        type="text"
-                        value={visibility}
-                        onChange={(e) => setVisibility(e.target.value)}
-                        placeholder="예: 공개 또는 비공개"
-                        className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[14px] tracking-[-0.28px] bg-transparent border-none outline-none placeholder:text-[#99a1af] text-[#4a5565]"
-                      />
+                <div className="flex gap-[12px] w-full">
+                  <button
+                    onClick={() => setIsPublic(true)}
+                    className={`flex-1 h-[48.2px] relative transition-all ${
+                      isPublic ? 'bg-[#f360c0]' : 'bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center size-full">
+                      <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${
+                        isPublic ? 'text-white' : 'text-[#4a5565]'
+                      }`}>
+                        공개
+                      </span>
                     </div>
-                  </div>
-                  <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                    <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                  </button>
+                  
+                  <button
+                    onClick={() => setIsPublic(false)}
+                    className={`flex-1 h-[48.2px] relative transition-all ${
+                      !isPublic ? 'bg-[#f360c0]' : 'bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center size-full">
+                      <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${
+                        !isPublic ? 'text-white' : 'text-[#4a5565]'
+                      }`}>
+                        비공개
+                      </span>
+                    </div>
+                    <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                  </button>
                 </div>
               </div>
             </div>
