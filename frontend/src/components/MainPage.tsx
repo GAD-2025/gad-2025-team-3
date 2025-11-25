@@ -7,13 +7,15 @@ interface MainPageProps {
   onNavigateToMyExhibition: () => void;
   onNavigateToStatistics?: () => void;
   onNavigateToExplore?: () => void;
+  onNavigateToFavorites?: () => void;
 }
 
 export default function MainPage({ 
   onNavigateToProfile, 
   onNavigateToMyExhibition, 
   onNavigateToStatistics,
-  onNavigateToExplore 
+  onNavigateToExplore,
+  onNavigateToFavorites
 }: MainPageProps) {
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
   const [hoveredMenu, setHoveredMenu] = useState<number | null>(null);
@@ -227,7 +229,7 @@ export default function MainPage({
 
               {/* 03 전시관 즐겨찾기 */}
               <motion.button 
-                onClick={() => setSelectedMenu(3)}
+                onClick={() => onNavigateToFavorites && onNavigateToFavorites()}
                 onHoverStart={() => setHoveredMenu(3)}
                 onHoverEnd={() => setHoveredMenu(null)}
                 className="absolute box-border content-stretch flex flex-col items-start left-[0.38px] p-[1.6px] size-[106px] top-[235.95px] cursor-pointer overflow-hidden"

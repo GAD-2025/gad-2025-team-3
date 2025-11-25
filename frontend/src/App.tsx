@@ -51,9 +51,18 @@ interface SignupData {
   selectedArtists: string[];
 }
 
+interface ExhibitionData {
+  title: string;
+  author: string;
+  room: string;
+  views: string;
+  likes: string;
+  shares: string;
+}
+
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail'>('loading');
+  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites'>('loading');
   const [signupStep, setSignupStep] = useState(1);
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -64,12 +73,18 @@ export default function App() {
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        setCurrentUser(user);
-        setCurrentView('main'); // Go to main page if logged in
+        // Add a check for a crucial property to ensure the object is a valid user
+        if (user && user.id) {
+          setCurrentUser(user);
+          setCurrentView('main'); // Go to main page if logged in
+        } else {
+          // If the parsed object is not a valid user, treat it as a logout
+          throw new Error("Invalid user object in localStorage");
+        }
       } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
+        console.error("Failed to parse or validate user from localStorage", error);
         localStorage.removeItem('currentUser');
-        setCurrentView('login'); // Fallback to login if stored data is corrupt
+        setCurrentView('login'); // Fallback to login if stored data is corrupt or invalid
       }
     } else {
       setCurrentView('login'); // Go to login if no user is stored
@@ -112,6 +127,14 @@ export default function App() {
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const [nicknameValid, setNicknameValid] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+
+  const [profileType, setProfileType] = useState<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l' | null>(null);
+
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+
+  const [exhibitionTitle, setExhibitionTitle] = useState<string>('');
+
+  const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionData | null>(null);
 
   // General input change handler for text/email/password inputs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -289,7 +312,23 @@ export default function App() {
         onNavigateToMyExhibition={() => setCurrentView('myexhibition')}
         onNavigateToStatistics={() => setCurrentView('statistics')}
         onNavigateToExplore={() => setCurrentView('exploremain')}
+        onNavigateToFavorites={() => setCurrentView('favorites')}
       />
+    );
+  }
+
+  if (currentView === 'favorites') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen max-w-[393px] mx-auto">
+        <h1 className="text-2xl mb-4">Favorites Page</h1>
+        <p className="mb-4">This page is under construction.</p>
+        <button 
+          onClick={() => setCurrentView('main')}
+          className="bg-black text-white px-4 py-2 rounded"
+        >
+          Back to Main
+        </button>
+      </div>
     );
   }
 
