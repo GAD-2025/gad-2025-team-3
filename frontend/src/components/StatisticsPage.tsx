@@ -17,11 +17,11 @@ interface StatisticsPageProps {
 
 export default function StatisticsPage({ 
   onBack,
-  totalViews = 2847,
-  views = 1234,
-  likes = 567,
-  shares = 89,
-  exhibitionCount = 12,
+  totalViews = 0,
+  views = 0,
+  likes = 0,
+  shares = 0,
+  exhibitionCount = 0,
   activityLog = [
     {
       date: '2024.10.15',
@@ -142,14 +142,14 @@ export default function StatisticsPage({
             </div>
           </div>
 
-          {/* 전시관 수 (Pink) */}
-          <div className="absolute bg-[#f360c0] box-border content-stretch flex flex-col gap-[8px] h-[106.2px] items-start justify-center left-[179px] px-[25.6px] py-0 top-[122.2px] w-[163px]" data-name="Container">
+          {/* 전시관 수 (White) */}
+          <div className="absolute bg-white box-border content-stretch flex flex-col gap-[8px] h-[106.2px] items-start justify-center left-[179px] px-[25.6px] py-0 top-[122.2px] w-[163px]" data-name="Container">
             <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
             <div className="content-stretch flex items-start opacity-90 relative shrink-0 w-full" data-name="Container">
-              <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[14px] text-white tracking-[-0.28px]">전시관 수</p>
+              <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">전시관 수</p>
             </div>
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Container">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-nowrap text-white whitespace-pre">{exhibitionCount}</p>
+              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{exhibitionCount}</p>
             </div>
           </div>
         </div>
