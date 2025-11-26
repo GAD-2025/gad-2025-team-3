@@ -19,6 +19,7 @@ import ExploreTrendingPage from './components/ExploreTrendingPage';
 import ExploreSearchResultsPage from './components/ExploreSearchResultsPage';
 import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
+import FavoritesPage from './components/FavoritesPage';
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -294,6 +295,7 @@ export default function App() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           userId: currentUser.id,
           title: exhibitionTitle,
@@ -368,16 +370,10 @@ export default function App() {
 
   if (currentView === 'favorites') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen max-w-[393px] mx-auto">
-        <h1 className="text-2xl mb-4">Favorites Page</h1>
-        <p className="mb-4">This page is under construction.</p>
-        <button 
-          onClick={() => setCurrentView('main')}
-          className="bg-black text-white px-4 py-2 rounded"
-        >
-          Back to Main
-        </button>
-      </div>
+      <FavoritesPage 
+        onBack={() => setCurrentView('main')}
+        currentUser={currentUser}
+      />
     );
   }
 
@@ -472,6 +468,15 @@ export default function App() {
 
   if (currentView === 'statistics') {
     return <StatisticsPage onBack={() => setCurrentView('main')} />;
+  }
+
+  if (currentView === 'exploremain') {
+    return (
+      <ExploreMainPage
+        onBack={() => setCurrentView('main')}
+        onSearch={() => setCurrentView('exploresearchresults')}
+      />
+    );
   }
 
   if (currentView === 'exploretrending') {

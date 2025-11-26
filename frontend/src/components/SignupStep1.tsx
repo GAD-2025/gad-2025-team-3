@@ -123,7 +123,7 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
               {/* Description */}
               <div className="content-stretch flex items-start relative shrink-0 w-full" data-name="Paragraph">
                 <div className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">
-                  <p className="mb-0">선택 항목은 마케팅 정보 수신을 위한 것으로,</p>
+                  <p className="mb-0">선택 항목은 을 위한 것으로,</p>
                   <p>동의하지 않아도 서비스 이용에는 제한이 없습니다.</p>
                 </div>
               </div>

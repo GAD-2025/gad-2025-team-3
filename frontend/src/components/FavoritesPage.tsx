@@ -31,13 +31,12 @@ interface Exhibition {
   author: string;
 }
 
-interface MyExhibitionPageProps {
+interface FavoritesPageProps {
   onBack: () => void;
-  onCreateNew: () => void;
   currentUser: User | null;
 }
 
-export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: MyExhibitionPageProps) {
+export default function FavoritesPage({ onBack, currentUser }: FavoritesPageProps) {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
@@ -55,10 +54,10 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
       setLoading(true);
       setError(null);
       try {
-        const url = `${import.meta.env.VITE_API_URL}/api/exhibitions?userId=${currentUser.id}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/favorites?userId=${currentUser.id}`;
         const response = await fetch(url, { credentials: 'include' });
         if (!response.ok) {
-          throw new Error('Failed to fetch exhibitions');
+          throw new Error('Failed to fetch favorite exhibitions');
         }
         const data = await response.json();
         setExhibitions(data);
@@ -133,7 +132,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
               {/* Heading */}
               <div className="h-[20.996px] relative shrink-0 w-[121px]" data-name="Heading 1">
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex h-[20.996px] items-start justify-center relative w-[121px]">
-                  <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">My Exhibition</p>
+                  <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Favorites</p>
                 </div>
               </div>
               {/* Empty Container */}
@@ -145,56 +144,19 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
         </div>
       </div>
 
-      {/* Create New Section */}
-      <div className="h-[120.8px] relative shrink-0 w-full" data-name="Container">
-        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-        <div className="size-full">
-          <div className="box-border content-stretch flex flex-col h-[120.8px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
-            <button 
-              onClick={onCreateNew}
-              className="h-[71.2px] relative shrink-0 w-full cursor-pointer group" 
-              data-name="Button"
-            >
-              <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none group-hover:bg-[#F360C0] transition-colors" />
-              <div className="flex flex-row items-center justify-center size-full">
-                <div className="box-border content-stretch flex gap-[12px] h-[71.2px] items-center justify-center p-[1.6px] relative w-full">
-                  <div className="relative shrink-0 size-[24px]" data-name="Icon">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                      <g id="Icon">
-                        <path d="M5 12H19" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" className="group-hover:stroke-white transition-colors" />
-                        <path d="M12 5V19" id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" className="group-hover:stroke-white transition-colors" />
-                      </g>
-                    </svg>
-                  </div>
-                  <div className="relative shrink-0" data-name="Text">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-                      <p className="font-['Pretendard',sans-serif] leading-[24px] not-italic relative shrink-0 text-[16px] text-black text-nowrap tracking-[-0.32px] whitespace-pre group-hover:text-white transition-colors">새로 만들기</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Exhibition List */}
       <div className="relative shrink-0 w-full pb-[24px]">
         <div className="box-border content-stretch flex flex-col gap-[16px] items-start px-[24px] pt-[24px] relative w-full">
           {/* Heading */}
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-            <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">내가 만든 쇼케이스</p>
+            <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">즐겨찾기한 전시</p>
           </div>
 
           {/* Empty State or Exhibition Grid */}
           {exhibitions.length === 0 ? (
             <div className="w-full flex flex-col items-center justify-center py-[100px]">
               <div className="content-stretch flex flex-col gap-[8px] items-center not-italic relative shrink-0 text-nowrap">
-                <p className="font-['Pretendard',sans-serif] leading-[28px] relative shrink-0 text-[18px] text-black tracking-[-0.36px] whitespace-pre">내가 만든 쇼케이스가 없어요.</p>
-                <div className="font-['Pretendard',sans-serif] leading-[20px] relative shrink-0 text-[#99a1af] text-[14px] text-center tracking-[-0.28px]">
-                  <p className="mb-0">'새로 만들기' 버튼을 눌러</p>
-                  <p>나만의 쇼케이스를 만들어보세요.</p>
-                </div>
+                <p className="font-['Pretendard',sans-serif] leading-[28px] relative shrink-0 text-[18px] text-black tracking-[-0.36px] whitespace-pre">즐겨찾기한 전시가 없어요.</p>
               </div>
             </div>
           ) : (

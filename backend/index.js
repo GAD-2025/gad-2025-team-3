@@ -8,7 +8,10 @@ const bcrypt = require('bcrypt');
 require('dotenv').config(); 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5174', 'http://localhost:3000'],
+    credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 
 // 2. ❌ 기존 const pool 선언 위치: 이 위치에서 선언하면 DB 연결 실패 시 서버 시작이 멈춥니다.
@@ -57,14 +60,14 @@ app.post('/api/signup', async (req, res) => {
         } catch (error) {
             await connection.rollback();
             connection.release();
-            console.error('Signup error:', error);
+            console.error('Signup error:', error.stack);
             if (error.code === 'ER_DUP_ENTRY') {
                 return res.status(409).json({ message: 'Username, email, or nickname already exists.' });
             }
             res.status(500).json({ message: 'Internal server error: ' + error.message });
         }
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error:', error.stack);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -105,11 +108,11 @@ app.post('/api/login', async (req, res) => {
 
         } catch (error) {
             connection.release();
-            console.error('Login error:', error);
+            console.error('Login error:', error.stack);
             res.status(500).json({ message: 'Internal server error' });
         }
     } catch (error) {
-        console.error('DB connection error:', error);
+        console.error('DB connection error:', error.stack);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -149,11 +152,11 @@ app.post('/api/exhibitions', async (req, res) => {
         } catch (error) {
             await connection.rollback();
             connection.release();
-            console.error('Create exhibition error:', error);
+            console.error('Create exhibition error:', error.stack);
             res.status(500).json({ message: 'Internal server error: ' + error.message });
         }
     } catch (error) {
-        console.error('DB connection error:', error);
+        console.error('DB connection error:', error.stack);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -198,7 +201,56 @@ app.get('/api/exhibitions', async (req, res) => {
         res.status(200).json(rows);
 
     } catch (error) {
-        console.error('Fetch exhibitions error:', error);
+        console.error('Fetch exhibitions error:', error.stack);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching favorite exhibitions for a user
+app.get('/api/favorites', async (req, res) => {
+    const { userId } = req.query;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const query = `
+                SELECT 
+                    e.id, 
+                    e.title, 
+                    e.description, 
+                    e.start_date, 
+                    e.end_date, 
+                    e.is_public, 
+                    e.views, 
+                    e.likes, 
+                    e.shares, 
+                    e.created_at,
+                    u.nickname as author
+                FROM 
+                    exhibitions e
+                JOIN 
+                    user_favorites uf ON e.id = uf.exhibition_id
+                JOIN
+                    users u ON e.user_id = u.id
+                WHERE 
+                    uf.user_id = ?
+                ORDER BY 
+                    uf.created_at DESC
+            `;
+            const [rows] = await connection.execute(query, [userId]);
+            connection.release();
+            res.status(200).json(rows);
+        } catch (error) {
+            connection.release();
+            console.error('Fetch favorites error:', error.stack);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    } catch (error) {
+        console.error('DB connection error:', error.stack);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -233,7 +285,7 @@ async function startServer() {
 
     } catch (error) {
         // DB 연결 실패 시 에러 출력 후 서버 시작 중단
-        console.error('❌ DB 연결 설정 오류 또는 서버 시작 실패:', error.message);
+        console.error('❌ DB 연결 설정 오류 또는 서버 시작 실패:', error.stack);
         console.log('🔥 서버가 종료됩니다. .env 파일의 DB 정보를 확인하세요.');
         process.exit(1); 
     }
