@@ -37,6 +37,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
     // By not calling a prop, we avoid an error since App.tsx doesn't pass it.
   };
 
+  const handleFeatureClick = (featureName: string) => {
+    alert(`${featureName} 기능은 아직 구현되지 않았습니다.`);
+  };
+
   // Render profile icon based on type
   const renderProfileIcon = () => {
     // SVG path for profile icon (same as in SignupComplete)
@@ -372,7 +376,11 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
             </div>
             {/* 비밀번호 변경 */}
-            <div className="h-[56.2px] relative shrink-0 w-full" data-name="Button">
+            <button 
+              onClick={() => handleFeatureClick('비밀번호 변경')}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
@@ -402,9 +410,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
             {/* 이메일 변경 */}
-            <div className="h-[56.2px] relative shrink-0 w-full" data-name="Button">
+            <button 
+              onClick={() => handleFeatureClick('이메일 변경')}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
@@ -434,7 +446,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -448,7 +460,11 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Notifications</p>
             </div>
             {/* 알림 설정 */}
-            <div className="h-[56.2px] relative shrink-0 w-full" data-name="Button">
+            <button 
+              onClick={() => handleFeatureClick('알림 설정')}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
@@ -478,7 +494,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -492,7 +508,11 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
             </div>
             {/* 개인정보 처리방침 */}
-            <div className="h-[56.2px] relative shrink-0 w-full" data-name="Button">
+            <button 
+              onClick={() => handleFeatureClick('개인정보 처리방침')}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
@@ -521,9 +541,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
             {/* 서비스 이용약관 */}
-            <div className="h-[56.2px] relative shrink-0 w-full" data-name="Button">
+            <button 
+              onClick={() => handleFeatureClick('서비스 이용약관')}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              data-name="Button"
+            >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               <div className="flex flex-row items-center size-full">
                 <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
@@ -552,7 +576,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -564,7 +588,11 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
           <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
         </div>
         {/* 자주 묻는 질문 */}
-        <div className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px]" data-name="Button">
+        <button
+          onClick={() => handleFeatureClick('자주 묻는 질문')}
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer" 
+          data-name="Button"
+        >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="h-[21px] relative shrink-0 w-[120.125px]" data-name="Container">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[120.125px]">
@@ -596,9 +624,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </g>
             </svg>
           </div>
-        </div>
+        </button>
         {/* 문의하기 */}
-        <div className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[122.2px] w-[342px]" data-name="Button">
+        <button
+          onClick={() => handleFeatureClick('문의하기')}
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[122.2px] w-[342px] cursor-pointer"
+          data-name="Button"
+        >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="h-[21px] relative shrink-0 w-[86.1px]" data-name="Container">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[86.1px]">
@@ -624,9 +656,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </g>
             </svg>
           </div>
-        </div>
+        </button>
         {/* Design System */}
-        <div className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[186.4px] w-[342px]" data-name="Button">
+        <button
+          onClick={() => handleFeatureClick('Design System')}
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer"
+          data-name="Button"
+        >
           <div aria-hidden="true" className="absolute border-[#f360c0] border-[1.6px] border-solid inset-0 pointer-events-none" />
           <div className="h-[21px] relative shrink-0 w-[124.05px]" data-name="Container">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[124.05px]">
@@ -651,7 +687,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </g>
             </svg>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Danger Zone Section */}
