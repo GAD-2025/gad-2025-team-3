@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 // 2. ❌ 기존 const pool 선언 위치: 이 위치에서 선언하면 DB 연결 실패 시 서버 시작이 멈춥니다.
 // const pool = mysql.createPool({...}); 
@@ -114,6 +114,95 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// API for creating an exhibition
+app.post('/api/exhibitions', async (req, res) => {
+    const { userId, title, description, startDate, endDate, isPublic, uploadedFiles } = req.body;
+
+    if (!userId || !title || !startDate || !endDate) {
+        return res.status(400).json({ message: 'Missing required exhibition fields.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        try {
+            const [exhibitionResult] = await connection.execute(
+                'INSERT INTO exhibitions (user_id, title, description, start_date, end_date, is_public) VALUES (?, ?, ?, ?, ?, ?)',
+                [userId, title, description, startDate, endDate, isPublic]
+            );
+
+            const exhibitionId = exhibitionResult.insertId;
+
+            if (uploadedFiles && uploadedFiles.length > 0) {
+                const itemValues = uploadedFiles.map((fileUrl) => [exhibitionId, 'image', fileUrl]); // Assuming 'image' for now
+                await connection.query(
+                    'INSERT INTO exhibition_items (exhibition_id, item_type, item_url) VALUES ?',
+                    [itemValues]
+                );
+            }
+
+            await connection.commit();
+            connection.release();
+            res.status(201).json({ message: 'Exhibition created successfully', exhibitionId });
+
+        } catch (error) {
+            await connection.rollback();
+            connection.release();
+            console.error('Create exhibition error:', error);
+            res.status(500).json({ message: 'Internal server error: ' + error.message });
+        }
+    } catch (error) {
+        console.error('DB connection error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching exhibitions
+app.get('/api/exhibitions', async (req, res) => {
+    const { userId } = req.query;
+
+    try {
+        const connection = await pool.getConnection();
+        let query = `
+            SELECT 
+                e.id, 
+                e.title, 
+                e.description, 
+                e.start_date, 
+                e.end_date, 
+                e.is_public, 
+                e.views, 
+                e.likes, 
+                e.shares, 
+                e.created_at,
+                u.nickname as author
+            FROM 
+                exhibitions e
+            JOIN 
+                users u ON e.user_id = u.id
+        `;
+        const params = [];
+
+        if (userId) {
+            query += ' WHERE e.user_id = ?';
+            params.push(userId);
+        } else {
+            query += ' WHERE e.is_public = TRUE'; // Only show public exhibitions if no specific user is requested
+        }
+
+        query += ' ORDER BY e.created_at DESC';
+
+        const [rows] = await connection.execute(query, params);
+        connection.release();
+        res.status(200).json(rows);
+
+    } catch (error) {
+        console.error('Fetch exhibitions error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // ----------------------------------------------------------------------------------
 
 // 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
@@ -150,4 +239,6 @@ async function startServer() {
     }
 }
 
-startServer();
+(async () => {
+    await startServer();
+})();

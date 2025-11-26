@@ -9,23 +9,39 @@ interface CreateExhibitionSettingsPageProps {
   onComplete: () => void;
   exhibitionTitle: string;
   setExhibitionTitle: (title: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
+  startDate: Date | undefined;
+  setStartDate: (date: Date | undefined) => void;
+  endDate: Date | undefined;
+  setEndDate: (date: Date | undefined) => void;
+  isPublic: boolean;
+  setIsPublic: (isPublic: boolean) => void;
 }
 
-export default function CreateExhibitionSettingsPage({ onBack, onComplete, exhibitionTitle, setExhibitionTitle }: CreateExhibitionSettingsPageProps) {
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [isPublic, setIsPublic] = useState(true);
-
+export default function CreateExhibitionSettingsPage({
+  onBack,
+  onComplete,
+  exhibitionTitle,
+  setExhibitionTitle,
+  description,
+  setDescription,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  isPublic,
+  setIsPublic,
+}: CreateExhibitionSettingsPageProps) {
   const formatDate = (date: Date | undefined) => {
     if (!date) return '';
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  const isButtonEnabled = 
-    exhibitionTitle.trim() !== '' && 
-    description.trim() !== '' && 
-    startDate !== undefined && 
+  const isButtonEnabled =
+    exhibitionTitle.trim() !== '' &&
+    description.trim() !== '' &&
+    startDate !== undefined &&
     endDate !== undefined &&
     startDate <= endDate; // 시작일이 종료일보다 이르거나 같아야 함
 

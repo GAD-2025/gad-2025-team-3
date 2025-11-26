@@ -1,36 +1,98 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import svgPaths from "../imports/svg-etunpzbgmu";
 import ShareExhibitionModal from "./ShareExhibitionModal";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  nickname: string;
+  bio: string;
+  exhibition_count: number;
+  follower_count: number;
+  following_count: number;
+  total_views: number;
+  total_likes: number;
+  total_shares: number;
+}
+
+interface Exhibition {
+  id: number;
+  user_id: number;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  is_public: boolean;
+  views: number;
+  likes: number;
+  shares: number;
+  created_at: string;
+  author: string;
+}
 
 interface MyExhibitionPageProps {
   onBack: () => void;
   onCreateNew: () => void;
+  currentUser: User | null;
 }
 
-interface ExhibitionCard {
-  id: string;
-  room: string;
-  title: string;
-  views: number;
-  likes: number;
-}
-
-export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPageProps) {
+export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: MyExhibitionPageProps) {
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionCard | null>(null);
+  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 빈 배열로 시작 (전시관 없음)
-  const exhibitions: ExhibitionCard[] = [];
-  
-  // 테스트용: 전시관이 하나 있을 때 확인하려면 아래 주석을 해제하세요
-  // const exhibitions: ExhibitionCard[] = [
-  //   { id: '101', room: '101', title: 'BTS 월드 투어 2024', views: 1234, likes: 567 },
-  // ];
+  useEffect(() => {
+    const fetchExhibitions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let url = `${import.meta.env.VITE_API_URL}/api/exhibitions`;
+        if (currentUser?.id) {
+          url += `?userId=${currentUser.id}`;
+        }
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch exhibitions');
+        }
+        const data = await response.json();
+        setExhibitions(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleShareClick = (exhibition: ExhibitionCard) => {
+    fetchExhibitions();
+  }, [currentUser]);
+
+  const handleShareClick = (exhibition: Exhibition) => {
     setSelectedExhibition(exhibition);
     setShareModalOpen(true);
   };
+
+  const getRoomNumber = (index: number) => {
+    return `${100 + (index + 1)}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen max-w-[393px] mx-auto">
+        <p>Loading exhibitions...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen max-w-[393px] mx-auto">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -134,7 +196,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPa
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-[16px] w-full">
-              {exhibitions.map((exhibition) => (
+              {[...exhibitions].reverse().map((exhibition, index) => (
                 <div
                   key={exhibition.id}
                   className="box-border content-stretch flex flex-col h-[206.8px] items-start p-[1.6px] relative shrink-0 w-full"
@@ -151,7 +213,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew }: MyExhibitionPa
                           <p className="font-['EB_Garamond',serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-white w-[37.938px]">Room</p>
                         </div>
                         <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Container">
-                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-nowrap text-white whitespace-pre">{exhibition.room}</p>
+                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-nowrap text-white whitespace-pre">{getRoomNumber(index)}</p>
                         </div>
                       </div>
                     </div>

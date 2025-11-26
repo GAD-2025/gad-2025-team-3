@@ -14,8 +14,19 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newFileUrls: string[] = Array.from(files).map((file) => URL.createObjectURL(file));
-      setUploadedFiles([...uploadedFiles, ...newFileUrls]);
+      const fileReaders: Promise<string>[] = Array.from(files).map((file) => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(fileReaders).then((dataUrls) => {
+        setUploadedFiles([...uploadedFiles, ...dataUrls]);
+      });
     }
   };
 

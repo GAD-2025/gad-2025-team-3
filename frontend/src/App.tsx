@@ -133,6 +133,10 @@ export default function App() {
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
   const [exhibitionTitle, setExhibitionTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [isPublic, setIsPublic] = useState<boolean>(true);
 
   const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionData | null>(null);
 
@@ -245,12 +249,7 @@ export default function App() {
 
     // Explicitly check for required fields on the frontend
     if (!finalSignupData.username || !finalSignupData.password || !finalSignupData.email || !finalSignupData.nickname) {
-      alert(`Error: One or more required fields are missing. Please check your input.
-        Username: ${finalSignupData.username}
-        Password: ${finalSignupData.password ? '******' : '(empty)'}
-        Email: ${finalSignupData.email}
-        Nickname: ${finalSignupData.nickname}
-      `);
+      alert(`Error: One or more required fields are missing. Please check your input.\n        Username: ${finalSignupData.username}\n        Password: ${finalSignupData.password ? '******' : '(empty)'}\n        Email: ${finalSignupData.email}\n        Nickname: ${finalSignupData.nickname}\n      `);
       return;
     }
     
@@ -274,6 +273,56 @@ export default function App() {
 
     } catch (error: any) { // Use 'any' for error type for now
       console.error('An error occurred during signup:', error);
+      alert(error.message);
+    }
+  };
+
+  const handleCreateExhibition = async () => {
+    if (!currentUser) {
+      alert('User not logged in.');
+      return;
+    }
+
+    if (!exhibitionTitle || !description || !startDate || !endDate) {
+      alert('Please fill in all exhibition details.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          title: exhibitionTitle,
+          description,
+          startDate: startDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
+          endDate: endDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
+          isPublic,
+          uploadedFiles, // Array of file URLs
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create exhibition');
+      }
+
+      const result = await response.json();
+      console.log('Exhibition created successfully:', result);
+      setCurrentView('createexhibitioncomplete');
+      // Reset exhibition creation states
+      setExhibitionTitle('');
+      setDescription('');
+      setStartDate(undefined);
+      setEndDate(undefined);
+      setIsPublic(true);
+      setUploadedFiles([]);
+
+    } catch (error: any) {
+      console.error('Error creating exhibition:', error);
       alert(error.message);
     }
   };
@@ -367,6 +416,7 @@ export default function App() {
       <MyExhibitionPage 
         onBack={() => setCurrentView('profile')}
         onCreateNew={() => setCurrentView('createexhibition')}
+        currentUser={currentUser}
       />
     );
   }
@@ -395,9 +445,17 @@ export default function App() {
     return (
       <CreateExhibitionSettingsPage 
         onBack={() => setCurrentView('createexhibitionupload')}
-        onComplete={() => setCurrentView('createexhibitioncomplete')}
+        onComplete={handleCreateExhibition}
         exhibitionTitle={exhibitionTitle}
         setExhibitionTitle={setExhibitionTitle}
+        description={description}
+        setDescription={setDescription}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        isPublic={isPublic}
+        setIsPublic={setIsPublic}
       />
     );
   }
