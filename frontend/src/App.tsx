@@ -8,7 +8,6 @@ import Login from './components/Login';
 import MainPage from './components/MainPage';
 import ProfilePage from './components/ProfilePage';
 import BadgesPage from './components/BadgesPage';
-import SettingsPage from './components/SettingsPage';
 import MyExhibitionPage from './components/MyExhibitionPage';
 import CreateExhibitionPage from './components/CreateExhibitionPage';
 import CreateExhibitionUploadPage from './components/CreateExhibitionUploadPage';
@@ -63,7 +62,7 @@ interface ExhibitionData {
 
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites'>('loading');
+  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites'>('loading');
   const [previousView, setPreviousView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites' | null>(null);
   const [signupStep, setSignupStep] = useState(1);
   
@@ -391,7 +390,6 @@ export default function App() {
         profileType={finalProfileType as any}
         onBack={() => setCurrentView('main')}
         onNavigateToBadges={() => setCurrentView('badges')}
-        onNavigateToSettings={() => setCurrentView('settings')}
         onNavigateToMyExhibition={() => {
           setPreviousView(currentView);
           setCurrentView('myexhibition');
@@ -403,15 +401,6 @@ export default function App() {
 
   if (currentView === 'badges') {
     return <BadgesPage onBack={() => setCurrentView('profile')} />;
-  }
-
-  if (currentView === 'settings') {
-    return (
-      <SettingsPage 
-        onBack={() => setCurrentView('profile')}
-        onLogout={handleLogout}
-      />
-    );
   }
 
   if (currentView === 'myexhibition') {
