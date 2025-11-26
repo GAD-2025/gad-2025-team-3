@@ -3,6 +3,11 @@
   import App from "./App.tsx";
   import "./index.css";
   import 'react-day-picker/dist/style.css';
+  import { BrowserRouter } from 'react-router-dom';
   
-  createRoot(document.getElementById("root")!).render(<App />);
+  createRoot(document.getElementById("root")!).render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
   

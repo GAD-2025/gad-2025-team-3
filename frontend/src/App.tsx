@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import SignupStep1 from './components/SignupStep1';
 import SignupStep2 from './components/SignupStep2';
 import SignupStep3 from './components/SignupStep3';
@@ -52,18 +53,19 @@ interface SignupData {
 }
 
 interface ExhibitionData {
+  id: string;
   title: string;
   author: string;
   room: string;
   views: string;
   likes: string;
   shares: string;
+  // Add other fields as per your backend response
 }
 
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites'>('loading');
-  const [previousView, setPreviousView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites' | null>(null);
+  const navigate = useNavigate();
   const [signupStep, setSignupStep] = useState(1);
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -77,7 +79,7 @@ export default function App() {
         // Add a check for a crucial property to ensure the object is a valid user
         if (user && user.id) {
           setCurrentUser(user);
-          setCurrentView('main'); // Go to main page if logged in
+          navigate('/main'); // Go to main page if logged in
         } else {
           // If the parsed object is not a valid user, treat it as a logout
           throw new Error("Invalid user object in localStorage");
@@ -85,10 +87,10 @@ export default function App() {
       } catch (error) {
         console.error("Failed to parse or validate user from localStorage", error);
         localStorage.removeItem('currentUser');
-        setCurrentView('login'); // Fallback to login if stored data is corrupt or invalid
+        navigate('/login'); // Fallback to login if stored data is corrupt or invalid
       }
     } else {
-      setCurrentView('login'); // Go to login if no user is stored
+      navigate('/login'); // Go to login if no user is stored
     }
   }, []); // The empty dependency array ensures this runs only once on mount
 
@@ -332,238 +334,174 @@ export default function App() {
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
-    setCurrentView('main');
+    navigate('/main');
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
-    setCurrentView('login');
+    navigate('/login');
   };
 
-  if (currentView === 'loading') {
-    return <div>Loading...</div>;
-  }
-  
-  if (currentView === 'login') {
-    return (
-      <Login 
-        onLogin={handleLoginSuccess}
-        onSignup={() => {
-          setCurrentView('signup');
-          setSignupStep(1);
-        }}
-      />
-    );
-  }
-
-  if (currentView === 'main') {
-    return (
-      <MainPage 
-        onNavigateToProfile={() => setCurrentView('profile')}
-        onNavigateToMyExhibition={() => {
-          setPreviousView(currentView);
-          setCurrentView('myexhibition');
-        }}
-        onNavigateToStatistics={() => setCurrentView('statistics')}
-        onNavigateToExplore={() => setCurrentView('exploremain')}
-        onNavigateToFavorites={() => setCurrentView('favorites')}
-      />
-    );
-  }
-
-  if (currentView === 'favorites') {
-    return (
-      <FavoritesPage 
-        onBack={() => setCurrentView('main')}
-        currentUser={currentUser}
-      />
-    );
-  }
-
-  if (currentView === 'profile' && currentUser) {
-    // If profileType is not set (e.g., after a refresh), try to get it from localStorage or default
-    const finalProfileType = profileType || localStorage.getItem('profileType') || 'profile_1_l';
-
-    return (
-      <ProfilePage 
-        user={currentUser}
-        profileType={finalProfileType as any}
-        onBack={() => setCurrentView('main')}
-        onNavigateToBadges={() => setCurrentView('badges')}
-        onNavigateToMyExhibition={() => {
-          setPreviousView(currentView);
-          setCurrentView('myexhibition');
-        }}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  if (currentView === 'badges') {
-    return <BadgesPage onBack={() => setCurrentView('profile')} />;
-  }
-
-  if (currentView === 'myexhibition') {
-    return (
-      <MyExhibitionPage 
-        onBack={() => setCurrentView(previousView || 'main')}
-        onCreateNew={() => setCurrentView('createexhibition')}
-        currentUser={currentUser}
-      />
-    );
-  }
-
-  if (currentView === 'createexhibition') {
-    return (
-      <CreateExhibitionPage 
-        onBack={() => setCurrentView('myexhibition')}
-        onNext={() => setCurrentView('createexhibitionupload')}
-      />
-    );
-  }
-
-  if (currentView === 'createexhibitionupload') {
-    return (
-      <CreateExhibitionUploadPage 
-        onBack={() => setCurrentView('createexhibition')}
-        onNext={() => setCurrentView('createexhibitionsettings')}
-        uploadedFiles={uploadedFiles}
-        setUploadedFiles={setUploadedFiles}
-      />
-    );
-  }
-
-  if (currentView === 'createexhibitionsettings') {
-    return (
-      <CreateExhibitionSettingsPage 
-        onBack={() => setCurrentView('createexhibitionupload')}
-        onComplete={handleCreateExhibition}
-        exhibitionTitle={exhibitionTitle}
-        setExhibitionTitle={setExhibitionTitle}
-        description={description}
-        setDescription={setDescription}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        isPublic={isPublic}
-        setIsPublic={setIsPublic}
-      />
-    );
-  }
-
-  if (currentView === 'createexhibitioncomplete') {
-    return (
-      <CreateExhibitionCompletePage 
-        onNavigateToGallery={() => setCurrentView('myexhibition')}
-        uploadedImages={uploadedFiles}
-        exhibitionTitle={exhibitionTitle}
-      />
-    );
-  }
-
-  if (currentView === 'statistics') {
-    return <StatisticsPage onBack={() => setCurrentView('main')} />;
-  }
-
-  if (currentView === 'exploremain') {
-    return (
-      <ExploreMainPage
-        onBack={() => setCurrentView('main')}
-        onSearch={() => setCurrentView('exploresearchresults')}
-      />
-    );
-  }
-
-  if (currentView === 'exploretrending') {
-    return (
-      <ExploreTrendingPage 
-        onBack={() => setCurrentView('main')} 
-        onSearch={() => setCurrentView('exploresearchresults')}
-        onKeywordClick={(keyword) => setCurrentView('exploresearchresults')}
-      />
-    );
-  }
-
-  if (currentView === 'exploresearchresults') {
-    return (
-      <ExploreSearchResultsPage 
-        onBack={() => setCurrentView('exploretrending')} 
-        onExhibitionClick={(data) => {
-          setSelectedExhibition(data);
-          setCurrentView('exhibitiondetail');
-        }}
-      />
-    );
-  }
-
-  if (currentView === 'exhibitiondetail') {
-    return (
-      <ExhibitionDetailPage 
-        onBack={() => setCurrentView('exploresearchresults')} 
-        exhibitionData={selectedExhibition}
-      />
-    );
-  }
-
-  if (currentView === 'signup') {
-    return (
-      <> {/* Removed SignupProvider */}
-        {signupStep === 1 && (
-          <SignupStep1 
-            onNext={() => setSignupStep(2)} 
-            onBack={() => setCurrentView('login')}
-            formData={signupData} // Pass signupData
-            handleCheckboxChange={handleCheckboxChange} // Pass handler
-            handleAllAgree={handleAllAgree} // Pass handler
-          />
-        )}
-        {signupStep === 2 && (
-          <SignupStep2 
-            onNext={() => setSignupStep(3)} 
-            onBack={() => setSignupStep(1)}
-            formData={signupData} // Pass signupData
-            handleInputChange={handleInputChange} // Pass handler
-            passwordConfirm={passwordConfirm} // Pass passwordConfirm
-            handleUsernameCheck={handleUsernameCheck} // Pass handler
-            isUsernameChecked={isUsernameChecked} // Pass state
-            usernameValid={usernameValid} // Pass state
-            usernameError={usernameError} // Pass state
-          />
-        )}
-        {signupStep === 3 && (
-          <SignupStep3 
-            onNext={() => setSignupStep(4)} 
-            onBack={() => setSignupStep(2)}
-            formData={signupData} // Pass signupData
-            handleInputChange={handleInputChange} // Pass handler
-            handleNicknameCheck={handleNicknameCheck} // Pass handler
-            isNicknameChecked={isNicknameChecked} // Pass state
-            nicknameValid={nicknameValid} // Pass state
-            nicknameError={nicknameError} // Pass state
-          />
-        )}
-        {signupStep === 4 && (
-          <SignupStep4 
-            username={signupData.nickname} 
-            onNext={() => handleSignupSubmit()} // No longer takes artists as prop directly
-            onBack={() => setSignupStep(3)}
-            formData={signupData} // Pass signupData
-            handleArtistToggle={handleArtistToggle} // Pass handler
-          />
-        )}
-        {signupStep === 5 && <SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); setCurrentView('main'); }} />}
-      </>
-    );
-  }
+  // Removed: if (currentView === 'loading') { return <div>Loading...</div>; }
   
   return (
-    <Login 
-      onLogin={handleLoginSuccess}
-      onSignup={() => {
-        setCurrentView('signup');
-        setSignupStep(1);
-      }}
-    />
+    <Routes>
+      <Route path="/login" element={
+        <Login 
+          onLogin={handleLoginSuccess}
+          onSignup={() => navigate('/signup')}
+        />
+      } />
+      <Route path="/signup" element={
+        <>
+          {signupStep === 1 && (
+            <SignupStep1 
+              onNext={() => setSignupStep(2)} 
+              onBack={() => navigate('/login')}
+              formData={signupData} // Pass signupData
+              handleCheckboxChange={handleCheckboxChange} // Pass handler
+              handleAllAgree={handleAllAgree} // Pass handler
+            />
+          )}
+          {signupStep === 2 && (
+            <SignupStep2 
+              onNext={() => setSignupStep(3)} 
+              onBack={() => setSignupStep(1)}
+              formData={signupData} // Pass signupData
+              handleInputChange={handleInputChange} // Pass handler
+              passwordConfirm={passwordConfirm} // Pass passwordConfirm
+              handleUsernameCheck={handleUsernameCheck} // Pass handler
+              isUsernameChecked={isUsernameChecked} // Pass state
+              usernameValid={usernameValid} // Pass state
+              usernameError={usernameError} // Pass state
+            />
+          )}
+          {signupStep === 3 && (
+            <SignupStep3 
+              onNext={() => setSignupStep(4)} 
+              onBack={() => setSignupStep(2)}
+              formData={signupData} // Pass signupData
+              handleInputChange={handleInputChange} // Pass handler
+              handleNicknameCheck={handleNicknameCheck} // Pass handler
+              isNicknameChecked={isNicknameChecked} // Pass state
+              nicknameValid={nicknameValid} // Pass state
+              nicknameError={nicknameError} // Pass state
+            />
+          )}
+          {signupStep === 4 && (
+            <SignupStep4 
+              username={signupData.nickname} 
+              onNext={() => handleSignupSubmit()} // No longer takes artists as prop directly
+              onBack={() => setSignupStep(3)}
+              formData={signupData} // Pass signupData
+              handleArtistToggle={handleArtistToggle} // Pass handler
+            />
+          )}
+        </>
+      } />
+      <Route path="/signup-complete" element={<SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); navigate('/main'); }} />} />
+      <Route path="/main" element={
+        <MainPage 
+          onNavigateToProfile={() => navigate('/profile')}
+          onNavigateToMyExhibition={() => navigate('/myexhibition')}
+          onNavigateToStatistics={() => navigate('/statistics')}
+          onNavigateToExplore={() => navigate('/explore')}
+          onNavigateToFavorites={() => navigate('/favorites')}
+        />
+      } />
+      <Route path="/favorites" element={
+        <FavoritesPage 
+          onBack={() => navigate('/main')}
+          currentUser={currentUser}
+        />
+      } />
+      <Route path="/profile" element={
+        currentUser && (
+          <ProfilePage 
+            user={currentUser}
+            profileType={(profileType || localStorage.getItem('profileType') || 'profile_1_l') as any}
+            onBack={() => navigate('/main')}
+            onNavigateToBadges={() => navigate('/badges')}
+            onNavigateToMyExhibition={() => navigate('/myexhibition')}
+            onLogout={handleLogout}
+          />
+        )
+      } />
+      <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
+      <Route path="/myexhibition" element={
+        <MyExhibitionPage 
+          onBack={() => navigate('/main')}
+          onCreateNew={() => navigate('/create-exhibition')}
+          currentUser={currentUser}
+        />
+      } />
+      <Route path="/create-exhibition" element={
+        <CreateExhibitionPage 
+          onBack={() => navigate('/myexhibition')}
+          onNext={() => navigate('/create-exhibition/upload')}
+        />
+      } />
+      <Route path="/create-exhibition/upload" element={
+        <CreateExhibitionUploadPage 
+          onBack={() => navigate('/create-exhibition')}
+          onNext={() => navigate('/create-exhibition/settings')}
+          uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+        />
+      } />
+      <Route path="/create-exhibition/settings" element={
+        <CreateExhibitionSettingsPage 
+          onBack={() => navigate('/create-exhibition/upload')}
+          onComplete={handleCreateExhibition}
+          exhibitionTitle={exhibitionTitle}
+          setExhibitionTitle={setExhibitionTitle}
+          description={description}
+          setDescription={setDescription}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          isPublic={isPublic}
+          setIsPublic={setIsPublic}
+        />
+      } />
+      <Route path="/create-exhibition/complete" element={
+        <CreateExhibitionCompletePage 
+          onNavigateToGallery={() => navigate('/myexhibition')}
+          uploadedImages={uploadedFiles}
+          exhibitionTitle={exhibitionTitle}
+        />
+      } />
+      <Route path="/statistics" element={<StatisticsPage onBack={() => navigate('/main')} />} />
+      <Route path="/explore" element={
+        <ExploreMainPage
+          onBack={() => navigate('/main')}
+          onSearch={() => navigate('/explore/search')}
+        />
+      } />
+      <Route path="/explore/trending" element={
+        <ExploreTrendingPage 
+          onBack={() => navigate('/main')} 
+          onSearch={() => navigate('/explore/search')}
+          onKeywordClick={(keyword) => navigate('/explore/search')}
+        />
+      } />
+      <Route path="/explore/search" element={
+        <ExploreSearchResultsPage 
+          onBack={() => navigate('/explore/trending')} 
+          onExhibitionClick={(data) => {
+            setSelectedExhibition(data);
+            navigate(`/exhibition/${data.id}`);
+          }}
+        />
+      } />
+      <Route path="/exhibition/:id" element={
+        <ExhibitionDetailPage 
+          onBack={() => navigate('/explore/search')} 
+          exhibitionData={selectedExhibition}
+        />
+      } />
+      <Route path="*" element={<Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />} />
+    </Routes>
   );
 }

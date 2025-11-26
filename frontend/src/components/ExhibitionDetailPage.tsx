@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import svgPaths from "../imports/svg-0is11x6gea";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import svgPaths from '../imports/svgPaths'; // Import svgPaths
+interface ExhibitionData {
+  title: string;
+  author: string;
+  room: string;
+  views: string;
+  likes: string;
+  shares: string;
+  description: string;
+  imageUrls: string[];
+}
 
-interface ExhibitionDetailPageProps {
-  onBack: () => void;
-  exhibitionData: {
-    title: string;
-    author: string;
-    room: string;
-    views: string;
-    likes: string;
-    shares: string;
-  };
+interface Comment {
+  id: number;
+  author: string;
+  content: string;
+  created_at: string; // Changed from timestamp to created_at
 }
 
 interface Circle {
@@ -23,12 +28,55 @@ interface Circle {
   delay: number;
 }
 
-export default function ExhibitionDetailPage({ 
+export default function ExhibitionDetailPage({
   onBack,
-  exhibitionData
 }: ExhibitionDetailPageProps) {
+  const { id } = useParams<{ id: string }>();
+  const [exhibitionData, setExhibitionData] = useState<ExhibitionData | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [circles, setCircles] = useState<Circle[]>([]);
+
+  useEffect(() => {
+    const fetchExhibitionAndComments = async () => {
+      if (!id) {
+        setError("Exhibition ID is missing.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const exhibitionResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`);
+        if (!exhibitionResponse.ok) {
+          throw new Error(`Failed to fetch exhibition: ${exhibitionResponse.statusText}`);
+        }
+        const exhibition: ExhibitionData = await exhibitionResponse.json();
+
+        const itemsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`);
+        if (!itemsResponse.ok) {
+          throw new Error(`Failed to fetch exhibition items: ${itemsResponse.statusText}`);
+        }
+        const imageUrls: string[] = await itemsResponse.json();
+
+        const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`);
+        if (!commentsResponse.ok) {
+          throw new Error(`Failed to fetch comments: ${commentsResponse.statusText}`);
+        }
+        const fetchedComments: Comment[] = await commentsResponse.json();
+
+        setExhibitionData({ ...exhibition, imageUrls });
+        setComments(fetchedComments);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExhibitionAndComments();
+  }, [id]);
 
   useEffect(() => {
     if (isLiked) {
@@ -52,9 +100,45 @@ export default function ExhibitionDetailPage({
     }
   }, [isLiked]);
 
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim() || !id) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: newComment, author: 'Anonymous' }), // You might want to replace 'Anonymous' with actual user data
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to post comment: ${response.statusText}`);
+      }
+
+      const postedComment: Comment = await response.json();
+      setComments((prevComments) => [...prevComments, postedComment]);
+      setNewComment('');
+    } catch (err: any) {
+      console.error('Error posting comment:', err.message);
+      setError('Failed to post comment.');
+    }
+  };
+
+  if (loading) {
+    return <div>Loading exhibition...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!exhibitionData) {
+    return <div>No exhibition data found.</div>;
+  }
+
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[34px] items-start relative w-full min-h-screen max-w-[393px] mx-auto overflow-x-hidden" data-name="메인 홈">
-      {/* Animated Pink Circles */}
+    <div className="bg-white content-stretch flex flex-col gap-[34px] items-start relative w-full min-h-screen max-w-[393px] mx-auto overflow-x-hidden" data-name="메인 홈">      {/* Animated Pink Circles */}
       {isLiked && circles.map((circle) => (
         <motion.div
           key={circle.id}
@@ -180,7 +264,11 @@ export default function ExhibitionDetailPage({
         <div className="bg-gray-100 h-[390px] relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
-            <div className="h-[390px] w-full" />
+            {exhibitionData.imageUrls && exhibitionData.imageUrls.length > 0 ? (
+              <img src={exhibitionData.imageUrls[0]} alt="Exhibition Hero" className="object-cover w-full h-full" />
+            ) : (
+              <div className="h-[390px] w-full flex items-center justify-center text-gray-500">No hero image available</div>
+            )}
           </div>
         </div>
 
@@ -259,8 +347,8 @@ export default function ExhibitionDetailPage({
                           <path d={svgPaths.p185fb780} id="Vector" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
                           <path d={svgPaths.p30ca5e80} id="Vector_2" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
                           <path d={svgPaths.pac25b80} id="Vector_3" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d="M5.72668 9.00667L10.28 11.66" id="Vector_4" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d={svgPaths.p39b18600} id="Vector_5" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
+                          <path d="M5.72668 9.00667L10.28 11.66" id="Vector_4" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                          <path d={svgPaths.p39b18600} id="Vector_5" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                         </g>
                       </svg>
                     </div>
@@ -285,7 +373,7 @@ export default function ExhibitionDetailPage({
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">About</p>
               </div>
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
-                <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black tracking-[-0.24px] w-[336px]">이 전시관은 팬들의 추억과 사랑을 담은 특별한 공간입니다. 콘서트, 팬미팅, 그리고 일상의 순간들을 함께 나누고 있습니다.</p>
+                <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black tracking-[-0.24px] w-[336px]">{exhibitionData.description}</p>
               </div>
             </div>
           </div>
@@ -300,23 +388,12 @@ export default function ExhibitionDetailPage({
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Gallery</p>
               </div>
               <div className="h-[225.325px] relative shrink-0 w-full" data-name="Container">
-                <div className="absolute bg-gray-100 left-0 size-[108.662px] top-0" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
-                </div>
-                <div className="absolute bg-gray-100 left-[116.66px] size-[108.662px] top-0" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
-                </div>
-                <div className="absolute bg-gray-100 left-[233.32px] size-[108.662px] top-0" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
-                </div>
-                <div className="absolute bg-gray-100 left-0 size-[108.662px] top-[116.66px]" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
-                </div>
-                <div className="absolute bg-gray-100 left-[116.66px] size-[108.662px] top-[116.66px]" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
-                </div>
-                <div className="absolute bg-gray-100 left-[233.32px] size-[108.662px] top-[116.66px]" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0.8px] border-gray-200 border-solid inset-0 pointer-events-none" />
+                <div className="flex flex-wrap gap-[8px] w-full h-full">
+                  {exhibitionData.imageUrls.map((imageUrl, index) => (
+                    <div key={index} className="relative w-[108px] h-[108px] bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <img src={imageUrl} alt={`Exhibition Image ${index + 1}`} className="object-cover w-full h-full" />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -324,113 +401,56 @@ export default function ExhibitionDetailPage({
         </div>
 
         {/* Comments */}
-        <div className="h-[234px] relative shrink-0 w-full" data-name="Container">
+        <div className="relative shrink-0 w-full" data-name="Container">
           <div className="size-full">
-            <div className="box-border content-stretch flex flex-col gap-[16px] h-[234px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
+            <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] w-[95px]">Comments 3</p>
+                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] w-[95px]">Comments {comments.length}</p>
               </div>
-              <div className="content-stretch flex flex-col gap-[16px] h-[152px] items-start relative shrink-0 w-full" data-name="Container">
-                {/* Comment 1 */}
-                <div className="h-[40px] relative shrink-0 w-full" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-                  <div className="size-full">
-                    <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
-                      <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                        <div className="h-[16.5px] relative shrink-0 w-[64.775px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[64.775px]">
-                            <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">fan_user_123</p>
+              <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="h-[40px] relative shrink-0 w-full" data-name="Container">
+                    <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
+                    <div className="size-full">
+                      <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
+                        <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
+                          <div className="h-[16.5px] relative shrink-0 w-auto" data-name="Text">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
+                              <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
+                            </div>
+                          </div>
+                          <div className="h-[16.5px] relative shrink-0 w-[2.913px]" data-name="Text">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
+                              <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
+                            </div>
+                          </div>
+                          <div className="h-[16.5px] relative shrink-0 w-auto" data-name="Text">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
+                              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleString()}</p>
+                            </div>
                           </div>
                         </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[2.913px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
-                            <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
-                          </div>
+                        <div className="h-[19.5px] relative shrink-0 w-full" data-name="Paragraph">
+                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-[14px] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">{comment.content}</p>
                         </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[39.888px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[39.888px]">
-                            <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">2시간 전</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="h-[19.5px] relative shrink-0 w-full" data-name="Paragraph">
-                        <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-[14px] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">정말 멋진 전시관이에요! 👏</p>
                       </div>
                     </div>
                   </div>
-                </div>
-                {/* Comment 2 */}
-                <div className="h-[40px] relative shrink-0 w-full" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-                  <div className="size-full">
-                    <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
-                      <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                        <div className="h-[16.5px] relative shrink-0 w-[60.875px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[60.875px]">
-                            <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">music_lover</p>
-                          </div>
-                        </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[2.913px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
-                            <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
-                          </div>
-                        </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[39.188px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[39.188px]">
-                            <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">5시간 전</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="h-[19.5px] relative shrink-0 w-full" data-name="Paragraph">
-                        <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-[14px] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">추억이 가득하네요 ❤️</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Comment 3 */}
-                <div className="h-[40px] relative shrink-0 w-full" data-name="Container">
-                  <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-                  <div className="size-full">
-                    <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
-                      <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                        <div className="h-[16.5px] relative shrink-0 w-[47.063px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[47.063px]">
-                            <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">kpop_fan</p>
-                          </div>
-                        </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[2.913px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
-                            <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
-                          </div>
-                        </div>
-                        <div className="h-[16.5px] relative shrink-0 w-[28.063px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[28.063px]">
-                            <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">1일 전</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="h-[19.5px] relative shrink-0 w-full" data-name="Paragraph">
-                        <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-[14px] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">저도 가보고 싶어요!</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Buttons */}
-      <div className="h-[107.2px] relative shrink-0 w-full" data-name="Container">
-        <div className="size-full">
-          <div className="box-border content-stretch flex gap-[12px] h-[107.2px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
-            <button onClick={() => setIsLiked(!isLiked)} className={`basis-0 grow h-[59.2px] min-h-px min-w-px relative shrink-0 cursor-pointer transition-all ${isLiked ? 'bg-[#f360c0]' : ''}`} data-name="Button">
-              {!isLiked && <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />}
-              <div className="size-full">
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[59.2px] items-start pb-[1.6px] pt-[19.6px] px-[72.5px] relative w-full">
-                  <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                    <div className="absolute inset-[16.6%_8.33%_12.5%_8.33%]" data-name="Vector">
+        {/* Bottom Buttons */}
+        <div className="h-[107.2px] relative shrink-0 w-full" data-name="Container">
+          <div className="size-full">
+            <div className="box-border content-stretch flex gap-[12px] h-[107.2px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
+              <button onClick={() => setIsLiked(!isLiked)} className={`basis-0 grow h-[59.2px] min-h-px min-w-px relative shrink-0 cursor-pointer transition-all ${isLiked ? 'bg-[#f360c0]' : ''}`} data-name="Button">
+                {!isLiked && <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />}
+                <div className="size-full">
+                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[59.2px] items-start pb-[1.6px] pt-[19.6px] px-[72.5px] relative w-full">
+                    <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
                       {isLiked ? (
                         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17 15">
                           <path d={svgPaths.p2e5bda00} fill="var(--fill-0, white)" id="Vector" />
@@ -445,16 +465,23 @@ export default function ExhibitionDetailPage({
                     </div>
                   </div>
                 </div>
-              </div>
-            </button>
-            <button className="basis-0 bg-black grow h-[59px] min-h-px min-w-px relative shrink-0 cursor-pointer hover:bg-[#f360c0] transition-colors" data-name="Button">
-              <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
-              <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[10px] h-[59px] items-center justify-center relative w-full">
-                <div className="content-stretch flex items-start justify-center relative shrink-0" data-name="Text">
-                  <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">코멘트 작성</p>
+              </button>
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="코멘트를 작성해주세요..."
+                className="basis-0 grow h-[59px] min-h-px min-w-px relative shrink-0 border border-black p-2 rounded"
+              />
+              <button onClick={handleCommentSubmit} className="basis-0 bg-black grow h-[59px] min-h-px min-w-px relative shrink-0 cursor-pointer hover:bg-[#f360c0] transition-colors" data-name="Button">
+                <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[10px] h-[59px] items-center justify-center relative w-full">
+                  <div className="content-stretch flex items-start justify-center relative shrink-0" data-name="Text">
+                    <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">코멘트 작성</p>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>

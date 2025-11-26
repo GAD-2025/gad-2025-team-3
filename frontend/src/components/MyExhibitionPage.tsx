@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import svgPaths from "../imports/svg-etunpzbgmu";
 import ShareExhibitionModal from "./ShareExhibitionModal";
 
@@ -38,6 +39,7 @@ interface MyExhibitionPageProps {
 }
 
 export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: MyExhibitionPageProps) {
+  const navigate = useNavigate();
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
@@ -75,6 +77,10 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
   const handleShareClick = (exhibition: Exhibition) => {
     setSelectedExhibition(exhibition);
     setShareModalOpen(true);
+  };
+
+  const handleExhibitionClick = (exhibition: Exhibition) => {
+    navigate(`/exhibition/${exhibition.id}`);
   };
 
   const getRoomNumber = (index: number) => {
@@ -202,7 +208,8 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
               {[...exhibitions].reverse().map((exhibition, index) => (
                 <div
                   key={exhibition.id}
-                  className="box-border content-stretch flex flex-col h-[206.8px] items-start p-[1.6px] relative shrink-0 w-full"
+                  onClick={() => handleExhibitionClick(exhibition)}
+                  className="box-border content-stretch flex flex-col h-[206.8px] items-start p-[1.6px] relative shrink-0 w-full cursor-pointer hover:shadow-lg transition-shadow"
                   data-name="Container"
                 >
                   <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />

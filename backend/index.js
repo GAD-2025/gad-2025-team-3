@@ -201,56 +201,115 @@ app.get('/api/exhibitions', async (req, res) => {
         res.status(200).json(rows);
 
     } catch (error) {
-        console.error('Fetch exhibitions error:', error.stack);
+        console.error('Fetch exhibitions error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-// API for fetching favorite exhibitions for a user
-app.get('/api/favorites', async (req, res) => {
-    const { userId } = req.query;
+app.get('/api/exhibitions/:id', async (req, res) => {
+    const { id } = req.params;
 
-    if (!userId) {
-        return res.status(400).json({ message: 'User ID is required.' });
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `
+            SELECT 
+                e.id, 
+                e.title, 
+                e.description, 
+                e.start_date, 
+                e.end_date, 
+                e.is_public, 
+                e.views, 
+                e.likes, 
+                e.shares, 
+                e.created_at,
+                u.nickname as author
+            FROM 
+                exhibitions e
+            JOIN 
+                users u ON e.user_id = u.id
+            WHERE 
+                e.id = ?
+            `,
+            [id]
+        );
+        connection.release();
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Exhibition not found.' });
+        }
+
+        res.status(200).json(rows[0]);
+
+    } catch (error) {
+        console.error('Fetch single exhibition error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching exhibition items by exhibition ID
+app.get('/api/exhibitions/:id/items', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT item_url FROM exhibition_items WHERE exhibition_id = ?',
+            [id]
+        );
+        connection.release();
+        res.status(200).json(rows.map(row => row.item_url));
+    } catch (error) {
+        console.error('Fetch exhibition items error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching comments for an exhibition
+app.get('/api/exhibitions/:id/comments', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT id, author, content, created_at FROM comments WHERE exhibition_id = ? ORDER BY created_at DESC',
+            [id]
+        );
+        connection.release();
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Fetch comments error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for posting a new comment to an exhibition
+app.post('/api/exhibitions/:id/comments', async (req, res) => {
+    const { id } = req.params;
+    const { author, content } = req.body;
+
+    if (!author || !content) {
+        return res.status(400).json({ message: 'Author and content are required for a comment.' });
     }
 
     try {
         const connection = await pool.getConnection();
-        try {
-            const query = `
-                SELECT 
-                    e.id, 
-                    e.title, 
-                    e.description, 
-                    e.start_date, 
-                    e.end_date, 
-                    e.is_public, 
-                    e.views, 
-                    e.likes, 
-                    e.shares, 
-                    e.created_at,
-                    u.nickname as author
-                FROM 
-                    exhibitions e
-                JOIN 
-                    user_favorites uf ON e.id = uf.exhibition_id
-                JOIN
-                    users u ON e.user_id = u.id
-                WHERE 
-                    uf.user_id = ?
-                ORDER BY 
-                    uf.created_at DESC
-            `;
-            const [rows] = await connection.execute(query, [userId]);
-            connection.release();
-            res.status(200).json(rows);
-        } catch (error) {
-            connection.release();
-            console.error('Fetch favorites error:', error.stack);
-            res.status(500).json({ message: 'Internal server error' });
-        }
+        const [result] = await connection.execute(
+            'INSERT INTO comments (exhibition_id, author, content) VALUES (?, ?, ?)',
+            [id, author, content]
+        );
+        connection.release();
+
+        const newCommentId = result.insertId;
+        const [newCommentRows] = await connection.execute(
+            'SELECT id, author, content, created_at FROM comments WHERE id = ?',
+            [newCommentId]
+        );
+
+        res.status(201).json(newCommentRows[0]);
     } catch (error) {
-        console.error('DB connection error:', error.stack);
+        console.error('Post comment error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

@@ -5,6 +5,7 @@ interface ExploreSearchResultsPageProps {
   onBack: () => void;
   searchQuery?: string;
   onExhibitionClick?: (data: {
+    id: string;
     title: string;
     author: string;
     room: string;
@@ -14,7 +15,7 @@ interface ExploreSearchResultsPageProps {
   }) => void;
 }
 
-export default function ExploreSearchResultsPage({ 
+export default function ExploreSearchResultsPage({
   onBack,
   searchQuery = 'BTS',
   onExhibitionClick
@@ -23,6 +24,7 @@ export default function ExploreSearchResultsPage({
 
   const results = [
     {
+      id: 'bts-army-global-exhibition',
       title: 'BTS ARMY 글로벌 전시관',
       description: '전 세계 ARMY들의 추억을 모은 특별한 공간입니다.',
       author: 'army_forever',
@@ -32,6 +34,7 @@ export default function ExploreSearchResultsPage({
       shares: '156'
     },
     {
+      id: 'nct-127-fanart-gallery',
       title: 'NCT 127 팬아트 갤러리',
       description: 'NCT 127 팬들의 창작물을 모은 갤러리입니다.',
       author: 'nctzen_art',
@@ -41,6 +44,7 @@ export default function ExploreSearchResultsPage({
       shares: '89'
     },
     {
+      id: 'blackpink-world-tour',
       title: 'BLACKPINK 월드투어',
       description: '월드투어의 감동을 함께 나누는 공간입니다.',
       author: 'blink_official',
@@ -50,7 +54,6 @@ export default function ExploreSearchResultsPage({
       shares: '123'
     }
   ];
-
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
       {/* Header */}
