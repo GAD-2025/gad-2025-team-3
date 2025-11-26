@@ -64,6 +64,7 @@ interface ExhibitionData {
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites'>('loading');
+  const [previousView, setPreviousView] = useState<'loading' | 'login' | 'signup' | 'main' | 'profile' | 'badges' | 'settings' | 'myexhibition' | 'createexhibition' | 'createexhibitionupload' | 'createexhibitionsettings' | 'createexhibitioncomplete' | 'statistics' | 'exploretrending' | 'exploresearchresults' | 'exploremain' | 'exhibitiondetail' | 'favorites' | null>(null);
   const [signupStep, setSignupStep] = useState(1);
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -360,7 +361,10 @@ export default function App() {
     return (
       <MainPage 
         onNavigateToProfile={() => setCurrentView('profile')}
-        onNavigateToMyExhibition={() => setCurrentView('myexhibition')}
+        onNavigateToMyExhibition={() => {
+          setPreviousView(currentView);
+          setCurrentView('myexhibition');
+        }}
         onNavigateToStatistics={() => setCurrentView('statistics')}
         onNavigateToExplore={() => setCurrentView('exploremain')}
         onNavigateToFavorites={() => setCurrentView('favorites')}
@@ -388,7 +392,10 @@ export default function App() {
         onBack={() => setCurrentView('main')}
         onNavigateToBadges={() => setCurrentView('badges')}
         onNavigateToSettings={() => setCurrentView('settings')}
-        onNavigateToMyExhibition={() => setCurrentView('myexhibition')}
+        onNavigateToMyExhibition={() => {
+          setPreviousView(currentView);
+          setCurrentView('myexhibition');
+        }}
         onLogout={handleLogout}
       />
     );
@@ -410,7 +417,7 @@ export default function App() {
   if (currentView === 'myexhibition') {
     return (
       <MyExhibitionPage 
-        onBack={() => setCurrentView('profile')}
+        onBack={() => setCurrentView(previousView || 'main')}
         onCreateNew={() => setCurrentView('createexhibition')}
         currentUser={currentUser}
       />
