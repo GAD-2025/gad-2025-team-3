@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import svgPaths from "../imports/svg-d9kg8os1tu";
 
 interface CreateExhibitionUploadPageProps {
@@ -10,36 +10,76 @@ interface CreateExhibitionUploadPageProps {
 
 export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFiles, setUploadedFiles }: CreateExhibitionUploadPageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const fileReaders: Promise<string>[] = Array.from(files).map((file) => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+
+    try {
+      // Create previews for immediate display
+      const newPreviews: string[] = await Promise.all(
+        Array.from(files).map((file) => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+
+      // Upload files to server
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append('files', file);
       });
 
-      Promise.all(fileReaders).then((dataUrls) => {
-        setUploadedFiles([...uploadedFiles, ...dataUrls]);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+
+      const result = await response.json();
+      const serverUrls: string[] = result.urls;
+
+      // Update state with server URLs (for database) and previews (for display)
+      setUploadedFiles([...uploadedFiles, ...serverUrls]);
+      setPreviewUrls([...previewUrls, ...newPreviews]);
+
+    } catch (error: any) {
+      console.error('File upload error:', error);
+      alert('파일 업로드에 실패했습니다: ' + error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleRemoveFile = (index: number) => {
     const newFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(newFiles);
+    const newPreviews = previewUrls.filter((_, i) => i !== index);
+    setPreviewUrls(newPreviews);
   };
+
+  // Use server URLs for display if available, otherwise fall back to previews
+  // When page loads with existing uploadedFiles from App state (server URLs), we use those
+  const displayUrls = previewUrls.length > 0 ? previewUrls : uploadedFiles;
 
   const handleAddMoreClick = () => {
     fileInputRef.current?.click();
   };
 
-  const isButtonEnabled = uploadedFiles.length > 0;
+  const isButtonEnabled = uploadedFiles.length > 0 && !isUploading;
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -191,7 +231,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                   <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                   
                   {/* Uploaded Images */}
-                  {uploadedFiles.map((fileUrl, index) => (
+                  {displayUrls.map((fileUrl, index) => (
                     <div key={index} className="relative shrink-0 size-[140px]">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
                         <div className="absolute left-0 size-[140px] top-0">
@@ -259,8 +299,10 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
               {isButtonEnabled && <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />}
               <div className="flex flex-col justify-center size-full">
                 <div className="box-border content-stretch flex flex-col gap-[10px] items-start justify-center pl-[24px] pr-px py-[20px] relative w-full">
-                  <div className="content-stretch flex h-[16.616px] items-start relative shrink-0 w-[26.794px]" data-name="Text">
-                    <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">다음으로 </p>
+                  <div className="content-stretch flex h-[16.616px] items-start relative shrink-0" data-name="Text">
+                    <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">
+                      {isUploading ? '업로드 중...' : '다음으로'}
+                    </p>
                   </div>
                 </div>
               </div>

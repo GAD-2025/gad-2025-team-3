@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 // 1. 🟢 필수 수정: .env 파일 경로 명시
-require('dotenv').config(); 
+require('dotenv').config();
 
 const app = express();
 app.use(cors({
@@ -14,12 +17,65 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 
+// Serve static files from img_save folder
+app.use('/uploads', express.static(path.join(__dirname, 'img_save')));
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, 'img_save');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, uniqueSuffix + ext);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|webm|mov/;
+        const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        if (ext && mimetype) {
+            return cb(null, true);
+        }
+        cb(new Error('Only image and video files are allowed!'));
+    }
+});
+
 // 2. ❌ 기존 const pool 선언 위치: 이 위치에서 선언하면 DB 연결 실패 시 서버 시작이 멈춥니다.
 // const pool = mysql.createPool({...}); 
 
 
 // 🟢 수정: Pool 객체를 담을 변수를 전역으로 선언
-let pool; 
+let pool;
+
+// ----------------------------------------------------------------------------------
+
+// API for uploading files
+app.post('/api/upload', upload.array('files', 20), (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files uploaded.' });
+        }
+
+        const fileUrls = req.files.map(file => {
+            return `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+        });
+
+        res.status(200).json({ urls: fileUrls });
+    } catch (error) {
+        console.error('File upload error:', error);
+        res.status(500).json({ message: 'File upload failed: ' + error.message });
+    }
+});
 
 // ----------------------------------------------------------------------------------
 
@@ -54,9 +110,15 @@ app.post('/api/signup', async (req, res) => {
             }
 
             await connection.commit();
+
+            // Fetch the newly created user to return it in the response
+            const [rows] = await connection.execute('SELECT * FROM users WHERE id = ?', [userId]);
+            const newUser = rows[0];
+            const { password: _, ...userWithoutPassword } = newUser;
+
             connection.release();
 
-            res.status(201).json({ message: 'User created successfully' });
+            res.status(201).json({ message: 'User created successfully', user: userWithoutPassword });
         } catch (error) {
             await connection.rollback();
             connection.release();

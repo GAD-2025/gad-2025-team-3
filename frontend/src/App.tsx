@@ -272,7 +272,12 @@ export default function App() {
 
       const result = await response.json();
       console.log('Signup successful:', result);
-      setSignupStep(5); // Move to complete page on success
+      if (result.user) {
+        setCurrentUser(result.user);
+        navigate('/main');
+      } else {
+        setSignupStep(5); // Fallback to complete page
+      }
 
     } catch (error: any) { // Use 'any' for error type for now
       console.error('An error occurred during signup:', error);
@@ -316,7 +321,6 @@ export default function App() {
 
       const result = await response.json();
       console.log('Exhibition created successfully:', result);
-      setCurrentView('createexhibitioncomplete');
       // Reset exhibition creation states
       setExhibitionTitle('');
       setDescription('');
@@ -324,6 +328,7 @@ export default function App() {
       setEndDate(undefined);
       setIsPublic(true);
       setUploadedFiles([]);
+      navigate('/create-exhibition/complete');
 
     } catch (error: any) {
       console.error('Error creating exhibition:', error);
