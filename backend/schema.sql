@@ -12,6 +12,13 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE user_artists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    artist_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+
 CREATE TABLE IF NOT EXISTS exhibitions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
