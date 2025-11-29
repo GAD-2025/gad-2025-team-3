@@ -169,8 +169,8 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
                   {/* Room Number */}
                   <div className="absolute bg-white box-border content-stretch flex flex-col h-[64.6px] items-start justify-center left-[1.6px] pb-[4px] pt-0 px-[12px] top-[1.6px] w-[159.8px]" data-name="Container">
                     <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-                    <div className="box-border content-stretch flex items-start mb-[-4px] opacity-60 relative shrink-0 w-full" data-name="Container">
-                      <p className="basis-0 font-['EB_Garamond',serif] grow leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[12px] text-black tracking-[0.3px]">Room</p>
+                    <div className="box-border content-stretch flex items-start justify-start mb-[-4px] opacity-60 relative shrink-0 w-full" data-name="Container">
+                      <p className="basis-0 font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[12px] text-black tracking-[0.3px]">Room</p>
                     </div>
                     <div className="box-border content-stretch flex gap-[10px] items-center mb-[-4px] relative shrink-0 w-full" data-name="Container">
                       <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-black text-nowrap whitespace-pre">{exhibition.room}</p>
@@ -188,7 +188,7 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
                       <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[12px] text-black text-nowrap top-[0.2px] tracking-[-0.24px] whitespace-pre">{exhibition.title}</p>
                     </div>
                     <div className="content-stretch flex h-[13.5px] items-start relative shrink-0 w-full" data-name="Container">
-                      <p className="basis-0 font-['EB_Garamond',serif] grow leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">{exhibition.author}</p>
+                      <p className="basis-0 font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">{exhibition.author}</p>
                     </div>
                   </div>
                 </button>
