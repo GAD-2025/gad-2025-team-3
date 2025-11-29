@@ -218,12 +218,12 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                   <div className="bg-black relative shrink-0 w-full" data-name="Container">
                     <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
                     <div className="size-full">
-                      <div className="box-border content-stretch flex flex-col items-center p-[14px] relative w-full">
-                        <div className="content-stretch flex items-center relative shrink-0" data-name="Text">
+                      <div className="box-border content-stretch flex flex-col items-start p-[14px] relative w-full">
+                        <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
                           <p className="font-['EB_Garamond',serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-white w-[37.938px]">Room</p>
                         </div>
-                        <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Container">
-                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-white">{getRoomNumber(index)}</p>
+                        <div className="content-stretch flex gap-[10px] items-center relative shrink-0" data-name="Container">
+                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-nowrap text-white whitespace-pre">{getRoomNumber(index)}</p>
                         </div>
                       </div>
                     </div>
