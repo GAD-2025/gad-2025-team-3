@@ -502,7 +502,7 @@ export default function App() {
       } />
       <Route path="/exhibition/:id" element={
         <ExhibitionDetailPage 
-          onBack={() => navigate('/explore/search')} 
+          onBack={() => navigate('/myexhibition')} 
           exhibitionData={selectedExhibition}
         />
       } />
