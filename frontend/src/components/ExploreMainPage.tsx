@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import svgPaths from "../imports/svg-6lwitwjk3d";
 
 interface ExploreMainPageProps {
   onBack: () => void;
-  onSearch: () => void;
+  onSearch: (searchQuery: string) => void;
 }
 
 export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPageProps) {
@@ -85,7 +85,7 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
               
               {/* Search Button */}
               <button 
-                onClick={onSearch}
+                onClick={() => onSearch('')}
                 className="relative shrink-0 size-[20px] cursor-pointer" 
                 data-name="Button"
               >

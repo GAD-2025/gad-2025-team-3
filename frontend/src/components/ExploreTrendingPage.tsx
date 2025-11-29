@@ -1,30 +1,60 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import svgPaths from "../imports/svg-cs3z6bunx5";
 
 interface ExploreTrendingPageProps {
   onBack: () => void;
-  onSearch: () => void;
+  onSearch: (searchQuery: string) => void;
   onKeywordClick?: (keyword: string) => void;
 }
 
-export default function ExploreTrendingPage({ 
-  onBack, 
+export default function ExploreTrendingPage({
+  onBack,
   onSearch,
-  onKeywordClick 
+  onKeywordClick
 }: ExploreTrendingPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const keywords = [
-    { rank: '01', text: 'BTS' },
-    { rank: '02', text: '아이유' },
-    { rank: '03', text: 'BLACKPINK' },
-    { rank: '04', text: 'NCT' },
-    { rank: '05', text: 'SEVENTEEN' },
-    { rank: '06', text: 'NewJeans' },
-    { rank: '07', text: '콘서트' },
-    { rank: '08', text: '팬미팅' },
-    { rank: '09', text: '앨범' },
-    { rank: '10', text: '포토카드' },
+    {
+      rank: '01',
+      text: 'BTS'
+    },
+    {
+      rank: '02',
+      text: '아이유'
+    },
+    {
+      rank: '03',
+      text: 'BLACKPINK'
+    },
+    {
+      rank: '04',
+      text: 'NCT'
+    },
+    {
+      rank: '05',
+      text: 'SEVENTEEN'
+    },
+    {
+      rank: '06',
+      text: 'NewJeans'
+    },
+    {
+      rank: '07',
+      text: '콘서트'
+    },
+    {
+      rank: '08',
+      text: '팬미팅'
+    },
+    {
+      rank: '09',
+      text: '앨범'
+    },
+    {
+      rank: '10',
+      text: '포토카드'
+    },
   ];
 
   return (
@@ -80,7 +110,7 @@ export default function ExploreTrendingPage({
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
-                          onSearch();
+                          onSearch(searchQuery);
                         }
                       }}
                       placeholder="전시관, 아티스트 검색"

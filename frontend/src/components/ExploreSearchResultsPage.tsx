@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import svgPaths from "../imports/svg-jbhf0egdok";
 
 interface ExploreSearchResultsPageProps {
   onBack: () => void;
-  searchQuery?: string;
   onExhibitionClick?: (data: {
     id: string;
     title: string;
@@ -17,12 +17,26 @@ interface ExploreSearchResultsPageProps {
 
 export default function ExploreSearchResultsPage({
   onBack,
-  searchQuery = 'BTS',
   onExhibitionClick
 }: ExploreSearchResultsPageProps) {
-  const [searchText, setSearchText] = useState(searchQuery);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialSearchQuery = (location.state as { searchQuery?: string })?.searchQuery || '';
 
-  const results = [
+  const [inputSearchText, setInputSearchText] = useState(initialSearchQuery);
+  const [submittedSearchText, setSubmittedSearchText] = useState(initialSearchQuery);
+
+  // Effect to redirect if submittedSearchText becomes empty
+  useEffect(() => {
+    if (submittedSearchText === '') {
+      // Only redirect if it's not the initial empty state from a direct URL access
+      // or if the user explicitly cleared the search.
+      // We can refine this later if needed, but for now, if it's empty, go to trending.
+      navigate('/explore/trending');
+    }
+  }, [submittedSearchText, navigate]);
+
+  const allResults = [
     {
       id: 'bts-army-global-exhibition',
       title: 'BTS ARMY 글로벌 전시관',
@@ -54,6 +68,37 @@ export default function ExploreSearchResultsPage({
       shares: '123'
     }
   ];
+
+  const filteredResults = allResults.filter(result => {
+    if (!submittedSearchText) return false; // No results if no search has been submitted
+
+    const lowerCaseSearchText = submittedSearchText.toLowerCase();
+    const btsKeywords = ['bts', '비티에스'];
+
+    // Check if the submitted search text itself contains a BTS keyword
+    const searchContainsBTSKeyword = btsKeywords.some(keyword => lowerCaseSearchText.includes(keyword));
+
+    // Prepare result fields for case-insensitive comparison
+    const lowerCaseTitle = result.title.toLowerCase();
+    const lowerCaseDescription = result.description.toLowerCase();
+
+    if (searchContainsBTSKeyword) {
+      // If the search query is BTS-related, check if the result's title or description contains 'bts' or '비티에스' (case-insensitive)
+      return lowerCaseTitle.includes('bts') || lowerCaseDescription.includes('bts') ||
+             lowerCaseTitle.includes('비티에스') || lowerCaseDescription.includes('비티에스');
+    }
+
+    // General search: check if title, description, or author contains the submitted search text (case-insensitive)
+    return lowerCaseTitle.includes(lowerCaseSearchText) ||
+           lowerCaseDescription.includes(lowerCaseSearchText) ||
+           result.author.toLowerCase().includes(lowerCaseSearchText);
+  });
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setSubmittedSearchText(inputSearchText);
+    }
+  };
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
       {/* Header */}
@@ -103,8 +148,9 @@ export default function ExploreSearchResultsPage({
                     </div>
                     <input
                       type="text"
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
+                      value={inputSearchText}
+                      onChange={(e) => setInputSearchText(e.target.value)}
+                      onKeyDown={handleKeyDown}
                       className="basis-0 grow h-[21px] min-h-px min-w-px bg-transparent border-none outline-none font-['Pretendard',sans-serif] leading-[20px] text-[#4a5565] text-[14px] tracking-[-0.28px]"
                       data-name="Text Input"
                     />
@@ -121,11 +167,11 @@ export default function ExploreSearchResultsPage({
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[24px] h-[370.4px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
             <div className="h-[18px] relative shrink-0 w-full" data-name="Heading 2">
-              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] top-[-0.2px] tracking-[-0.24px] w-[84px]">검색 결과 {results.length}개</p>
+              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] top-[-0.2px] tracking-[-0.24px] w-[84px]">검색 결과 {filteredResults.length}개</p>
             </div>
             
             <div className="content-stretch flex flex-col gap-[16px] h-[280.4px] items-start relative shrink-0 w-full" data-name="Container">
-              {results.map((result, index) => (
+              {filteredResults.map((result, index) => (
                 <button
                   key={index}
                   onClick={() => onExhibitionClick && onExhibitionClick(result)}

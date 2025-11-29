@@ -481,17 +481,16 @@ export default function App() {
       <Route path="/explore" element={
         <ExploreMainPage
           onBack={() => navigate('/main')}
-          onSearch={() => navigate('/explore/search')}
+          onSearch={(searchQuery: string) => navigate('/explore/search', { state: { searchQuery } })}
         />
       } />
       <Route path="/explore/trending" element={
         <ExploreTrendingPage 
           onBack={() => navigate('/main')} 
-          onSearch={() => navigate('/explore/search')}
-          onKeywordClick={(keyword) => navigate('/explore/search')}
+          onSearch={(searchQuery: string) => navigate('/explore/search', { state: { searchQuery } })}
+          onKeywordClick={(keyword) => navigate('/explore/search', { state: { searchQuery: keyword } })}
         />
-      } />
-      <Route path="/explore/search" element={
+      } />      <Route path="/explore/search" element={
         <ExploreSearchResultsPage 
           onBack={() => navigate('/explore/trending')} 
           onExhibitionClick={(data) => {
