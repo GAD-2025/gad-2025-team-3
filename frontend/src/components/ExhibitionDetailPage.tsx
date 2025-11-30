@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import svgPaths from '../imports/svgPaths'; // Import svgPaths
+import { ChevronLeft, Heart, Share2, Eye, Star } from 'react-feather';
+import { motion } from 'framer-motion';
 interface ExhibitionData {
   title: string;
   author: string;
@@ -26,6 +27,10 @@ interface Circle {
   size: number;
   duration: number;
   delay: number;
+}
+
+interface ExhibitionDetailPageProps {
+  onBack: () => void;
 }
 
 export default function ExhibitionDetailPage({
@@ -176,80 +181,19 @@ export default function ExhibitionDetailPage({
             <div className="flex flex-row items-center size-full">
               <div className="box-border content-stretch flex h-[84px] items-center justify-between px-[24px] py-0 relative w-full">
                 <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer" data-name="Button">
-                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start relative size-[20px]">
-                    <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                      <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">
-                        <div className="absolute inset-[-7.14%_-14.29%]">
-                          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 14">
-                            <path d={svgPaths.p37c3e100} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-1/2 left-[20.83%] right-[20.83%] top-1/2" data-name="Vector">
-                        <div className="absolute inset-[-0.83px_-7.14%]">
-                          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 14 2">
-                            <path d="M12.5 0.833333H0.833333" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <ChevronLeft size={20} />
                 </button>
                 <div className="h-[36px] relative shrink-0 w-[80px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative w-[80px]">
                     <div className="relative shrink-0 size-[36px]" data-name="Button">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[8px] px-[8px] relative size-[36px]">
-                        <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                          <div className="absolute inset-[8.33%_8.33%_12.2%_8.33%]" data-name="Vector">
-                            <div className="absolute inset-[-5.24%_-5%]">
-                              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19 18">
-                                <path d={svgPaths.p31c92d00} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
+                        <Heart size={20} />
                       </div>
                     </div>
                     <div className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0" data-name="Button">
                       <div className="size-full">
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[36px] items-start pb-0 pt-[8px] px-[8px] relative w-full">
-                          <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                            <div className="absolute inset-[8.33%_12.5%_66.67%_62.5%]" data-name="Vector">
-                              <div className="absolute inset-[-16.67%]">
-                                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 7">
-                                  <path d={svgPaths.p2314a170} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="absolute inset-[37.5%_62.5%_37.5%_12.5%]" data-name="Vector">
-                              <div className="absolute inset-[-16.67%]">
-                                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 7">
-                                  <path d={svgPaths.p2314a170} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="absolute inset-[66.67%_12.5%_8.33%_62.5%]" data-name="Vector">
-                              <div className="absolute inset-[-16.67%]">
-                                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 7">
-                                  <path d={svgPaths.p2314a170} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="absolute inset-[56.29%_35.75%_27.12%_35.79%]" data-name="Vector">
-                              <div className="absolute inset-[-25.13%_-14.64%]">
-                                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 5">
-                                  <path d={svgPaths.p159ed400} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="absolute inset-[27.13%_35.79%_56.29%_35.79%]" data-name="Vector">
-                              <div className="absolute inset-[-25.13%_-14.67%]">
-                                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 5">
-                                  <path d={svgPaths.p93d600} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
+                          <Share2 size={20} />
                         </div>
                       </div>
                     </div>
@@ -309,12 +253,7 @@ export default function ExhibitionDetailPage({
                 <div className="h-[16.5px] relative shrink-0 w-[51.4px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[16.5px] items-center relative w-[51.4px]">
                     <div className="relative shrink-0 size-[16px]" data-name="Icon">
-                      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
-                        <g id="Icon">
-                          <path d={svgPaths.pb43a980} id="Vector" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d={svgPaths.p28db2b80} id="Vector_2" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                        </g>
-                      </svg>
+                      <Eye size={16} color="#4A5565" />
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[27.4px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[27.4px]">
@@ -326,11 +265,7 @@ export default function ExhibitionDetailPage({
                 <div className="h-[16.5px] relative shrink-0 w-[38.725px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[16.5px] items-center relative w-[38.725px]">
                     <div className="relative shrink-0 size-[16px]" data-name="Icon">
-                      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
-                        <g id="Icon">
-                          <path d={svgPaths.p133d9800} id="Vector" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                        </g>
-                      </svg>
+                      <Star size={16} color="#4A5565" />
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[14.725px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[14.725px]">
@@ -342,15 +277,7 @@ export default function ExhibitionDetailPage({
                 <div className="h-[16.5px] relative shrink-0 w-[35.325px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[16.5px] items-center relative w-[35.325px]">
                     <div className="relative shrink-0 size-[16px]" data-name="Icon">
-                      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
-                        <g id="Icon">
-                          <path d={svgPaths.p185fb780} id="Vector" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d={svgPaths.p30ca5e80} id="Vector_2" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d={svgPaths.pac25b80} id="Vector_3" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                          <path d="M5.72668 9.00667L10.28 11.66" id="Vector_4" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                          <path d={svgPaths.p39b18600} id="Vector_5" stroke="var(--stroke-0, #4A5565)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        </g>
-                      </svg>
+                      <Share2 size={16} color="#4A5565" />
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[11.325px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[11.325px]">
@@ -449,19 +376,9 @@ export default function ExhibitionDetailPage({
               <button onClick={() => setIsLiked(!isLiked)} className={`basis-0 grow h-[59.2px] min-h-px min-w-px relative shrink-0 cursor-pointer transition-all ${isLiked ? 'bg-[#f360c0]' : ''}`} data-name="Button">
                 {!isLiked && <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />}
                 <div className="size-full">
-                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[59.2px] items-start pb-[1.6px] pt-[19.6px] px-[72.5px] relative w-full">
-                    <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                      {isLiked ? (
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17 15">
-                          <path d={svgPaths.p2e5bda00} fill="var(--fill-0, white)" id="Vector" />
-                        </svg>
-                      ) : (
-                        <div className="absolute inset-[-5.88%_-5%]">
-                          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19 16">
-                            <path d={svgPaths.p12f1f900} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                          </svg>
-                        </div>
-                      )}
+                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[59.2px] items-center justify-center relative w-full">
+                    <div className="h-[20px] overflow-clip relative shrink-0" data-name="Icon">
+                      <Heart size={20} color={isLiked ? 'white' : 'black'} fill={isLiked ? 'white' : 'none'} />
                     </div>
                   </div>
                 </div>
