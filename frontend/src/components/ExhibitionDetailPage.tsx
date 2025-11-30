@@ -317,7 +317,7 @@ export default function ExhibitionDetailPage({
               <div className="h-[225.325px] relative shrink-0 w-full overflow-y-auto" data-name="Container">
                 <div className="flex flex-wrap gap-[8px] w-full h-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
-                    <div key={index} className="relative w-[72px] h-[72px] bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <div key={index} className="relative bg-gray-100 flex items-center justify-center overflow-hidden" style={{ width: '72px', height: '72px' }}>
                       <img src={imageUrl} alt={`Exhibition Image ${index + 1}`} className="object-cover w-full h-full" />
                     </div>
                   ))}
@@ -341,19 +341,19 @@ export default function ExhibitionDetailPage({
                     <div className="size-full">
                       <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
                         <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                          <div className="h-[16.5px] relative shrink-0 w-auto flex-shrink-0 max-w-full" data-name="Text">
-                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
-                              <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
+                          <div className="h-[16.5px] relative shrink-0 flex-shrink-0 max-w-full" data-name="Text">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
+                              <p className="font-['EB_Garamond',serif] leading-[16px] not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
                             </div>
                           </div>
                           <div className="h-[16.5px] relative shrink-0 w-[2.913px] flex-shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
-                              <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
+                              <p className="font-['Playfair_Display',serif] font-normal leading-[16.5px] text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
                             </div>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0 w-auto flex-shrink-0" data-name="Text">
-                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
-                              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleDateString()}</p>
+                          <div className="h-[16.5px] relative shrink-0 flex-shrink-0" data-name="Text">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
+                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleDateString()}</p>
                             </div>
                           </div>
                         </div>
