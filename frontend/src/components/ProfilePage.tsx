@@ -218,157 +218,15 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="gap-[12px] grid grid-cols-[repeat(3,_minmax(0px,_1fr))] grid-rows-[repeat(1,_minmax(0px,_1fr))] h-[74.7px] relative shrink-0 w-full" data-name="Container">
-              {/* 전체 조회수 */}
-              <div className="[grid-area:1_/_1] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
-                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-                <div className="relative shrink-0 w-full" data-name="Container">
-                  <div className="flex flex-row items-center justify-center size-full">
-                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[18px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_views}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
-                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 조회수</p>
-                </div>
-              </div>
-              {/* 전체 좋아요수 */}
-              <div className="[grid-area:1_/_2] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
-                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-                <div className="relative shrink-0 w-full" data-name="Container">
-                  <div className="flex flex-row items-center justify-center size-full">
-                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[25px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_likes}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
-                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 좋아요수</p>
-                </div>
-              </div>
-              {/* 전체 공유수 */}
-              <div className="[grid-area:1_/_3] content-stretch flex flex-col h-[74.7px] items-center justify-center relative shrink-0" data-name="Container">
-                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-                <div className="relative shrink-0 w-full" data-name="Container">
-                  <div className="flex flex-row items-center justify-center size-full">
-                    <div className="box-border content-stretch flex gap-[10px] items-center justify-center px-[30px] py-px relative w-full">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-center text-nowrap whitespace-pre">{user.total_shares}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
-                  <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-center tracking-[-0.24px] w-[78.8px]">전체 공유수</p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
 
-      {/* Menu Section */}
-      <div className="h-[330.8px] relative shrink-0 w-full" data-name="Container">
-        <div className="absolute content-stretch flex gap-[10px] items-center left-[24px] top-[24.12px] w-[342px]" data-name="Heading 3">
-          <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Menu</p>
-        </div>
-        {/* 나의 전시관 */}
-        <button 
-          onClick={onNavigateToMyExhibition}
-          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer" 
-          data-name="Button"
-        >
-          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0 w-[181.9px]">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] items-center relative w-[181.9px]">
-              <div className="relative shrink-0 size-[20px]" data-name="Icon">
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                  <g id="Icon">
-                    <path d={iconPaths.p2ac52300} fill="var(--stroke-0, black)" id="Union" />
-                  </g>
-                </svg>
-              </div>
-              <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
-                <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">나의 전시관</p>
-              </div>
-            </div>
-          </div>
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">{user.exhibition_count}개</p>
-            </div>
-          </div>
-        </button>
-        {/* 받은 배지 */}
-        <button 
-          onClick={onNavigateToBadges}
-          className="absolute box-border content-stretch flex gap-[12px] h-[56.2px] items-center left-[24px] pl-[17.6px] pr-[1.6px] py-[1.6px] top-[122.2px] w-[342px] cursor-pointer" 
-          data-name="Button"
-        >
-          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0 size-[20px]" data-name="Icon">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-              <g id="Icon">
-                <path d={svgPaths.p27e2e0c0} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                <path d={svgPaths.p809b580} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-              </g>
-            </svg>
-          </div>
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">받은 배지</p>
-            </div>
-          </div>
-        </button>
-        {/* 활동 통계 */}
-        <button 
-          className="absolute box-border content-stretch flex gap-[12px] h-[56.2px] items-center left-[24px] pl-[17.6px] pr-[266.812px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer" 
-          data-name="Button"
-        >
-          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0 size-[20px]" data-name="Icon">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-              <g id="Icon">
-                <path d={iconPaths.p391f8480} fill="var(--fill-0, black)" id="Union" />
-              </g>
-            </svg>
-          </div>
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">활동 통계</p>
-            </div>
-          </div>
-        </button>
-        {/* 즐겨찾기 */}
-        <button 
-          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[250.6px] w-[342px] cursor-pointer" 
-          data-name="Button"
-        >
-          <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-          <div className="relative shrink-0 w-[176.9px]">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] items-center relative w-[176.9px]">
-              <div className="relative shrink-0 size-[20px]" data-name="Icon">
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                  <g id="Icon">
-                    <path d={iconPaths.p28ca6b00} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                  </g>
-                </svg>
-              </div>
-              <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Text">
-                <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">즐겨찾기</p>
-              </div>
-            </div>
-          </div>
-          <div className="relative shrink-0" data-name="Text">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[10px] items-center justify-center relative">
-              <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px] w-full">3개</p>
-            </div>
-          </div>
-        </button>
-      </div>
+
 
       {/* Account Section */}
-      <div className="relative shrink-0 w-full" data-name="Container">
+      <div className="relative shrink-0 w-full mt-[24px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full">
@@ -451,53 +309,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
         </div>
       </div>
 
-      {/* Notifications Section */}
-      <div className="relative shrink-0 w-full" data-name="Container">
-        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-        <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full">
-            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Notifications</p>
-            </div>
-            {/* 알림 설정 */}
-            <button 
-              onClick={() => handleFeatureClick('알림 설정')}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
-              data-name="Button"
-            >
-              <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-              <div className="flex flex-row items-center size-full">
-                <div className="box-border content-stretch flex h-[56.2px] items-center justify-between px-[17.6px] py-[1.6px] relative w-full">
-                  <div className="h-[21px] relative shrink-0 w-[89.588px]" data-name="Container">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[89.588px]">
-                      <div className="relative shrink-0 size-[20px]" data-name="Icon">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                          <g id="Icon">
-                            <path d={settingsSvgPaths.p3b7be120} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                            <path d={settingsSvgPaths.p1f3d9f80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                          </g>
-                        </svg>
-                      </div>
-                      <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">알림 설정</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative shrink-0 size-[20px]" data-name="Icon">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                      <g id="Icon">
-                        <path d="M7.5 15L12.5 10L7.5 5" id="Vector" stroke="var(--stroke-0, #99A1AF)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                      </g>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
+
 
       {/* Privacy Section */}
       <div className="h-[204px] relative shrink-0 w-full" data-name="Container">
