@@ -205,7 +205,7 @@ export default function ExhibitionDetailPage({
         </div>
 
         {/* Hero Image */}
-        <div className="bg-gray-100 h-[390px] relative shrink-0 w-full" data-name="Container">
+        <div className="bg-gray-100 h-[390px] relative shrink-0 w-full overflow-hidden" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
             {exhibitionData.imageUrls && exhibitionData.imageUrls.length > 0 ? (

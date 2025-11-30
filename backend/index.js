@@ -341,7 +341,10 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
         connection.release();
         res.status(200).json(rows);
     } catch (error) {
-        console.error('Fetch comments error:', error);
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.error('!!! FETCH COMMENTS ERROR !!!');
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -361,13 +364,13 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
             'INSERT INTO comments (exhibition_id, author, content) VALUES (?, ?, ?)',
             [id, author, content]
         );
-        connection.release();
 
         const newCommentId = result.insertId;
         const [newCommentRows] = await connection.execute(
             'SELECT id, author, content, created_at FROM comments WHERE id = ?',
             [newCommentId]
         );
+        connection.release();
 
         res.status(201).json(newCommentRows[0]);
     } catch (error) {
