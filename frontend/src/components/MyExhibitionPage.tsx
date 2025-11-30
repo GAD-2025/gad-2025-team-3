@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, Heart, Share2 } from 'react-feather';
 import svgPaths from "../imports/svgPaths";
 import ShareExhibitionModal from "./ShareExhibitionModal";
 
@@ -125,21 +126,11 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
               >
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start relative size-[19.992px]">
                   <div className="h-[19.992px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                    <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">
-                      <div className="absolute inset-[-7.14%_-14.29%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 14">
-                          <path d={svgPaths.p63e1620} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
-                        </svg>
-                      </div>
+                      <svg className="block" fill="none" viewBox="0 0 14 14" width="100%" height="100%">
+                        <path d="M6.66389 12.4948L0.832986 6.66389L6.66389 0.832986" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
+                        <path d="M12.4948 6.66389H0.832986" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
+                      </svg>
                     </div>
-                    <div className="absolute bottom-1/2 left-[20.83%] right-[20.83%] top-1/2" data-name="Vector">
-                      <div className="absolute inset-[-0.83px_-7.14%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 14 2">
-                          <path d="M12.4948 0.832986H0.832986" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </button>
               {/* Heading */}
@@ -246,13 +237,8 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[38px] items-start justify-between relative w-[92px]">
                               <div className="content-stretch flex gap-[8px] items-center relative shrink-0" data-name="Container">
                                 <div className="relative shrink-0 size-[12px]" data-name="Icon">
-                                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                                    <g id="Icon">
-                                      <path d={svgPaths.p2ab476c0} id="Vector" stroke="#4A5565" strokeLinecap="round" strokeLinejoin="round" />
-                                      <path d={svgPaths.p24092800} id="Vector_2" stroke="#4A5565" strokeLinecap="round" strokeLinejoin="round" />
-                                    </g>
-                                  </svg>
-                                </div>
+                                    <Eye size={12} color="#4A5565" />
+                                  </div>
                                 <div className="relative shrink-0" data-name="Text">
                                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex items-start relative">
                                     <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[-0.24px] whitespace-pre">{exhibition.views || 0}</p>
@@ -261,12 +247,8 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                               </div>
                               <div className="content-stretch flex gap-[8px] items-center relative shrink-0" data-name="Container">
                                 <div className="relative shrink-0 size-[12px]" data-name="Icon">
-                                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                                    <g id="Icon">
-                                      <path d={svgPaths.p2bb2e280} id="Vector" stroke="#4A5565" strokeLinecap="round" strokeLinejoin="round" />
-                                    </g>
-                                  </svg>
-                                </div>
+                                    <Heart size={12} color="#4A5565" />
+                                  </div>
                                 <div className="relative shrink-0" data-name="Text">
                                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex items-start relative">
                                     <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[-0.24px] whitespace-pre">{exhibition.likes || 0}</p>
@@ -285,21 +267,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                             <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-[0.8px] pt-[8.8px] px-[8.8px] relative size-[29.6px] pointer-events-none">
                               <div className="h-[12px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                                <div className="absolute inset-[8.33%_12.5%_66.67%_62.5%]">
-                                  <svg className="block size-full" viewBox="0 0 4 4"><path d={svgPaths.peae880} stroke="black" /></svg>
-                                </div>
-                                <div className="absolute inset-[37.5%_62.5%_37.5%_12.5%]">
-                                  <svg className="block size-full" viewBox="0 0 4 4"><path d={svgPaths.peae880} stroke="black" /></svg>
-                                </div>
-                                <div className="absolute inset-[66.67%_12.5%_8.33%_62.5%]">
-                                  <svg className="block size-full" viewBox="0 0 4 4"><path d={svgPaths.peae880} stroke="black" /></svg>
-                                </div>
-                                <div className="absolute inset-[56.29%_35.75%_27.12%_35.79%]">
-                                  <svg className="block size-full" viewBox="0 0 5 3"><path d={svgPaths.p27b6c800} stroke="black" /></svg>
-                                </div>
-                                <div className="absolute inset-[27.13%_35.79%_56.29%_35.79%]">
-                                  <svg className="block size-full" viewBox="0 0 5 3"><path d={svgPaths.p1973d000} stroke="black" /></svg>
-                                </div>
+                                <Share2 size={12} color="black" />
                               </div>
                             </div>
                           </button>
