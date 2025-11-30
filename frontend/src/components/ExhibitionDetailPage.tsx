@@ -317,7 +317,7 @@ export default function ExhibitionDetailPage({
               <div className="h-[225.325px] relative shrink-0 w-full overflow-y-auto" data-name="Container">
                 <div className="flex flex-wrap gap-[8px] w-full h-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
-                    <div key={index} className="relative bg-gray-100 flex items-center justify-center overflow-hidden" style={{ width: '88px', height: '88px' }}>
+                    <div key={index} className="relative bg-gray-100 flex items-center justify-center overflow-hidden" style={{ width: '109px', height: '109px' }}>
                       <img src={imageUrl} alt={`Exhibition Image ${index + 1}`} className="object-cover w-full h-full" />
                     </div>
                   ))}
