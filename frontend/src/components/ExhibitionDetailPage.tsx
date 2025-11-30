@@ -353,7 +353,7 @@ export default function ExhibitionDetailPage({
                           </div>
                           <div className="h-[16.5px] relative shrink-0 flex-shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
-                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleDateString()}</p>
+                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
