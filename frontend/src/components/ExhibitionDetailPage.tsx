@@ -209,7 +209,7 @@ export default function ExhibitionDetailPage({
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
             {exhibitionData.imageUrls && exhibitionData.imageUrls.length > 0 ? (
-              <img src={exhibitionData.imageUrls[0]} alt="Exhibition Hero" className="object-cover w-full h-full" />
+              <img src={exhibitionData.imageUrls[0]} alt="Exhibition Hero" className="object-cover w-full h-full" style={{ width: '100%', height: '100%' }} />
             ) : (
               <div className="h-[390px] w-full flex items-center justify-center text-gray-500">No hero image available</div>
             )}
@@ -314,10 +314,10 @@ export default function ExhibitionDetailPage({
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Gallery</p>
               </div>
-              <div className="h-[225.325px] relative shrink-0 w-full" data-name="Container">
+              <div className="h-[225.325px] relative shrink-0 w-full overflow-y-auto" data-name="Container">
                 <div className="flex flex-wrap gap-[8px] w-full h-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
-                    <div key={index} className="relative w-[108px] h-[108px] bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <div key={index} className="relative w-[72px] h-[72px] bg-gray-100 flex items-center justify-center overflow-hidden">
                       <img src={imageUrl} alt={`Exhibition Image ${index + 1}`} className="object-cover w-full h-full" />
                     </div>
                   ))}
@@ -341,19 +341,19 @@ export default function ExhibitionDetailPage({
                     <div className="size-full">
                       <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
                         <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                          <div className="h-[16.5px] relative shrink-0 w-auto" data-name="Text">
+                          <div className="h-[16.5px] relative shrink-0 w-auto flex-shrink-0 max-w-full" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
                               <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
                             </div>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0 w-[2.913px]" data-name="Text">
+                          <div className="h-[16.5px] relative shrink-0 w-[2.913px] flex-shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
                               <p className="absolute font-['Playfair_Display',serif] font-normal leading-[16.5px] left-0 text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
                             </div>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0 w-auto" data-name="Text">
+                          <div className="h-[16.5px] relative shrink-0 w-auto flex-shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-auto">
-                              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleString()}</p>
+                              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#99a1af] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleDateString()}</p>
                             </div>
                           </div>
                         </div>
