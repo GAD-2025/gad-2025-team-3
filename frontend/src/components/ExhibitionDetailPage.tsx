@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { ChevronLeft, Heart, Share2, Eye, Star, ArrowUp } from 'react-feather';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart } from 'react-feather';
 import ShareExhibitionModal from './ShareExhibitionModal';
 
 interface ExhibitionData {
+  id: number;
+  user_id: number;
   title: string;
   author: string;
   room: string;
@@ -18,7 +20,7 @@ interface Comment {
   id: number;
   author: string;
   content: string;
-  created_at: string; // Changed from timestamp to created_at
+  created_at: string;
 }
 
 interface ExhibitionDetailPageProps {
@@ -29,6 +31,7 @@ export default function ExhibitionDetailPage({
   onBack,
 }: ExhibitionDetailPageProps) {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [exhibitionData, setExhibitionData] = useState<ExhibitionData | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -38,6 +41,11 @@ export default function ExhibitionDetailPage({
   const [isFavorited, setIsFavorited] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
 
+  // TODO: Replace with actual authentication logic from context
+  // For now, we assume a logged-in user with ID 1 for demonstration
+  const loggedInUserId = 1; 
+  const isOwner = exhibitionData?.user_id === loggedInUserId;
+
   useEffect(() => {
     const fetchExhibitionAndComments = async () => {
       if (!id) {
@@ -46,23 +54,20 @@ export default function ExhibitionDetailPage({
         return;
       }
       try {
-        const exhibitionResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`);
-        if (!exhibitionResponse.ok) {
-          throw new Error(`Failed to fetch exhibition: ${exhibitionResponse.statusText}`);
-        }
-        const exhibition: ExhibitionData = await exhibitionResponse.json();
+        // Fetch all data in parallel
+        const [exhibitionRes, itemsRes, commentsRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`),
+        ]);
 
-        const itemsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`);
-        if (!itemsResponse.ok) {
-          throw new Error(`Failed to fetch exhibition items: ${itemsResponse.statusText}`);
-        }
-        const imageUrls: string[] = await itemsResponse.json();
+        if (!exhibitionRes.ok) throw new Error(`Failed to fetch exhibition: ${exhibitionRes.statusText}`);
+        if (!itemsRes.ok) throw new Error(`Failed to fetch exhibition items: ${itemsRes.statusText}`);
+        if (!commentsRes.ok) throw new Error(`Failed to fetch comments: ${commentsRes.statusText}`);
 
-        const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`);
-        if (!commentsResponse.ok) {
-          throw new Error(`Failed to fetch comments: ${commentsResponse.statusText}`);
-        }
-        const fetchedComments: Comment[] = await commentsResponse.json();
+        const exhibition: ExhibitionData = await exhibitionRes.json();
+        const imageUrls: string[] = await itemsRes.json();
+        const fetchedComments: Comment[] = await commentsRes.json();
 
         setExhibitionData({ ...exhibition, imageUrls });
         setComments(fetchedComments);
@@ -85,7 +90,7 @@ export default function ExhibitionDetailPage({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newComment, author: 'Anonymous' }), // You might want to replace 'Anonymous' with actual user data
+        body: JSON.stringify({ content: newComment, author: 'Anonymous' }), // Replace with actual user data
       });
 
       if (!response.ok) {
@@ -93,7 +98,7 @@ export default function ExhibitionDetailPage({
       }
 
       const postedComment: Comment = await response.json();
-      setComments((prevComments) => [...prevComments, postedComment]);
+      setComments((prevComments) => [postedComment, ...prevComments]);
       setNewComment('');
     } catch (err: any) {
       console.error('Error posting comment:', err.message);
@@ -101,16 +106,50 @@ export default function ExhibitionDetailPage({
     }
   };
 
+  const handleDelete = async () => {
+    // Direct deletion confirmation for testing
+    if (!window.confirm("팝업 테스트 대신, 즉시 삭제됩니다. 정말로 이 전시관을 삭제하시겠습니까?")) {
+      return;
+    }
+
+    if (!id) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        try {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete the exhibition.');
+        } catch (e) {
+            throw new Error(`Failed to delete exhibition. Server responded with status: ${response.status}`);
+        }
+      }
+      
+      alert('전시관이 삭제되었습니다.');
+      navigate('/myexhibition'); // Redirect to user's exhibition list page after deletion
+
+    } catch (err: any) {
+      console.error('Deletion error:', err.message);
+      setError(err.message);
+      alert(`삭제 중 오류가 발생했습니다: ${err.message}`);
+    }
+  };
+  
+  const onShare = () => setShareModalOpen(true);
+
   if (loading) {
-    return <div>Loading exhibition...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading exhibition...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
   }
 
   if (!exhibitionData) {
-    return <div>No exhibition data found.</div>;
+    return <div className="flex justify-center items-center h-screen">No exhibition data found.</div>;
   }
 
   return (
@@ -123,23 +162,36 @@ export default function ExhibitionDetailPage({
           <div className="h-[84px] relative shrink-0 w-full" data-name="Container">
             <div className="flex flex-row items-center size-full">
               <div className="box-border content-stretch flex h-[84px] items-center justify-between px-[24px] py-0 relative w-full">
-                <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer" data-name="Button">
-                  <ChevronLeft size={20} />
+                <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+                  <ChevronLeft className="size-5 text-black" />
                 </button>
-                <div className="h-[36px] relative shrink-0 w-[80px]" data-name="Container">
-                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative w-[80px]">
-                    <div className="relative shrink-0 size-[36px]" data-name="Button">
-                      <button onClick={() => setIsFavorited(!isFavorited)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[8px] px-[8px] relative size-[36px]">
-                        <Star size={20} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
+                <div className={`h-[36px] relative shrink-0 ${isOwner ? 'w-[116px]' : 'w-[80px]'}`} data-name="Container">
+                  <div className={`bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative ${isOwner ? 'w-[116px]' : 'w-[80px]'}`}>
+                    {isOwner && (
+                      <button
+                        onClick={handleDelete}
+                        className="relative shrink-0 size-[36px] cursor-pointer hover:bg-[#f360c0] hover:text-white transition-all group"
+                        data-name="Delete Button"
+                      >
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-center justify-center relative size-[36px]">
+                          <Trash2 className="size-5 text-black group-hover:text-white transition-colors" />
+                        </div>
                       </button>
-                    </div>
-                    <div className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0" data-name="Button">
-                      <div className="size-full">
-                        <button onClick={() => setShareModalOpen(true)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[36px] items-start pb-0 pt-[8px] px-[8px] relative w-full">
-                          <Share2 size={20} />
-                        </button>
-                      </div>
-                    </div>
+                    )}
+                    <button 
+                      onClick={() => setIsFavorited(!isFavorited)}
+                      className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" 
+                      data-name="Button"
+                    >
+                      <Star size={24} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
+                    </button>
+                    <button 
+                      onClick={onShare}
+                      className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" 
+                      data-name="Button"
+                    >
+                      <Share2 className="size-5 text-black" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -200,7 +252,7 @@ export default function ExhibitionDetailPage({
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[27.4px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[27.4px]">
-                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{exhibitionData.views}</p>
+                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.3px] whitespace-pre">{exhibitionData.views}</p>
                       </div>
                     </div>
                   </div>
@@ -212,7 +264,7 @@ export default function ExhibitionDetailPage({
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[14.725px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[14.725px]">
-                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{exhibitionData.likes}</p>
+                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.3px] whitespace-pre">{exhibitionData.likes}</p>
                       </div>
                     </div>
                   </div>
@@ -224,7 +276,7 @@ export default function ExhibitionDetailPage({
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[11.325px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[11.325px]">
-                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{exhibitionData.shares}</p>
+                        <p className="absolute font-['EB_Garamond',serif] leading-[16px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.3px] whitespace-pre">{exhibitionData.shares}</p>
                       </div>
                     </div>
                   </div>
@@ -311,10 +363,10 @@ export default function ExhibitionDetailPage({
             </div>
           </div>
         </div>
+        
         {/* Comment Input Section */}
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
           <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-2">
-            {/* Heart button */}
             <button
               onClick={() => setIsLiked(!isLiked)}
               className="shrink-0 flex items-center justify-center cursor-pointer mx-[30px] py-2"
@@ -322,8 +374,6 @@ export default function ExhibitionDetailPage({
             >
               <Heart size={20} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
             </button>
-            
-            {/* Input field that grows */}
             <input
               type="text"
               value={newComment}
@@ -331,8 +381,6 @@ export default function ExhibitionDetailPage({
               placeholder="응원 댓글을 입력해보세요."
               className="font-['Pretendard',sans-serif] leading-[20px] not-italic w-full h-full text-[14px] text-black placeholder:text-gray-400 tracking-[-0.28px] bg-transparent border-none outline-none"
             />
-
-            {/* Send Button */}
             <button
               onClick={handleCommentSubmit}
               className="bg-black flex items-center justify-center shrink-0 h-full w-[59px] cursor-pointer hover:bg-[#f360c0] transition-colors"
@@ -343,6 +391,7 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
       </div>
+
       {isShareModalOpen && exhibitionData && (
         <ShareExhibitionModal
             isOpen={isShareModalOpen}

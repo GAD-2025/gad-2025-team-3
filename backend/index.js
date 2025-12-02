@@ -277,6 +277,7 @@ app.get('/api/exhibitions/:id', async (req, res) => {
             `
             SELECT 
                 e.id, 
+                e.user_id,
                 e.title, 
                 e.description, 
                 e.start_date, 
@@ -324,6 +325,66 @@ app.get('/api/exhibitions/:id/items', async (req, res) => {
         res.status(200).json(rows.map(row => row.item_url));
     } catch (error) {
         console.error('Fetch exhibition items error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for deleting an exhibition
+app.delete('/api/exhibitions/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. Get image file URLs before deleting the exhibition
+        const [items] = await connection.execute(
+            'SELECT item_url FROM exhibition_items WHERE exhibition_id = ?',
+            [id]
+        );
+
+        // 2. Delete the exhibition from the database (cascades to exhibition_items, comments, etc.)
+        const [deleteResult] = await connection.execute(
+            'DELETE FROM exhibitions WHERE id = ?',
+            [id]
+        );
+
+        if (deleteResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'Exhibition not found.' });
+        }
+
+        await connection.commit();
+        connection.release();
+
+        // 3. Delete files from the filesystem
+        if (items.length > 0) {
+            items.forEach(item => {
+                try {
+                    const url = item.item_url;
+                    const filename = path.basename(url); // Extracts filename from URL
+                    const filePath = path.join(__dirname, 'img_save', filename);
+
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                        console.log(`Deleted file: ${filePath}`);
+                    }
+                } catch (fileError) {
+                    // Log error but don't stop the process, as the DB entry is already gone.
+                    console.error(`Error deleting file: ${item.item_url}`, fileError);
+                }
+            });
+        }
+
+        res.status(200).json({ message: 'Exhibition deleted successfully.' });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Delete exhibition error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
