@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Eye, Star, ArrowUp } from 'react-feather';
+import ShareExhibitionModal from './ShareExhibitionModal';
 
 interface ExhibitionData {
   title: string;
@@ -34,6 +35,8 @@ export default function ExhibitionDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchExhibitionAndComments = async () => {
@@ -126,15 +129,15 @@ export default function ExhibitionDetailPage({
                 <div className="h-[36px] relative shrink-0 w-[80px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative w-[80px]">
                     <div className="relative shrink-0 size-[36px]" data-name="Button">
-                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[8px] px-[8px] relative size-[36px]">
-                        <Heart size={20} />
-                      </div>
+                      <button onClick={() => setIsFavorited(!isFavorited)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[8px] px-[8px] relative size-[36px]">
+                        <Star size={20} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
+                      </button>
                     </div>
                     <div className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0" data-name="Button">
                       <div className="size-full">
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[36px] items-start pb-0 pt-[8px] px-[8px] relative w-full">
+                        <button onClick={() => setShareModalOpen(true)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[36px] items-start pb-0 pt-[8px] px-[8px] relative w-full">
                           <Share2 size={20} />
-                        </div>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -340,6 +343,13 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
       </div>
+      {isShareModalOpen && exhibitionData && (
+        <ShareExhibitionModal
+            isOpen={isShareModalOpen}
+            onClose={() => setShareModalOpen(false)}
+            exhibition={exhibitionData}
+        />
+      )}
     </div>
   );
 }
