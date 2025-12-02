@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ChevronLeft, Heart, Share2, Eye, Star } from 'react-feather';
-import { motion } from 'framer-motion';
+import { ChevronLeft, Heart, Share2, Eye, Star, ArrowUp } from 'react-feather';
+
 interface ExhibitionData {
   title: string;
   author: string;
@@ -20,15 +20,6 @@ interface Comment {
   created_at: string; // Changed from timestamp to created_at
 }
 
-interface Circle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
-}
-
 interface ExhibitionDetailPageProps {
   onBack: () => void;
 }
@@ -43,7 +34,6 @@ export default function ExhibitionDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [circles, setCircles] = useState<Circle[]>([]);
 
   useEffect(() => {
     const fetchExhibitionAndComments = async () => {
@@ -83,28 +73,6 @@ export default function ExhibitionDetailPage({
     fetchExhibitionAndComments();
   }, [id]);
 
-  useEffect(() => {
-    if (isLiked) {
-      const newCircles: Circle[] = [];
-      const circleCount = 15;
-      
-      for (let i = 0; i < circleCount; i++) {
-        newCircles.push({
-          id: i,
-          x: Math.random() * 90 + 5,
-          y: Math.random() * 90 + 5,
-          size: Math.random() * 12 + 8,
-          duration: Math.random() * 6 + 4,
-          delay: Math.random() * 2,
-        });
-      }
-      
-      setCircles(newCircles);
-    } else {
-      setCircles([]);
-    }
-  }, [isLiked]);
-
   const handleCommentSubmit = async () => {
     if (!newComment.trim() || !id) return;
 
@@ -143,35 +111,7 @@ export default function ExhibitionDetailPage({
   }
 
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[34px] items-start relative w-full min-h-screen max-w-[393px] mx-auto overflow-x-hidden" data-name="메인 홈">      {/* Animated Pink Circles */}
-      {isLiked && circles.map((circle) => (
-        <motion.div
-          key={circle.id}
-          className="absolute z-50 pointer-events-none"
-          style={{
-            left: `${circle.x}%`,
-            top: `${circle.y}%`,
-            width: `${circle.size}px`,
-            height: `${circle.size}px`,
-          }}
-          animate={{
-            y: [0, -60, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [0.4, 0.8, 0.4],
-          }}
-          transition={{
-            duration: circle.duration,
-            repeat: Infinity,
-            delay: circle.delay,
-            ease: "easeInOut",
-          }}
-        >
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 9 9">
-            <circle cx="4.5" cy="4.5" fill="#F360C0" r="2.5" stroke="#F360C0" strokeWidth="4" />
-          </svg>
-        </motion.div>
-      ))}
-
+    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto">
       {/* Main Content */}
       <div className="bg-white content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="디자인 페이지 생성 (Copy)">
         {/* Header */}
@@ -307,14 +247,14 @@ export default function ExhibitionDetailPage({
         </div>
 
         {/* Gallery */}
-        <div className="h-[308.925px] relative shrink-0 w-full" data-name="Container">
+        <div className="relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
-            <div className="box-border content-stretch flex flex-col gap-[16px] h-[308.925px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+            <div className="box-border content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full">
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Gallery</p>
               </div>
-              <div className="h-[225.325px] relative shrink-0 w-full overflow-y-auto" data-name="Container">
+              <div className="overflow-y-auto w-full">
                 <div className="flex flex-wrap gap-[8px] w-full h-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
                     <div key={index} className="relative bg-gray-100 flex items-center justify-center overflow-hidden" style={{ width: '109px', height: '109px' }}>
@@ -330,11 +270,11 @@ export default function ExhibitionDetailPage({
         {/* Comments */}
         <div className="relative shrink-0 w-full" data-name="Container">
           <div className="size-full">
-            <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
+            <div className="box-border content-stretch flex flex-col gap-[16px] items-start px-[24px] pb-[24px] pt-[24px] relative w-full">
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] w-[95px]">Comments {comments.length}</p>
               </div>
-              <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
+              <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
                 {comments.map((comment) => (
                   <div key={comment.id} className="h-[40px] relative shrink-0 w-full" data-name="Container">
                     <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -368,37 +308,35 @@ export default function ExhibitionDetailPage({
             </div>
           </div>
         </div>
+        {/* Comment Input Section */}
+        <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
+          <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-2">
+            {/* Heart button */}
+            <button
+              onClick={() => setIsLiked(!isLiked)}
+              className="shrink-0 flex items-center justify-center cursor-pointer mx-[30px] py-2"
+              data-name="Heart Button"
+            >
+              <Heart size={20} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
+            </button>
+            
+            {/* Input field that grows */}
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="응원 댓글을 입력해보세요."
+              className="font-['Pretendard',sans-serif] leading-[20px] not-italic w-full h-full text-[14px] text-black placeholder:text-gray-400 tracking-[-0.28px] bg-transparent border-none outline-none"
+            />
 
-        {/* Bottom Buttons */}
-        <div className="h-[107.2px] relative shrink-0 w-full" data-name="Container">
-          <div className="size-full">
-            <div className="box-border content-stretch flex gap-[12px] h-[107.2px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
-              <button onClick={() => setIsLiked(!isLiked)} className={`basis-0 grow h-[59.2px] min-h-px min-w-px relative shrink-0 cursor-pointer transition-all ${isLiked ? 'bg-[#f360c0]' : ''}`} data-name="Button">
-                {!isLiked && <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />}
-                <div className="size-full">
-                  <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[59.2px] items-center justify-center relative w-full">
-                    <div className="h-[20px] overflow-clip relative shrink-0" data-name="Icon">
-                      <Heart size={20} color={isLiked ? 'white' : 'black'} fill={isLiked ? 'white' : 'none'} />
-                    </div>
-                  </div>
-                </div>
-              </button>
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="코멘트를 작성해주세요..."
-                className="basis-0 grow h-[59px] min-h-px min-w-px relative shrink-0 border border-black p-2 rounded"
-              />
-              <button onClick={handleCommentSubmit} className="basis-0 bg-black grow h-[59px] min-h-px min-w-px relative shrink-0 cursor-pointer hover:bg-[#f360c0] transition-colors" data-name="Button">
-                <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[10px] h-[59px] items-center justify-center relative w-full">
-                  <div className="content-stretch flex items-start justify-center relative shrink-0" data-name="Text">
-                    <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">코멘트 작성</p>
-                  </div>
-                </div>
-              </button>
-            </div>
+            {/* Send Button */}
+            <button
+              onClick={handleCommentSubmit}
+              className="bg-black flex items-center justify-center shrink-0 h-full w-[59px] cursor-pointer hover:bg-[#f360c0] transition-colors"
+              data-name="Button"
+            >
+              <ArrowUp size={20} color="white" />
+            </button>
           </div>
         </div>
       </div>
