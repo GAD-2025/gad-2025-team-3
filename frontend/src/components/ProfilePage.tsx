@@ -137,10 +137,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       </div>
 
       {/* Profile Section */}
-      <div className="h-[232.8px] relative shrink-0 w-full" data-name="Container">
+      <div className="h-auto relative shrink-0 w-full pb-[24px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[24px] h-[232.8px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[24px] h-[180px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             {/* Profile Info */}
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
@@ -226,10 +226,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
 
 
       {/* Account Section */}
-      <div className="relative shrink-0 w-full mt-[24px]" data-name="Container">
+      <div className="relative shrink-0 w-full mt-[24px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[16px] items-start p-[24px] relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[12px] items-start p-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
             </div>
@@ -312,10 +312,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
 
 
       {/* Privacy Section */}
-      <div className="h-[204px] relative shrink-0 w-full" data-name="Container">
+      <div className="relative shrink-0 w-full mt-[24px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[16px] h-[204px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[12px] h-auto items-start pb-[24px] pt-[24px] px-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
             </div>
@@ -396,7 +396,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       {/* Support Section */}
       <div className="h-[268.2px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-        <div className="absolute content-stretch flex gap-[10px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
+        <div className="absolute content-stretch flex gap-[12px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
           <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
         </div>
         {/* 자주 묻는 질문 */}
@@ -503,9 +503,9 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       </div>
 
       {/* Danger Zone Section */}
-      <div className="h-[178.4px] relative shrink-0 w-full mb-8" data-name="Container">
+      <div className="h-auto relative shrink-0 w-full mb-8 pt-[24px] pd-[24px]" data-name="Container">
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[16px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
               <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#eb210f] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
             </div>
