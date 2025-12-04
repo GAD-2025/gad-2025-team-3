@@ -20,7 +20,6 @@ import ExploreSearchResultsPage from './components/ExploreSearchResultsPage';
 import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 import FavoritesPage from './components/FavoritesPage';
-import DeleteExhibitionPage from './components/DeleteExhibitionPage';
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -506,7 +505,6 @@ export default function App() {
           exhibitionData={selectedExhibition}
         />
       } />
-      <Route path="/exhibition/delete/:id" element={<DeleteExhibitionPage />} />
       <Route path="*" element={<Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />} />
     </Routes>
   );
