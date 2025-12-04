@@ -3,6 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart } from 'react-feather';
 import ShareExhibitionModal from './ShareExhibitionModal';
 
+interface User {
+  id: number;
+  username: string;
+}
+
 interface ExhibitionData {
   id: number;
   user_id: number;
@@ -25,10 +30,12 @@ interface Comment {
 
 interface ExhibitionDetailPageProps {
   onBack: () => void;
+  currentUser: User | null;
 }
 
 export default function ExhibitionDetailPage({
   onBack,
+  currentUser,
 }: ExhibitionDetailPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -38,50 +45,66 @@ export default function ExhibitionDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
 
-  // TODO: Replace with actual authentication logic from context
-  // For now, we assume a logged-in user with ID 1 for demonstration
-  const loggedInUserId = 1; 
+  const loggedInUserId = currentUser?.id;
   const isOwner = exhibitionData?.user_id === loggedInUserId;
 
-  useEffect(() => {
-    const fetchExhibitionAndComments = async () => {
-      if (!id) {
-        setError("Exhibition ID is missing.");
-        setLoading(false);
-        return;
-      }
-      try {
-        // Fetch all data in parallel
-        const [exhibitionRes, itemsRes, commentsRes, isLikedRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
+  const fetchExhibitionAndComments = async () => {
+    if (!id) {
+      setError("Exhibition ID is missing.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const [exhibitionRes, itemsRes, commentsRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
+        fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
+        fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`),
+      ]);
+
+      if (!exhibitionRes.ok) throw new Error(`Failed to fetch exhibition: ${exhibitionRes.statusText}`);
+      if (!itemsRes.ok) throw new Error(`Failed to fetch exhibition items: ${itemsRes.statusText}`);
+      if (!commentsRes.ok) throw new Error(`Failed to fetch comments: ${commentsRes.statusText}`);
+
+      const exhibition: ExhibitionData = await exhibitionRes.json();
+      const imageUrls: string[] = await itemsRes.json();
+      const fetchedComments: Comment[] = await commentsRes.json();
+      
+      setExhibitionData({ ...exhibition, imageUrls });
+      setComments(fetchedComments);
+
+      if (loggedInUserId) {
+        const [isLikedRes, isFavoritedRes] = await Promise.all([
+            fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
+            fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}/favorites`),
         ]);
 
-        if (!exhibitionRes.ok) throw new Error(`Failed to fetch exhibition: ${exhibitionRes.statusText}`);
-        if (!itemsRes.ok) throw new Error(`Failed to fetch exhibition items: ${itemsRes.statusText}`);
-        if (!commentsRes.ok) throw new Error(`Failed to fetch comments: ${commentsRes.statusText}`);
         if (!isLikedRes.ok) throw new Error(`Failed to fetch like status: ${isLikedRes.statusText}`);
-
-        const exhibition: ExhibitionData = await exhibitionRes.json();
-        const imageUrls: string[] = await itemsRes.json();
-        const fetchedComments: Comment[] = await commentsRes.json();
+        if (!isFavoritedRes.ok) throw new Error(`Failed to fetch favorite status: ${isFavoritedRes.statusText}`);
+        
         const { isLiked } = await isLikedRes.json();
+        const favorites = await isFavoritedRes.json();
+        const isFavorited = favorites.some((fav: any) => fav.id === parseInt(id, 10));
 
-        setExhibitionData({ ...exhibition, imageUrls });
-        setComments(fetchedComments);
         setIsLiked(isLiked);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setIsFavorited(isFavorited);
       }
-    };
 
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchExhibitionAndComments();
+    if (loggedInUserId) {
+        const intervalId = setInterval(fetchExhibitionAndComments, 5000);
+        return () => clearInterval(intervalId);
+    }
   }, [id, loggedInUserId]);
 
   const handleLikeClick = async () => {
@@ -90,7 +113,6 @@ export default function ExhibitionDetailPage({
     const originalIsLiked = isLiked;
     const originalLikes = parseInt(exhibitionData.likes, 10);
 
-    // Optimistic UI update
     const newIsLiked = !originalIsLiked;
     const newLikes = newIsLiked ? originalLikes + 1 : originalLikes - 1;
     
@@ -100,24 +122,42 @@ export default function ExhibitionDetailPage({
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/like`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: loggedInUserId }),
       });
 
       if (!response.ok) {
-        // Revert on failure
         setIsLiked(originalIsLiked);
         setExhibitionData({ ...exhibitionData, likes: String(originalLikes) });
-        console.error("Failed to update like status on the server.");
       }
-      // No need to do anything on success, UI is already updated
     } catch (error) {
-      // Revert on error
       setIsLiked(originalIsLiked);
       setExhibitionData({ ...exhibitionData, likes: String(originalLikes) });
-      console.error("An error occurred while liking:", error);
+    }
+  };
+
+  const handleFavoriteClick = async () => {
+    if (!id || !loggedInUserId || !exhibitionData) return;
+  
+    const originalIsFavorited = isFavorited;
+  
+    setIsFavorited(!originalIsFavorited);
+  
+    try {
+      // Note: The backend uses the same 'like' endpoint for favorites.
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: loggedInUserId }),
+      });
+  
+      if (!response.ok) {
+        setIsFavorited(originalIsFavorited);
+      } else {
+        fetchExhibitionAndComments();
+      }
+    } catch (error) {
+      setIsFavorited(originalIsFavorited);
     }
   };
 
@@ -130,7 +170,7 @@ export default function ExhibitionDetailPage({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newComment, author: 'Anonymous' }), // Replace with actual user data
+        body: JSON.stringify({ content: newComment, author: currentUser?.username || 'Anonymous' }),
       });
 
       if (!response.ok) {
@@ -147,7 +187,6 @@ export default function ExhibitionDetailPage({
   };
 
   const handleDelete = async () => {
-    // Direct deletion confirmation for testing
     if (!window.confirm("팝업 테스트 대신, 즉시 삭제됩니다. 정말로 이 전시관을 삭제하시겠습니까?")) {
       return;
     }
@@ -169,7 +208,7 @@ export default function ExhibitionDetailPage({
       }
       
       alert('전시관이 삭제되었습니다.');
-      navigate('/myexhibition'); // Redirect to user's exhibition list page after deletion
+      navigate('/myexhibition');
 
     } catch (err: any) {
       console.error('Deletion error:', err.message);
@@ -194,9 +233,7 @@ export default function ExhibitionDetailPage({
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto">
-      {/* Main Content */}
       <div className="bg-white content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="디자인 페이지 생성 (Copy)">
-        {/* Header */}
         <div className="box-border content-stretch flex flex-col h-[85.6px] items-start pb-[1.6px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="h-[84px] relative shrink-0 w-full" data-name="Container">
@@ -208,28 +245,16 @@ export default function ExhibitionDetailPage({
                 <div className={`h-[36px] relative shrink-0 ${isOwner ? 'w-[116px]' : 'w-[80px]'}`} data-name="Container">
                   <div className={`bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative ${isOwner ? 'w-[116px]' : 'w-[80px]'}`}>
                     {isOwner && (
-                      <button
-                        onClick={handleDelete}
-                        className="relative shrink-0 size-[36px] cursor-pointer hover:bg-[#f360c0] hover:text-white transition-all group"
-                        data-name="Delete Button"
-                      >
+                      <button onClick={handleDelete} className="relative shrink-0 size-[36px] cursor-pointer hover:bg-[#f360c0] hover:text-white transition-all group" data-name="Delete Button">
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-center justify-center relative size-[36px]">
                           <Trash2 className="size-5 text-black group-hover:text-white transition-colors" />
                         </div>
                       </button>
                     )}
-                    <button 
-                      onClick={handleLikeClick}
-                      className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" 
-                      data-name="Button"
-                    >
-                      <Star size={24} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
+                    <button onClick={handleFavoriteClick} className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
+                      <Star size={24} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
                     </button>
-                    <button 
-                      onClick={onShare}
-                      className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" 
-                      data-name="Button"
-                    >
+                    <button onClick={onShare} className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
                       <Share2 className="size-5 text-black" />
                     </button>
                   </div>
@@ -239,7 +264,6 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        {/* Hero Image */}
         <div className="bg-gray-100 h-[390px] relative shrink-0 w-full overflow-hidden" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
@@ -251,7 +275,6 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        {/* Title Section */}
         <div className="h-[159.9px] relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
@@ -326,7 +349,6 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        {/* About */}
         <div className="relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
@@ -341,7 +363,6 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        {/* Gallery */}
         <div className="relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
@@ -362,7 +383,6 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        {/* Comments */}
         <div className="relative shrink-0 w-full" data-name="Container">
           <div className="size-full">
             <div className="box-border content-stretch flex flex-col gap-[16px] items-start px-[24px] pb-[24px] pt-[24px] relative w-full">
@@ -404,16 +424,8 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
         
-        {/* Comment Input Section */}
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
-          <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-2">
-            <button
-              onClick={handleLikeClick}
-              className="shrink-0 flex items-center justify-center cursor-pointer mx-[30px] py-2"
-              data-name="Heart Button"
-            >
-              <Heart size={20} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
-            </button>
+          <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-4 pr-2">
             <input
               type="text"
               value={newComment}
