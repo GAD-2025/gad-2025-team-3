@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import svgPaths from "../imports/svg-6lwitwjk3d";
 
 interface ExploreMainPageProps {
   onBack: () => void;
   onSearch: (searchQuery: string) => void;
+  onExhibitionClick: (id: string) => void;
 }
 
-export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPageProps) {
+// Define the type for a single exhibition based on the backend response
+interface Exhibition {
+  id: number;
+  title: string;
+  author: string;
+  room: string; // Assuming room is part of the data, if not, it needs adjustment
+  // Add any other properties that come from the API
+}
+
+export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }: ExploreMainPageProps) {
   const [selectedTag, setSelectedTag] = useState('인기 쇼케이스');
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const tags = [
     '인기 쇼케이스',
@@ -19,28 +32,37 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
     'seventeen'
   ];
 
-  const exhibitions = [
-    {
-      room: '202',
-      title: '아이유 콘서트 메모리',
-      author: 'uaena_love'
-    },
-    {
-      room: '203',
-      title: 'BLACKPINK 월드투어',
-      author: 'blink_official'
-    },
-    {
-      room: '204',
-      title: 'NCT 127 팬아트 갤러리',
-      author: 'nctzen_art'
-    },
-    {
-      room: '205',
-      title: 'SEVENTEEN 캐럿랜드',
-      author: 'carat_world'
-    }
-  ];
+  useEffect(() => {
+    const fetchExhibitions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch exhibitions');
+        }
+        const data: Exhibition[] = await response.json();
+        // The backend provides 'id' and 'author', but not 'room'. We'll use id as a stand-in for now.
+        const exhibitionsWithRoom = data.map(ex => ({ ...ex, room: String(ex.id) }));
+        setExhibitions(exhibitionsWithRoom);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExhibitions();
+  }, []); // Empty dependency array means this runs once on mount
+
+  // ... (rest of the component will be updated to use the new state)
+  
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
+  }
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -160,7 +182,8 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
             <div className="content-start flex flex-wrap gap-[16px] items-start relative shrink-0 w-[342px]">
               {exhibitions.map((exhibition) => (
                 <button
-                  key={exhibition.room}
+                  key={exhibition.id} 
+                  onClick={() => onExhibitionClick(String(exhibition.id))} 
                   className="h-[305.1px] relative shrink-0 w-[163px] cursor-pointer hover:opacity-80 transition-opacity" 
                   data-name="Container"
                 >
@@ -200,3 +223,5 @@ export default function ExploreMainPage({ onBack, onSearch }: ExploreMainPagePro
     </div>
   );
 }
+
+

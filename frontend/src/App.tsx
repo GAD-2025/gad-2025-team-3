@@ -488,6 +488,7 @@ export default function App() {
         <FavoritesPage 
           onBack={() => navigate('/main')}
           currentUser={currentUser}
+          onNavigateToDetail={(id: number) => navigate(`/exhibition/${id}`)}
         />
       } />
       <Route path="/profile" element={
@@ -552,6 +553,7 @@ export default function App() {
         <ExploreMainPage
           onBack={() => navigate('/main')}
           onSearch={(searchQuery: string) => navigate('/explore/search', { state: { searchQuery } })}
+          onExhibitionClick={(id: string) => navigate(`/exhibition/${id}`)} // Pass the navigation function
         />
       } />
       <Route path="/explore/trending" element={

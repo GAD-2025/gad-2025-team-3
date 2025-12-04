@@ -9,18 +9,21 @@ interface FavoriteExhibitionProps {
   views: number;
   likes: number;
   roomId: number;
+  onNavigateToDetail: (id: number) => void; // New prop for navigation
   // imageURL: string; // 나중에 이미지를 위해 추가
 }
 
 const FavoriteExhibitionCard: React.FC<FavoriteExhibitionProps> = ({
+  id, // Destructure id
   exhibitionTitle,
   authorName,
   views,
   likes,
   roomId,
+  onNavigateToDetail, // Destructure new prop
 }) => {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={() => onNavigateToDetail(id)}> {/* Add onClick handler */}
       <div className={styles.imagePlaceholder}>
         <div className={styles.roomBox}>
           <span className={styles.roomText}>{roomId}</span>

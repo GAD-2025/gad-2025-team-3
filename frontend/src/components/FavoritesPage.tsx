@@ -1,40 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './FavoritesPage.module.css';
 import FavoriteExhibitionCard from './FavoriteExhibitionCard';
-import { ChevronLeft, Star } from 'react-feather'; // Import icons
+import { ChevronLeft, Star } from 'react-feather';
+
+// Define the type for the user object passed as a prop
+interface User {
+  id: number;
+  // Add other user properties if available and needed
+}
 
 interface FavoritesPageProps {
   onBack: () => void;
+  currentUser: User | null; // Receive the current user
+  onNavigateToDetail: (id: number) => void; // Receive navigation function
 }
 
-const dummyExhibitions = [
-  {
-    id: 1,
-    exhibitionTitle: 'BTS ARMY 글로벌 전시관',
-    authorName: 'army_forever',
-    views: 8900,
-    likes: 1240,
-    roomId: 201,
-  },
-  {
-    id: 2,
-    exhibitionTitle: 'NCT 127 팬아트 갤러리',
-    authorName: 'nctzen_art',
-    views: 4327,
-    likes: 567,
-    roomId: 204,
-  },
-  {
-    id: 3,
-    exhibitionTitle: 'BLACKPINK 월드투어',
-    authorName: 'blink_official',
-    views: 6543,
-    likes: 892,
-    roomId: 203,
-  },
-];
+interface FavoriteExhibition {
+  id: number;
+  exhibitionTitle: string;
+  authorName: string;
+  views: number;
+  likes: number;
+  roomId: number;
+}
 
-const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack }) => {
+const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNavigateToDetail }) => {
+  const [exhibitions, setExhibitions] = useState<FavoriteExhibition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setError("Please log in to see your favorites.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchFavorites = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser.id}/favorites`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch favorites');
+        }
+        const data: FavoriteExhibition[] = await response.json();
+        setExhibitions(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, [currentUser]); // Refetch if the user changes
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading favorites...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
+  }
+
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -49,15 +77,23 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack }) => {
       {/* Status Area */}
       <div className={styles.statusArea}>
         <Star size={24} strokeWidth={2.0} color="#FF69B4" />
-        <p className={styles.statusText}>저장한 전시관 {dummyExhibitions.length}개</p>
+        <p className={styles.statusText}>저장한 전시관 {exhibitions.length}개</p>
       </div>
       <div className={styles.statusSeparator}></div>
 
       {/* Exhibition List */}
       <div className={styles.cardList}>
-        {dummyExhibitions.map((exhibition) => (
-          <FavoriteExhibitionCard key={exhibition.id} {...exhibition} />
-        ))}
+        {exhibitions.length > 0 ? (
+          exhibitions.map((exhibition) => (
+            <FavoriteExhibitionCard 
+              key={exhibition.id} 
+              {...exhibition} 
+              onNavigateToDetail={onNavigateToDetail}
+            />
+          ))
+        ) : (
+          <p className={styles.noFavoritesText}>아직 저장한 전시관이 없습니다.</p>
+        )}
       </div>
     </div>
   );

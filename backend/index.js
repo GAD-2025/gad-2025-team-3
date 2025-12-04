@@ -604,6 +604,46 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
     }
 });
 
+// API for fetching a user's favorite exhibitions
+app.get('/api/users/:userId/favorites', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `
+            SELECT 
+                e.id,
+                e.title,
+                e.views,
+                e.likes,
+                e.id as roomId,
+                u.nickname as authorName
+            FROM 
+                exhibitions e
+            JOIN 
+                user_favorites f ON e.id = f.exhibition_id
+            JOIN 
+                users u ON e.user_id = u.id
+            WHERE 
+                f.user_id = ?
+            ORDER BY 
+                f.created_at DESC
+            `,
+            [userId]
+        );
+        connection.release();
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Fetch favorites error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // ----------------------------------------------------------------------------------
 
 // 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
