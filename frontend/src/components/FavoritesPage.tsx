@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import FavoriteExhibitionCard from './FavoriteExhibitionCard';
-import { ChevronLeft, Star } from 'react-feather';
 
-const imgVector = "https://www.figma.com/api/mcp/asset/883c243c-4cb5-4f02-8da1-2b2f7f41fcdf";
-const imgIcon = "https://www.figma.com/api/mcp/asset/1f89ebf8-049f-46bb-9b1d-5f9116b1ff11";
+const imgVector = "https://www.figma.com/api/mcp/asset/d63bf8e8-3da1-41fe-9bd0-68cb6643dbb9"; // Back button icon
+const imgIcon = "https://www.figma.com/api/mcp/asset/b4ed6bb2-eaf1-4f0f-888c-3d52b8dd0a66"; // Star icon for status
 
 interface User {
   id: number;
@@ -85,7 +84,6 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   const handleDelete = async () => {
     if (!currentUser) return;
     try {
-      // Assuming an API endpoint for deleting multiple favorites
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser.id}/favorites`, {
         method: 'DELETE',
         headers: {
@@ -127,6 +125,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   return (
     <div className="bg-[#fbfaf9] flex justify-center min-h-screen">
       <div className="w-[390px] bg-white flex flex-col">
+        {/* Header */}
         <div className="border-b-[1.6px] border-black h-[70.6px] flex-shrink-0">
           <div className="flex h-[69px] items-center justify-between px-[24px]">
             <button className="w-[20px] h-[20px]" onClick={onBack}>
@@ -144,6 +143,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
           </div>
         </div>
 
+        {/* Status Area */}
         <div className="border-b-[1.6px] border-black flex items-center h-[69.6px] px-[24px] gap-[12px] flex-shrink-0">
           {!isEditMode ? (
             <>
@@ -167,6 +167,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
           )}
         </div>
 
+        {/* Exhibition List */}
         <div className="flex-grow p-[24px] flex flex-col gap-[16px] overflow-y-auto">
           {exhibitions.length > 0 ? (
             exhibitions.map((exhibition) => (
@@ -184,6 +185,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
           )}
         </div>
 
+        {/* Delete Button */}
         {isEditMode && (
           <div className="p-[24px] flex-shrink-0">
             <button

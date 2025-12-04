@@ -1,19 +1,7 @@
 import React from 'react';
 
-const imgIcon1 = "https://www.figma.com/api/mcp/asset/3a429c64-21ca-4c07-966c-79055f4c0b54";
-const imgIcon2 = "https://www.figma.com/api/mcp/asset/15a7e90b-95c4-48c4-ab7f-7542293c6d24";
-
-interface FavoriteExhibitionCardProps {
-  id: number;
-  exhibitionTitle: string;
-  authorName: string;
-  views: number;
-  likes: number;
-  roomId: number;
-<<<<<<< Updated upstream
-  onNavigateToDetail: (id: number) => void; // New prop for navigation
-  // imageURL: string; // 나중에 이미지를 위해 추가
-}
+const imgIcon1 = "https://www.figma.com/api/mcp/asset/dc1904c2-e118-48ca-96ab-8a0e8ed56a27"; // Views icon
+const imgIcon2 = "https://www.figma.com/api/mcp/asset/d1346a0e-b545-4bc2-ac96-5df2ef1e5531"; // Likes icon
 
 interface FavoriteExhibitionCardProps {
   id: number;
