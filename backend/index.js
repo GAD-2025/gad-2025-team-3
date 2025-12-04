@@ -611,19 +611,24 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
 
 // API for fetching a user's favorite exhibitions
 app.get('/api/users/:userId/favorites', async (req, res) => {
+    console.log('>>> Received request for /api/users/:userId/favorites');
     const { userId } = req.params;
 
     if (!userId) {
+        console.log('User ID is missing.');
         return res.status(400).json({ message: 'User ID is required.' });
     }
 
     const parsedUserId = parseInt(userId, 10);
     if (isNaN(parsedUserId)) {
+        console.log('Invalid User ID format.');
         return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
     }
 
     try {
+        console.log('Attempting to get DB connection...');
         const connection = await pool.getConnection();
+        console.log('DB connection obtained.');
         const [rows] = await connection.execute(
             `
             SELECT 
@@ -647,6 +652,7 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
             [parsedUserId]
         );
         connection.release();
+        console.log('Fetched favorites successfully.');
         res.status(200).json(rows);
     } catch (error) {
         console.error('Fetch favorites error:', error);
