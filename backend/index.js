@@ -588,11 +588,16 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
         return res.status(400).json({ message: 'User ID is required.' });
     }
 
+    const parsedUserId = parseInt(userId as string, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
             'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
-            [userId, exhibitionId]
+            [parsedUserId, exhibitionId]
         );
         connection.release();
 
