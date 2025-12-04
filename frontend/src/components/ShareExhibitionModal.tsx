@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
-const imgIcon3 = "https://www.figma.com/api/mcp/asset/4169c851-33aa-4bd8-b68f-befcb2c405de";
 const imgVector7 = "https://www.figma.com/api/mcp/asset/5365ce12-9ceb-4d38-af85-2372d596dcbb";
 const imgVector8 = "https://www.figma.com/api/mcp/asset/ebe12498-4b11-4f49-80d3-2d574fa78460";
 
@@ -47,13 +47,13 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 flex justify-center items-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
       {message && (
         <div className="fixed top-[100px] left-1/2 -translate-x-1/2 bg-black text-white px-[24px] py-[12px] z-[60] border-[1px] border-white">
           <p className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">{message}</p>
         </div>
       )}
-      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] gap-[12px]" onClick={(e) => e.stopPropagation()}>
         <div className="border-b-[1.108px] border-black border-solid flex h-[70px] items-center justify-between px-[24px]">
           <h2 className="font-['EB_Garamond',serif] text-[18px]">
             Share Exhibition
@@ -65,8 +65,8 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             </svg>
           </button>
         </div>
-        <div className="px-[24px] py-[24px] flex flex-col gap-[24px]">
-          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[8px] p-[17px]">
+        <div className="px-[24px] py-[24px] flex flex-col gap-[20px]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[8px] py-[28px] text-start">
             <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565]">
               Room {exhibition.room}
             </p>
@@ -87,7 +87,8 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="flex-1 h-[44px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
+                className="flex-1 h-[40px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
+                style={{ paddingLeft: '10px' }}
               />
               <button onClick={handleCopy} className="w-[62px] h-[44px] border border-black flex items-center justify-center">
                 <div className="w-5 h-5 relative">
@@ -97,15 +98,22 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
               </button>
             </div>
           </div>
-          <div className="border-[1.108px] border-black border-solid p-[33px] h-[295px] flex items-center justify-center">
-            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full h-full flex flex-col items-center justify-center gap-[8px]">
-              <img alt="QR Code" src={imgIcon3} className="w-8 h-8" />
-              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px]">
+          <div className="border-[1.108px] border-black border-solid p-4 h-[200px] flex items-center justify-center">
+            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
+              <QRCodeCanvas
+                value={shareUrl}
+                size={120}
+                bgColor={"#f9fafb"}
+                fgColor={"#000000"}
+                level={"L"}
+                includeMargin={false}
+              />
+              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px] mt-2">
                 QR 코드
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-[8px]">
+          <div className="flex flex-col gap-[8px] mb-4">
             <button onClick={handleKakaoShare} className="h-[50px] border border-black text-left px-3">
               <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
                 카카오톡으로 공유
@@ -119,8 +127,11 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
           </div>
         </div>
         <div className="px-[24px] pb-[25px] pt-[25px] border-t-[1.108px] border-black">
-          <button onClick={onClose} className="w-full h-[56px] bg-black text-white flex items-center px-6">
-            <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
+          <button onClick={onClose} className="w-full h-[56px] bg-black text-white flex items-center">
+            <span 
+              className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]" 
+              style={{ paddingLeft: '20px' }}
+            >
               닫기
             </span>
           </button>
