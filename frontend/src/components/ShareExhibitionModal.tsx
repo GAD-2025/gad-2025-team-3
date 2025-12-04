@@ -12,9 +12,10 @@ interface ShareExhibitionModalProps {
     title: string;
     author: string;
   };
+  onShareSuccess: () => void;
 }
 
-export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: ShareExhibitionModalProps) {
+export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onShareSuccess }: ShareExhibitionModalProps) {
   const [message, setMessage] = useState('');
 
   if (!isOpen) return null;
@@ -42,6 +43,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: Sh
     const text = `${exhibition.title} - Exhibition Room ${exhibition.room}`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(url, '_blank');
+    onShareSuccess();
   };
 
   return (

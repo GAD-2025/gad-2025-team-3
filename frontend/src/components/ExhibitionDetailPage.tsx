@@ -53,7 +53,7 @@ export default function ExhibitionDetailPage({
         return;
       }
       try {
-        // Fetch all data in parallel
+        // The backend is expected to increment the view count on this fetch.
         const [exhibitionRes, itemsRes, commentsRes, isLikedRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
           fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
@@ -118,6 +118,32 @@ export default function ExhibitionDetailPage({
       setIsLiked(originalIsLiked);
       setExhibitionData({ ...exhibitionData, likes: String(originalLikes) });
       console.error("An error occurred while liking:", error);
+    }
+  };
+
+  const handleShareSuccess = async () => {
+    if (!id || !exhibitionData) return;
+
+    const originalShares = parseInt(exhibitionData.shares, 10);
+    const newShares = originalShares + 1;
+
+    // Optimistic UI update
+    setExhibitionData({ ...exhibitionData, shares: String(newShares) });
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/share`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        // Revert on failure
+        setExhibitionData({ ...exhibitionData, shares: String(originalShares) });
+        console.error("Failed to update share count on the server.");
+      }
+    } catch (error) {
+      // Revert on error
+      setExhibitionData({ ...exhibitionData, shares: String(originalShares) });
+      console.error("An error occurred while updating share count:", error);
     }
   };
 
@@ -437,6 +463,7 @@ export default function ExhibitionDetailPage({
             isOpen={isShareModalOpen}
             onClose={() => setShareModalOpen(false)}
             exhibition={exhibitionData}
+            onShareSuccess={handleShareSuccess}
         />
       )}
     </div>
