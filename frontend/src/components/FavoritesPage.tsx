@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import FavoriteExhibitionCard from './FavoriteExhibitionCard';
 
-const imgVector = "https://www.figma.com/api/mcp/asset/d63bf8e8-3da1-41fe-9bd0-68cb6643dbb9"; // Back button icon
-const imgIcon = "https://www.figma.com/api/mcp/asset/b4ed6bb2-eaf1-4f0f-888c-3d52b8dd0a66"; // Star icon for status
+const imgVector = "https://www.figma.com/api/mcp/asset/545e3b9c-df95-4aaf-8afb-da7d9c237ef4"; // Back button icon
+const imgIcon = "https://www.figma.com/api/mcp/asset/9da527eb-a72f-4306-a93e-ce005fc54f3b"; // Star icon for status
 
 interface User {
   id: number;
@@ -62,7 +62,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
       setSelectedIds(exhibitions.map(ex => ex.id));
     } else {
       if (selectedIds.length === exhibitions.length && exhibitions.length > 0) {
-        setSelectedIds([]);
+        setIsSelectAll(false); // Only set to false if not all are selected
       }
     }
   }, [isSelectAll, exhibitions]);

@@ -1,7 +1,7 @@
 import React from 'react';
 
-const imgIcon1 = "https://www.figma.com/api/mcp/asset/dc1904c2-e118-48ca-96ab-8a0e8ed56a27"; // Views icon
-const imgIcon2 = "https://www.figma.com/api/mcp/asset/d1346a0e-b545-4bc2-ac96-5df2ef1e5531"; // Likes icon
+const imgIcon1 = "https://www.figma.com/api/mcp/asset/145044ef-da44-4c1f-b251-dfedcacfd17d"; // Views icon
+const imgIcon2 = "https://www.figma.com/api/mcp/asset/3f7565ae-eca4-4ece-ba6c-2d8f059a56fe"; // Likes icon
 
 interface FavoriteExhibitionCardProps {
   id: number;
