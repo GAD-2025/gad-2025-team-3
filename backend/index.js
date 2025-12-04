@@ -617,6 +617,11 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
         return res.status(400).json({ message: 'User ID is required.' });
     }
 
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
@@ -639,7 +644,7 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
             ORDER BY 
                 f.created_at DESC
             `,
-            [userId]
+            [parsedUserId]
         );
         connection.release();
         res.status(200).json(rows);
