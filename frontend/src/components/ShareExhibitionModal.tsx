@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
-const imgIcon3 = "https://www.figma.com/api/mcp/asset/4169c851-33aa-4bd8-b68f-befcb2c405de";
 const imgVector7 = "https://www.figma.com/api/mcp/asset/5365ce12-9ceb-4d38-af85-2372d596dcbb";
 const imgVector8 = "https://www.figma.com/api/mcp/asset/ebe12498-4b11-4f49-80d3-2d574fa78460";
 
@@ -97,10 +97,17 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: Sh
               </button>
             </div>
           </div>
-          <div className="border-[1.108px] border-black border-solid p-[33px] h-[295px] flex items-center justify-center">
-            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full h-full flex flex-col items-center justify-center gap-[8px]">
-              <img alt="QR Code" src={imgIcon3} className="w-8 h-8" />
-              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px]">
+          <div className="border-[1.108px] border-black border-solid p-4 h-[120px] flex items-center justify-center">
+            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
+              <QRCodeCanvas
+                value={shareUrl}
+                size={160}
+                bgColor={"#f9fafb"}
+                fgColor={"#000000"}
+                level={"L"}
+                includeMargin={false}
+              />
+              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px] mt-2">
                 QR 코드
               </p>
             </div>
