@@ -650,11 +650,11 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
         res.status(200).json(rows);
     } catch (error) {
         console.error('Fetch favorites error:', error);
-        if ((error as any).code) {
-            console.error('MySQL Error Code:', (error as any).code);
+        if (error.code) {
+            console.error('MySQL Error Code:', error.code);
         }
-        if ((error as any).sqlMessage) {
-            console.error('MySQL Error Message:', (error as any).sqlMessage);
+        if (error.sqlMessage) {
+            console.error('MySQL Error Message:', error.sqlMessage);
         }
         res.status(500).json({ message: 'Internal server error' });
     }
