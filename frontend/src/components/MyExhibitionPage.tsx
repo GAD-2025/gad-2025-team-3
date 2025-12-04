@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Heart, Share2, Trash2 } from 'react-feather';
+import { Eye, Heart, Share2 } from 'react-feather';
 import svgPaths from "../imports/svgPaths";
 import ShareExhibitionModal from "./ShareExhibitionModal";
 
@@ -76,19 +76,13 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
     fetchExhibitions();
   }, [currentUser]);
 
+  // ✅ [수정됨] 이벤트 전파를 막는 강력한 핸들러
   const handleShareClick = (e: React.MouseEvent, exhibition: Exhibition) => {
     e.preventDefault();
-    e.stopPropagation();
+    e.stopPropagation(); // 부모(카드) 클릭 이벤트 차단
     console.log("🚀 공유 버튼 클릭 성공:", exhibition.title);
     setSelectedExhibition(exhibition);
     setShareModalOpen(true);
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent, exhibitionId: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("🚀 삭제 버튼 클릭:", exhibitionId);
-    navigate(`/exhibition/delete/${exhibitionId}`);
   };
 
   const handleExhibitionClick = (exhibition: Exhibition) => {
@@ -264,28 +258,19 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 z-50">
-                            <button 
-                              onClick={(e) => handleShareClick(e, exhibition)}
-                              className="relative shrink-0 size-[29.6px] cursor-pointer hover:bg-[#F360C0] transition-colors group" 
-                              data-name="Button"
-                            >
-                              <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
-                              <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-center justify-center h-full w-full pointer-events-none">
+                          {/* 🔴 핵심 수정: z-index를 50으로 높이고, 내부 요소 클릭을 완전히 차단 */}
+                          <button 
+                            onClick={(e) => handleShareClick(e, exhibition)}
+                            className="relative shrink-0 size-[29.6px] cursor-pointer hover:bg-[#F360C0] transition-colors group z-50" 
+                            data-name="Button"
+                          >
+                            <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-[0.8px] pt-[8.8px] px-[8.8px] relative size-[29.6px] pointer-events-none">
+                              <div className="h-[12px] overflow-clip relative shrink-0 w-full" data-name="Icon">
                                 <Share2 size={12} color="black" />
                               </div>
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteClick(e, exhibition.id)}
-                              className="relative shrink-0 size-[29.6px] cursor-pointer hover:bg-red-500 transition-colors group"
-                              data-name="DeleteButton"
-                            >
-                              <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
-                              <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-center justify-center h-full w-full pointer-events-none">
-                                  <Trash2 size={12} color="black" />
-                              </div>
-                            </button>
-                          </div>
+                            </div>
+                          </button>
                         </div>
                       </div>
                     </div>
