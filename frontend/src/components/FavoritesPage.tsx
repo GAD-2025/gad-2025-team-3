@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import styles from './FavoritesPage.module.css';
 import FavoriteExhibitionCard from './FavoriteExhibitionCard';
 import { ChevronLeft, Star } from 'react-feather';
 
-// Define the type for the user object passed as a prop
+const imgVector = "https://www.figma.com/api/mcp/asset/883c243c-4cb5-4f02-8da1-2b2f7f41fcdf";
+const imgIcon = "https://www.figma.com/api/mcp/asset/1f89ebf8-049f-46bb-9b1d-5f9116b1ff11";
+
 interface User {
   id: number;
-  // Add other user properties if available and needed
 }
 
 interface FavoritesPageProps {
   onBack: () => void;
-  currentUser: User | null; // Receive the current user
-  onNavigateToDetail: (id: number) => void; // Receive navigation function
+  currentUser: User | null;
+  onNavigateToDetail: (id: number) => void;
 }
 
 interface FavoriteExhibition {
@@ -28,6 +28,9 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   const [exhibitions, setExhibitions] = useState<FavoriteExhibition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isSelectAll, setIsSelectAll] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -53,7 +56,65 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
     };
 
     fetchFavorites();
-  }, [currentUser]); // Refetch if the user changes
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (isSelectAll) {
+      setSelectedIds(exhibitions.map(ex => ex.id));
+    } else {
+      if (selectedIds.length === exhibitions.length && exhibitions.length > 0) {
+        setSelectedIds([]);
+      }
+    }
+  }, [isSelectAll, exhibitions]);
+
+  useEffect(() => {
+    if (exhibitions.length > 0 && selectedIds.length === exhibitions.length) {
+      setIsSelectAll(true);
+    } else {
+      setIsSelectAll(false);
+    }
+  }, [selectedIds, exhibitions]);
+
+  const handleSelect = (id: number) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+    );
+  };
+
+  const handleDelete = async () => {
+    if (!currentUser) return;
+    try {
+      // Assuming an API endpoint for deleting multiple favorites
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser.id}/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ exhibitionIds: selectedIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete favorites');
+      }
+
+      setExhibitions(prev => prev.filter(ex => !selectedIds.includes(ex.id)));
+      setSelectedIds([]);
+      setIsEditMode(false);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    setIsSelectAll(!isSelectAll);
+  };
+
+  const handleCancel = () => {
+    setIsEditMode(false);
+    setSelectedIds([]);
+    setIsSelectAll(false);
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading favorites...</div>;
@@ -64,35 +125,75 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   }
 
   return (
-    <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
-        <button onClick={onBack} className={styles.backButton}>
-          <ChevronLeft size={24} strokeWidth={2.0} color="#333333" />
-        </button>
-        <h1 className={styles.headerTitle}>Favorites</h1>
-      </div>
-      <div className={styles.headerSeparator}></div>
+    <div className="bg-[#fbfaf9] flex justify-center min-h-screen">
+      <div className="w-[390px] bg-white flex flex-col">
+        <div className="border-b-[1.6px] border-black h-[70.6px] flex-shrink-0">
+          <div className="flex h-[69px] items-center justify-between px-[24px]">
+            <button className="w-[20px] h-[20px]" onClick={onBack}>
+              <img src={imgVector} alt="Back" className="w-full h-full" />
+            </button>
+            <h1 className="font-['Apple_Garamond:Bold',sans-serif] text-[18px] leading-[28px] text-center">
+              Favorites
+            </h1>
+            <button
+              className="font-['Pretendard:Regular',sans-serif] text-[16px] leading-[24px] tracking-[-0.32px] w-[50px] text-right"
+              onClick={isEditMode ? handleCancel : () => setIsEditMode(true)}
+            >
+              {isEditMode ? 'Cancel' : 'Select'}
+            </button>
+          </div>
+        </div>
 
-      {/* Status Area */}
-      <div className={styles.statusArea}>
-        <Star size={24} strokeWidth={2.0} color="#FF69B4" />
-        <p className={styles.statusText}>저장한 전시관 {exhibitions.length}개</p>
-      </div>
-      <div className={styles.statusSeparator}></div>
+        <div className="border-b-[1.6px] border-black flex items-center h-[69.6px] px-[24px] gap-[12px] flex-shrink-0">
+          {!isEditMode ? (
+            <>
+              <img src={imgIcon} alt="Favorites" className="w-[20px] h-[20px]" />
+              <p className="font-['Pretendard:Regular',sans-serif] text-[16px] leading-[24px] tracking-[-0.32px]">
+                저장한 전시관 {exhibitions.length}개
+              </p>
+            </>
+          ) : (
+            <div className="flex items-center gap-[8px]">
+              <input
+                type="checkbox"
+                checked={isSelectAll}
+                onChange={toggleSelectAll}
+                className="appearance-none w-5 h-5 border-2 border-black rounded-full checked:bg-black checked:border-white checked:ring-2 checked:ring-black"
+              />
+              <p className="font-['Pretendard:Regular',sans-serif] text-[16px] leading-[24px] tracking-[-0.32px]">
+                {selectedIds.length}개 선택됨
+              </p>
+            </div>
+          )}
+        </div>
 
-      {/* Exhibition List */}
-      <div className={styles.cardList}>
-        {exhibitions.length > 0 ? (
-          exhibitions.map((exhibition) => (
-            <FavoriteExhibitionCard 
-              key={exhibition.id} 
-              {...exhibition} 
-              onNavigateToDetail={onNavigateToDetail}
-            />
-          ))
-        ) : (
-          <p className={styles.noFavoritesText}>아직 저장한 전시관이 없습니다.</p>
+        <div className="flex-grow p-[24px] flex flex-col gap-[16px] overflow-y-auto">
+          {exhibitions.length > 0 ? (
+            exhibitions.map((exhibition) => (
+              <FavoriteExhibitionCard
+                key={exhibition.id}
+                {...exhibition}
+                onNavigateToDetail={onNavigateToDetail}
+                isEditMode={isEditMode}
+                isSelected={selectedIds.includes(exhibition.id)}
+                onSelect={handleSelect}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 mt-8">아직 저장한 전시관이 없습니다.</p>
+          )}
+        </div>
+
+        {isEditMode && (
+          <div className="p-[24px] flex-shrink-0">
+            <button
+              onClick={handleDelete}
+              disabled={selectedIds.length === 0}
+              className="w-full bg-black text-white h-[48px] rounded-none font-['Pretendard:Regular',sans-serif] text-[16px] disabled:bg-gray-300"
+            >
+              Delete
+            </button>
+          </div>
         )}
       </div>
     </div>
