@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import svgPaths from "../imports/svg-eycs1wfpjn";
+
+const imgIcon3 = "https://www.figma.com/api/mcp/asset/4169c851-33aa-4bd8-b68f-befcb2c405de";
+const imgVector7 = "https://www.figma.com/api/mcp/asset/5365ce12-9ceb-4d38-af85-2372d596dcbb";
+const imgVector8 = "https://www.figma.com/api/mcp/asset/ebe12498-4b11-4f49-80d3-2d574fa78460";
 
 interface ShareExhibitionModalProps {
   isOpen: boolean;
@@ -12,9 +15,8 @@ interface ShareExhibitionModalProps {
 }
 
 export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: ShareExhibitionModalProps) {
-  const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   if (!isOpen) return null;
 
   const shareUrl = `https://exhibition.hotel/room/${exhibition.room}`;
@@ -25,24 +27,11 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: Sh
   };
 
   const handleCopy = () => {
-    const input = document.getElementById('share-url-input') as HTMLInputElement;
-    if (input) {
-      input.select();
-      input.setSelectionRange(0, 99999);
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          setCopied(true);
-          showMessage('링크가 복사되었습니다!');
-          setTimeout(() => setCopied(false), 2000);
-        } else {
-          showMessage('Ctrl+C 를 눌러 복사해주세요.');
-        }
-      } catch (err) {
-        showMessage('Ctrl+C 를 눌러 복사해주세요.');
-      }
-    }
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showMessage('링크가 복사되었습니다!');
+    }, () => {
+      showMessage('링크 복사에 실패했습니다.');
+    });
   };
 
   const handleKakaoShare = () => {
@@ -57,17 +46,16 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: Sh
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      {/* Toast Message */}
       {message && (
         <div className="fixed top-[100px] left-1/2 -translate-x-1/2 bg-black text-white px-[24px] py-[12px] z-[60] border-[1px] border-white">
           <p className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">{message}</p>
         </div>
       )}
-      
-      <div className="bg-white w-[343px] max-w-[95vw] flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="h-[70px] border-b border-black px-6 flex items-center justify-between">
-          <h2 className="font-['EB_Garamond',serif] text-[18px]">Share Exhibition</h2>
+      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw]" onClick={(e) => e.stopPropagation()}>
+        <div className="border-b-[1.108px] border-black border-solid flex h-[70px] items-center justify-between px-[24px]">
+          <h2 className="font-['EB_Garamond',serif] text-[18px]">
+            Share Exhibition
+          </h2>
           <button onClick={onClose} className="w-5 h-5 flex items-center justify-center hover:opacity-70">
             <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
               <path d="M10.8288 0.832986L0.832986 10.8288" stroke="black" strokeWidth="1.666" strokeLinecap="round" strokeLinejoin="round" />
@@ -75,75 +63,64 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition }: Sh
             </svg>
           </button>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 px-6 py-6 flex flex-col gap-8">
-          {/* Exhibition Info */}
-          <div className="border border-black p-4 flex flex-col gap-2">
-            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565]">Room {exhibition.room}</p>
-            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]">{exhibition.title}</p>
-            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">by {exhibition.author}</p>
+        <div className="px-[24px] py-[24px] flex flex-col gap-[24px]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[8px] p-[17px]">
+            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565]">
+              Room {exhibition.room}
+            </p>
+            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]">
+              {exhibition.title}
+            </p>
+            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">
+              by {exhibition.author}
+            </p>
           </div>
-
-          {/* Link Section */}
-          <div className="flex flex-col gap-2">
-            <label className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">전시관 링크</label>
-            <div className="flex gap-2">
-              <input 
+          <div className="flex flex-col gap-[8px]">
+            <label className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">
+              전시관 링크
+            </label>
+            <div className="flex gap-[8px]">
+              <input
                 id="share-url-input"
-                type="text" 
-                value={shareUrl} 
-                readOnly 
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-                className="flex-1 h-[44px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px] cursor-pointer"
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="flex-1 h-[44px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
               />
-              <button 
-                onClick={handleCopy} 
-                className="w-[62px] h-[44px] border border-black hover:bg-[#F360C0] transition-colors group flex items-center justify-center"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 14 14" fill="none">
-                  <path d={svgPaths.p383b4ad0} stroke="black" strokeWidth="1.666" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
-                  <path d={svgPaths.p258b8b00} stroke="black" strokeWidth="1.666" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors" />
-                </svg>
+              <button onClick={handleCopy} className="w-[62px] h-[44px] border border-black flex items-center justify-center">
+                <div className="w-5 h-5 relative">
+                    <img alt="copy" src={imgVector7} className="absolute inset-[33.33%_8.33%_8.33%_33.33%] w-auto h-auto"/>
+                    <img alt="copy" src={imgVector8} className="absolute inset-[8.33%_33.33%_33.33%_8.33%] w-auto h-auto"/>
+                </div>
               </button>
             </div>
           </div>
-
-          {/* QR Code Section */}
-          <div className="border border-black p-6 h-[180px] flex items-center justify-center">
-            <div className="bg-gray-50 border border-gray-200 w-full h-full flex flex-col items-center justify-center gap-2">
-              <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
-                <path d={svgPaths.p2c152b80} stroke="#99A1AF" strokeWidth="2.666" strokeLinecap="round" strokeLinejoin="round" />
-                <path d={svgPaths.p35f97940} stroke="#99A1AF" strokeWidth="2.666" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px]">QR 코드</p>
+          <div className="border-[1.108px] border-black border-solid p-[33px] h-[295px] flex items-center justify-center">
+            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full h-full flex flex-col items-center justify-center gap-[8px]">
+              <img alt="QR Code" src={imgIcon3} className="w-8 h-8" />
+              <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px]">
+                QR 코드
+              </p>
             </div>
           </div>
-
-          {/* Share Buttons */}
-          <div className="flex flex-col gap-2">
-            <button 
-              onClick={handleKakaoShare} 
-              className="h-[50px] border border-black hover:bg-[#F360C0] transition-colors group flex items-center px-3"
-            >
-              <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px] group-hover:text-white transition-colors">카카오톡으로 공유</span>
+          <div className="flex flex-col gap-[8px]">
+            <button onClick={handleKakaoShare} className="h-[50px] border border-black text-left px-3">
+              <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
+                카카오톡으로 공유
+              </span>
             </button>
-            <button 
-              onClick={handleXShare} 
-              className="h-[50px] border border-black hover:bg-[#F360C0] transition-colors group flex items-center px-3"
-            >
-              <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px] group-hover:text-white transition-colors">x로 공유</span>
+            <button onClick={handleXShare} className="h-[50px] border border-black text-left px-3">
+              <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
+                x로 공유
+              </span>
             </button>
           </div>
         </div>
-
-        {/* Close Button */}
-        <div className="px-6 pb-6">
-          <button 
-            onClick={onClose} 
-            className="w-full h-[56px] bg-black border border-black hover:bg-[#F360C0] transition-colors flex items-center px-6"
-          >
-            <span className="font-['Pretendard',sans-serif] text-[14px] text-white tracking-[-0.28px]">닫기</span>
+        <div className="px-[24px] pb-[25px] pt-[25px] border-t-[1.108px] border-black">
+          <button onClick={onClose} className="w-full h-[56px] bg-black text-white flex items-center px-6">
+            <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
+              닫기
+            </span>
           </button>
         </div>
       </div>
