@@ -182,7 +182,7 @@ export default function SignupStep3({
                   </div>
                 ) : nicknameError ? (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#ff4444] text-[12px] tracking-[-0.24px]">{nicknameError}</p>
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#eb210f] text-[12px] tracking-[-0.24px]">{nicknameError}</p>
                   </div>
                 ) : (
                   <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">

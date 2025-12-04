@@ -38,7 +38,6 @@ export default function ExhibitionDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
 
   // TODO: Replace with actual authentication logic from context
@@ -55,22 +54,26 @@ export default function ExhibitionDetailPage({
       }
       try {
         // Fetch all data in parallel
-        const [exhibitionRes, itemsRes, commentsRes] = await Promise.all([
+        const [exhibitionRes, itemsRes, commentsRes, isLikedRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
           fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
           fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
         ]);
 
         if (!exhibitionRes.ok) throw new Error(`Failed to fetch exhibition: ${exhibitionRes.statusText}`);
         if (!itemsRes.ok) throw new Error(`Failed to fetch exhibition items: ${itemsRes.statusText}`);
         if (!commentsRes.ok) throw new Error(`Failed to fetch comments: ${commentsRes.statusText}`);
+        if (!isLikedRes.ok) throw new Error(`Failed to fetch like status: ${isLikedRes.statusText}`);
 
         const exhibition: ExhibitionData = await exhibitionRes.json();
         const imageUrls: string[] = await itemsRes.json();
         const fetchedComments: Comment[] = await commentsRes.json();
+        const { isLiked } = await isLikedRes.json();
 
         setExhibitionData({ ...exhibition, imageUrls });
         setComments(fetchedComments);
+        setIsLiked(isLiked);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -79,7 +82,44 @@ export default function ExhibitionDetailPage({
     };
 
     fetchExhibitionAndComments();
-  }, [id]);
+  }, [id, loggedInUserId]);
+
+  const handleLikeClick = async () => {
+    if (!id || !loggedInUserId || !exhibitionData) return;
+
+    const originalIsLiked = isLiked;
+    const originalLikes = parseInt(exhibitionData.likes, 10);
+
+    // Optimistic UI update
+    const newIsLiked = !originalIsLiked;
+    const newLikes = newIsLiked ? originalLikes + 1 : originalLikes - 1;
+    
+    setIsLiked(newIsLiked);
+    setExhibitionData({ ...exhibitionData, likes: String(newLikes) });
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: loggedInUserId }),
+      });
+
+      if (!response.ok) {
+        // Revert on failure
+        setIsLiked(originalIsLiked);
+        setExhibitionData({ ...exhibitionData, likes: String(originalLikes) });
+        console.error("Failed to update like status on the server.");
+      }
+      // No need to do anything on success, UI is already updated
+    } catch (error) {
+      // Revert on error
+      setIsLiked(originalIsLiked);
+      setExhibitionData({ ...exhibitionData, likes: String(originalLikes) });
+      console.error("An error occurred while liking:", error);
+    }
+  };
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim() || !id) return;
@@ -179,11 +219,11 @@ export default function ExhibitionDetailPage({
                       </button>
                     )}
                     <button 
-                      onClick={() => setIsFavorited(!isFavorited)}
+                      onClick={handleLikeClick}
                       className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" 
                       data-name="Button"
                     >
-                      <Star size={24} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
+                      <Star size={24} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
                     </button>
                     <button 
                       onClick={onShare}
@@ -260,7 +300,7 @@ export default function ExhibitionDetailPage({
                 <div className="h-[16.5px] relative shrink-0 w-[38.725px]" data-name="Container">
                   <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[16.5px] items-center relative w-[38.725px]">
                     <div className="relative shrink-0 size-[16px]" data-name="Icon">
-                      <Star size={16} color="#4A5565" />
+                      <Heart size={16} color="#4A5565" />
                     </div>
                     <div className="h-[16.5px] relative shrink-0 w-[14.725px]" data-name="Text">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[14.725px]">
@@ -368,7 +408,7 @@ export default function ExhibitionDetailPage({
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
           <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-2">
             <button
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={handleLikeClick}
               className="shrink-0 flex items-center justify-center cursor-pointer mx-[30px] py-2"
               data-name="Heart Button"
             >

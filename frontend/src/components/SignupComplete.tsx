@@ -1,25 +1,36 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import svgPaths from "../imports/svg-75d091w3ip";
 
 interface SignupCompleteProps {
   username: string;
-  onNext: (profileType: 'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l') => void;
 }
 
-export default function SignupComplete({ username, onNext }: SignupCompleteProps) {
-  // Randomly select one of 4 profile types (profile_1_l, profile_2_l, profile_3_l, profile_4_l)
+export default function SignupComplete({ username }: SignupCompleteProps) {
+  const navigate = useNavigate();
+
+  // Randomly select one of 4 profile types and save it
   const profileType = useMemo(() => {
     const types: Array<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'> = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
-    return types[Math.floor(Math.random() * types.length)];
+    const selectedType = types[Math.floor(Math.random() * types.length)];
+    localStorage.setItem('profileType', selectedType); // Save to localStorage
+    return selectedType;
   }, []);
 
-  const handleNext = () => {
-    onNext(profileType);
-  };
+  // Automatically navigate to the main page after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate('/main');
+    }, 3000); // 3-second delay
+
+    // Cleanup the timer if the component unmounts
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   // Render profile icon based on selected type
   const renderProfileIcon = () => {
+    // ... (rest of the rendering logic is the same)
     if (profileType === 'profile_1_l') {
       return (
         <div className="absolute flex inset-[-12%_-62.49%_-56.53%_-29%] items-center justify-center">
@@ -149,22 +160,6 @@ export default function SignupComplete({ username, onNext }: SignupCompleteProps
           <p className="font-['Pretendard',sans-serif] leading-[20px] relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">SHOWCASE에서 나만의 쇼케이스를 만들어 보세요.</p>
         </motion.div>
       </div>
-
-      {/* Button */}
-      <motion.button 
-        onClick={handleNext}
-        className="absolute bg-black box-border content-stretch flex flex-col gap-[10px] items-start justify-center left-[calc(50%-163.5px)] pl-[24px] pr-px py-[20px] top-[636px] w-[327px] cursor-pointer"
-        data-name="Button"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.6 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <div className="content-stretch flex h-[16.616px] items-start relative shrink-0" data-name="Text">
-          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-nowrap text-white tracking-[-0.28px] whitespace-pre">SHOWCASE 시작하기</p>
-        </div>
-      </motion.button>
     </div>
   );
 }

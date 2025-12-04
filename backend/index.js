@@ -179,6 +179,80 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Endpoint to check for duplicate username
+app.post('/api/check-username', async (req, res) => {
+    const { username } = req.body;
+
+    if (!username) {
+        return res.status(400).json({ message: 'Username is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT * FROM users WHERE username = ?',
+                [username]
+            );
+
+            connection.release();
+
+            if (rows.length > 0) {
+                // Username found, it's a duplicate
+                res.status(200).json({ isDuplicate: true });
+            } else {
+                // Username not found, it's available
+                res.status(200).json({ isDuplicate: false });
+            }
+
+        } catch (error) {
+            connection.release();
+            console.error('Check username error:', error.stack);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    } catch (error) {
+        console.error('DB connection error:', error.stack);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Endpoint to check for duplicate nickname
+app.post('/api/check-nickname', async (req, res) => {
+    const { nickname } = req.body;
+
+    if (!nickname) {
+        return res.status(400).json({ message: 'Nickname is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT * FROM users WHERE nickname = ?',
+                [nickname]
+            );
+
+            connection.release();
+
+            if (rows.length > 0) {
+                // Nickname found, it's a duplicate
+                res.status(200).json({ isDuplicate: true });
+            } else {
+                // Nickname not found, it's available
+                res.status(200).json({ isDuplicate: false });
+            }
+
+        } catch (error) {
+            connection.release();
+            console.error('Check nickname error:', error.stack);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    } catch (error) {
+        console.error('DB connection error:', error.stack);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for creating an exhibition
 app.post('/api/exhibitions', async (req, res) => {
     const { userId, title, description, startDate, endDate, isPublic, uploadedFiles } = req.body;
@@ -200,11 +274,14 @@ app.post('/api/exhibitions', async (req, res) => {
             const exhibitionId = exhibitionResult.insertId;
 
             if (uploadedFiles && uploadedFiles.length > 0) {
-                const itemValues = uploadedFiles.map((fileUrl) => [exhibitionId, 'image', fileUrl]); // Assuming 'image' for now
-                await connection.query(
-                    'INSERT INTO exhibition_items (exhibition_id, item_type, item_url) VALUES ?',
-                    [itemValues]
-                );
+                const uniqueUrls = [...new Set(uploadedFiles)];
+                const itemValues = uniqueUrls.map((fileUrl) => [exhibitionId, 'image', fileUrl]);
+                if (itemValues.length > 0) {
+                    await connection.query(
+                        'INSERT INTO exhibition_items (exhibition_id, item_type, item_url) VALUES ?',
+                        [itemValues]
+                    );
+                }
             }
 
             await connection.commit();
@@ -436,6 +513,93 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
         res.status(201).json(newCommentRows[0]);
     } catch (error) {
         console.error('Post comment error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for liking/unliking an exhibition
+app.post('/api/exhibitions/:id/like', async (req, res) => {
+    const { id: exhibitionId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // Check if the user has already liked the exhibition
+        const [favoriteRows] = await connection.execute(
+            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [userId, exhibitionId]
+        );
+
+        if (favoriteRows.length > 0) {
+            // User has already liked, so unlike it
+            await connection.execute(
+                'DELETE FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+                [userId, exhibitionId]
+            );
+
+            await connection.execute(
+                'UPDATE exhibitions SET likes = likes - 1 WHERE id = ?',
+                [exhibitionId]
+            );
+
+            await connection.commit();
+            connection.release();
+            res.status(200).json({ message: 'Exhibition unliked successfully.' });
+
+        } else {
+            // User has not liked yet, so like it
+            await connection.execute(
+                'INSERT INTO user_favorites (user_id, exhibition_id) VALUES (?, ?)',
+                [userId, exhibitionId]
+            );
+
+            await connection.execute(
+                'UPDATE exhibitions SET likes = likes + 1 WHERE id = ?',
+                [exhibitionId]
+            );
+
+            await connection.commit();
+            connection.release();
+            res.status(200).json({ message: 'Exhibition liked successfully.' });
+        }
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Like/unlike exhibition error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for checking if a user liked an exhibition
+app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
+    const { id: exhibitionId } = req.params;
+    const { userId } = req.query;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [userId, exhibitionId]
+        );
+        connection.release();
+
+        res.status(200).json({ isLiked: rows.length > 0 });
+
+    } catch (error) {
+        console.error('Check is-liked error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

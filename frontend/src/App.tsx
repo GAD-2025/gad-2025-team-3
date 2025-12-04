@@ -193,7 +193,7 @@ export default function App() {
     return { valid: true, message: '' };
   };
 
-  const handleUsernameCheck = () => {
+  const handleUsernameCheck = async () => {
     const validation = isValidUsername(signupData.username);
     if (!validation.valid) {
       setUsernameError(validation.message);
@@ -201,9 +201,35 @@ export default function App() {
       setUsernameValid(false);
       return;
     }
+
+    setIsUsernameChecked(false); // Reset while checking
     setUsernameError('');
-    setIsUsernameChecked(true);
-    setUsernameValid(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/check-username`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: signupData.username }),
+      });
+
+      setIsUsernameChecked(true);
+      const data = await response.json();
+
+      if (data.isDuplicate) {
+        setUsernameValid(false);
+        setUsernameError('이미 사용 중인 아이디입니다.');
+      } else {
+        setUsernameValid(true);
+        setUsernameError('');
+      }
+    } catch (error) {
+      console.error('Username check failed:', error);
+      setIsUsernameChecked(true);
+      setUsernameValid(false);
+      setUsernameError('네트워크 오류로 확인에 실패했습니다.');
+    }
   };
 
   // Nickname validation logic (moved from SignupStep3)
@@ -218,7 +244,7 @@ export default function App() {
     return { valid: true, message: '' };
   };
 
-  const handleNicknameCheck = () => {
+  const handleNicknameCheck = async () => {
     const validation = isValidNickname(signupData.nickname);
     if (!validation.valid) {
       setNicknameError(validation.message);
@@ -226,9 +252,35 @@ export default function App() {
       setNicknameValid(false);
       return;
     }
+
+    setIsNicknameChecked(false); // Reset while checking
     setNicknameError('');
-    setIsNicknameChecked(true);
-    setNicknameValid(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/check-nickname`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nickname: signupData.nickname }),
+      });
+
+      setIsNicknameChecked(true);
+      const data = await response.json();
+      
+      if (data.isDuplicate) {
+        setNicknameValid(false);
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+      } else {
+        setNicknameValid(true);
+        setNicknameError('');
+      }
+    } catch (error) {
+      console.error('Nickname check failed:', error);
+      setIsNicknameChecked(true);
+      setNicknameValid(false);
+      setNicknameError('네트워크 오류로 확인에 실패했습니다.');
+    }
   };
 
   // Artist selection logic (moved from SignupStep4)
@@ -268,21 +320,39 @@ export default function App() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        // Specifically check for 409 Conflict status
+        if (response.status === 409) {
+          // You could inspect errorData.message to see which field is duplicated
+          // and potentially navigate back to the specific step (2 or 3).
+          // For now, a general message and returning to step 2 is a good improvement.
+          alert('이미 사용 중인 아이디, 이메일, 또는 닉네임입니다. 다시 확인해주세요.');
+          setSignupStep(2); // Go back to the info-input step
+        }
         throw new Error(errorData.message || 'Signup failed');
       }
 
       const result = await response.json();
       console.log('Signup successful:', result);
+      // The backend should return the new user object upon successful signup
       if (result.user) {
+        // Set the new user as the currentUser
         setCurrentUser(result.user);
-        navigate('/main');
+        // Navigate to a post-signup page or main page
+        navigate('/signup-complete'); 
       } else {
-        setSignupStep(5); // Fallback to complete page
+        // Fallback if user object is not returned
+        navigate('/signup-complete');
       }
 
     } catch (error: any) { // Use 'any' for error type for now
       console.error('An error occurred during signup:', error);
-      alert(error.message);
+      // Avoid alerting if it was a 409, as it's handled above
+      if (error.message.includes('already exists')) {
+        // This is now handled above, but as a fallback, we can log it.
+        console.error("Duplicate entry error was not caught as expected.");
+      } else {
+        alert('회원가입 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
+      }
     }
   };
 
@@ -405,7 +475,7 @@ export default function App() {
           )}
         </>
       } />
-      <Route path="/signup-complete" element={<SignupComplete username={signupData.nickname} onNext={(selectedProfileType) => { setProfileType(selectedProfileType); navigate('/main'); }} />} />
+      <Route path="/signup-complete" element={<SignupComplete username={signupData.nickname} />} />
       <Route path="/main" element={
         <MainPage 
           onNavigateToProfile={() => navigate('/profile')}
