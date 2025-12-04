@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ChevronLeft } from 'react-feather';
+import { AlertTriangle } from 'lucide-react';
 
 // This is the clean, flexbox-based version of the delete page.
 
@@ -55,8 +56,8 @@ export default function DeleteExhibitionPage() {
     <div className="flex flex-col h-screen max-w-[393px] mx-auto bg-white">
       {/* 1. Header Area */}
       <header className="flex items-center p-4 border-b border-gray-200">
-        <button onClick={handleCancel} className="p-2">
-          <ArrowLeft className="size-6" />
+        <button onClick={handleCancel} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+          <ChevronLeft className="size-5 text-black" />
         </button>
         <h1 className="text-lg font-semibold mx-auto">
           전시관 삭제

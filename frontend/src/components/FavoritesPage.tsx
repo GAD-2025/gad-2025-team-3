@@ -67,8 +67,8 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
     <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
-        <button onClick={onBack} className={styles.backButton}>
-          <ChevronLeft size={24} strokeWidth={2.0} color="#333333" />
+        <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+          <ChevronLeft className="size-5 text-black" />
         </button>
         <h1 className={styles.headerTitle}>Favorites</h1>
       </div>

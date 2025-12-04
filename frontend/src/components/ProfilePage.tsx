@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'react-feather';
 import svgPaths from "../imports/svg-cv3j1aafl9";
 import iconPaths from "../imports/svg-0l1y3hgd5b";
 import settingsSvgPaths from "../imports/svg-menh3de8oj";
@@ -107,27 +108,8 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
         <div className="flex flex-row items-center size-full">
           <div className="box-border content-stretch flex h-[70.083px] items-center justify-between px-[20px] py-0 relative w-full">
             {/* Back Button */}
-            <button 
-              onClick={onBack}
-              className="content-stretch flex flex-col items-start relative shrink-0 size-[19.992px] cursor-pointer" 
-              data-name="Button"
-            >
-              <div className="h-[19.992px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">
-                  <div className="absolute inset-[-7.14%_-14.29%]">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 14">
-                      <path d={svgPaths.p63e1620} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="absolute bottom-1/2 left-[20.83%] right-[20.83%] top-1/2" data-name="Vector">
-                  <div className="absolute inset-[-0.83px_-7.14%]">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 14 2">
-                      <path d="M12.4948 0.832986H0.832986" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
+            <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+              <ChevronLeft className="size-5 text-black" />
             </button>
             <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
             {/* Empty Container to balance the header */}

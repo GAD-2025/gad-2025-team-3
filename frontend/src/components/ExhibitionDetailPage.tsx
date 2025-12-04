@@ -51,22 +51,6 @@ export default function ExhibitionDetailPage({
   const loggedInUserId = currentUser?.id;
   const isOwner = exhibitionData?.user_id === loggedInUserId;
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const fetchExhibitionAndComments = async () => {
-      if (!id) {
-        setError("Exhibition ID is missing.");
-        setLoading(false);
-        return;
-      }
-      try {
-        // The backend is expected to increment the view count on this fetch.
-        const [exhibitionRes, itemsRes, commentsRes, isLikedRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
-=======
   const fetchExhibitionAndComments = async () => {
     if (!id) {
       setError("Exhibition ID is missing.");
@@ -74,6 +58,7 @@ export default function ExhibitionDetailPage({
       return;
     }
     try {
+      // The backend is expected to increment the view count on this fetch.
       const [exhibitionRes, itemsRes, commentsRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`),
         fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/items`),
@@ -95,7 +80,6 @@ export default function ExhibitionDetailPage({
         const [isLikedRes, isFavoritedRes] = await Promise.all([
             fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
             fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}/favorites`),
->>>>>>> 13ddc67d2911831be92d013f302cd596d39ad499
         ]);
 
         if (!isLikedRes.ok) throw new Error(`Failed to fetch like status: ${isLikedRes.statusText}`);

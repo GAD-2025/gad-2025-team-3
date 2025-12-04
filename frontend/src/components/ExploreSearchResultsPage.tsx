@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronLeft } from 'react-feather';
 import svgPaths from "../imports/svg-jbhf0egdok";
 
 interface ExploreSearchResultsPageProps {
@@ -108,29 +109,8 @@ export default function ExploreSearchResultsPage({
           <div className="flex flex-row items-center size-full">
             <div className="box-border content-stretch flex gap-[12px] h-[96.2px] items-center px-[24px] py-0 relative w-full">
               {/* Back Button */}
-              <button 
-                onClick={onBack}
-                className="relative shrink-0 size-[20px] cursor-pointer" 
-                data-name="Button"
-              >
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start relative size-[20px]">
-                  <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                    <div className="absolute bottom-[20.83%] left-[20.83%] right-1/2 top-[20.83%]" data-name="Vector">
-                      <div className="absolute inset-[-7.14%_-14.29%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 14">
-                          <path d={svgPaths.p37c3e100} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-1/2 left-[20.83%] right-[20.83%] top-1/2" data-name="Vector">
-                      <div className="absolute inset-[-0.83px_-7.14%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 14 2">
-                          <path d="M12.5 0.833333H0.833333" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+                <ChevronLeft className="size-5 text-black" />
               </button>
 
               {/* Search Input */}
