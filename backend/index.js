@@ -646,8 +646,6 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
                 users u ON e.user_id = u.id
             WHERE 
                 f.user_id = ?
-            ORDER BY 
-                f.created_at DESC
             `,
             [parsedUserId]
         );
