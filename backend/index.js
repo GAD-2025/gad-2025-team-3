@@ -648,8 +648,14 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
         );
         connection.release();
         res.status(200).json(rows);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Fetch favorites error:', error);
+        if (error.code) {
+            console.error('MySQL Error Code:', error.code);
+        }
+        if (error.sqlMessage) {
+            console.error('MySQL Error Message:', error.sqlMessage);
+        }
         res.status(500).json({ message: 'Internal server error' });
     }
 });
