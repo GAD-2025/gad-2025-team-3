@@ -1,27 +1,8 @@
 import { useState } from 'react';
-import svgPaths from "../imports/svg-cnim5xb21f";
+import { ChevronLeft } from 'react-feather';
 
 interface FindPasswordProps {
   onBack: () => void;
-}
-
-function Showcase() {
-  return (
-    <div className="h-[15.223px] relative shrink-0 w-[86px]" data-name="SHOWCASE">
-      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 86 16">
-        <g id="SHOWCASE">
-          <path d={svgPaths.p18193400} fill="var(--fill-0, black)" id="Vector" />
-          <path d={svgPaths.p3e727180} fill="var(--fill-0, black)" id="Vector_2" />
-          <path d={svgPaths.p182c5428} fill="var(--fill-0, black)" id="Vector_3" />
-          <path d={svgPaths.p22c55700} fill="var(--fill-0, black)" id="Vector_4" />
-          <path d={svgPaths.p2b7c4e00} fill="var(--fill-0, black)" id="Vector_5" />
-          <path d={svgPaths.p27e05300} fill="var(--fill-0, black)" id="Vector_6" />
-          <path d={svgPaths.p15f36600} fill="var(--fill-0, black)" id="Vector_7" />
-          <path d={svgPaths.p1673c000} fill="var(--fill-0, black)" id="Vector_8" />
-        </g>
-      </svg>
-    </div>
-  );
 }
 
 export default function FindPassword({ onBack }: FindPasswordProps) {
@@ -50,8 +31,8 @@ export default function FindPassword({ onBack }: FindPasswordProps) {
         <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
         <div className="flex flex-row items-center size-full">
           <div className="box-border content-stretch flex h-[70.083px] items-center pl-[20px] pr-0 py-0 relative w-full">
-            <button onClick={onBack} className="cursor-pointer">
-              <Showcase />
+            <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+              <ChevronLeft className="size-5 text-black" />
             </button>
             <div className="h-0 shrink-0 w-[19.992px]" data-name="Container" />
           </div>

@@ -350,6 +350,13 @@ app.get('/api/exhibitions/:id', async (req, res) => {
 
     try {
         const connection = await pool.getConnection();
+
+        // Increment view count
+        await connection.execute(
+            'UPDATE exhibitions SET views = views + 1 WHERE id = ?',
+            [id]
+        );
+
         const [rows] = await connection.execute(
             `
             SELECT 
@@ -575,6 +582,24 @@ app.post('/api/exhibitions/:id/like', async (req, res) => {
             connection.release();
         }
         console.error('Like/unlike exhibition error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for incrementing share count
+app.post('/api/exhibitions/:id/share', async (req, res) => {
+    const { id: exhibitionId } = req.params;
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute(
+            'UPDATE exhibitions SET shares = shares + 1 WHERE id = ?',
+            [exhibitionId]
+        );
+        connection.release();
+        res.status(200).json({ message: 'Share count incremented successfully.' });
+    } catch (error) {
+        console.error('Increment share count error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

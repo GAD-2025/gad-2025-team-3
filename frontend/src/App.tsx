@@ -573,8 +573,8 @@ export default function App() {
       } />
       <Route path="/exhibition/:id" element={
         <ExhibitionDetailPage 
-          onBack={() => navigate('/myexhibition')} 
-          exhibitionData={selectedExhibition}
+          onBack={() => navigate(-1)} 
+          currentUser={currentUser}
         />
       } />
       <Route path="*" element={<Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />} />
