@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'react-feather';
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -33,6 +33,10 @@ export default function CreateExhibitionSettingsPage({
   isPublic,
   setIsPublic,
 }: CreateExhibitionSettingsPageProps) {
+  useEffect(() => {
+    setStartDate(new Date());
+  }, [setStartDate]);
+
   const formatDate = (date: Date | undefined) => {
     if (!date) return '';
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -163,24 +167,28 @@ export default function CreateExhibitionSettingsPage({
               </div>
 
               {/* Period Field - Calendar Selection */}
-              <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Container">
+              <div className={`content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full transition-opacity ${!isPublic ? 'opacity-50 cursor-not-allowed' : ''}`} data-name="Container">
                 <div className="content-stretch flex items-start relative shrink-0 w-full" data-name="Label">
-                  <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">전시 기간</p>
+                  <p className={`basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[12px] tracking-[-0.24px] ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>전시 기간</p>
                 </div>
                 <div className="flex gap-[8px] w-full">
                   {/* Start Date */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button className="flex-1 h-[48.2px] relative" data-name="Date Picker">
+                      <button
+                        disabled
+                        className="flex-1 h-[48.2px] relative cursor-not-allowed"
+                        data-name="Date Picker"
+                      >
                         <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                           <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
-                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${startDate ? 'text-[#4a5565]' : 'text-[#99a1af]'}`}>
+                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!isPublic || !startDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
                               {startDate ? formatDate(startDate) : '시작일'}
                             </span>
-                            <CalendarIcon className="size-4 text-[#4a5565]" />
+                            <CalendarIcon className={`size-4 ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
                           </div>
                         </div>
-                        <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                        <div aria-hidden="true" className={`absolute border-[1.6px] ${!isPublic ? 'border-[#99a1af]' : 'border-black'} border-solid inset-0 pointer-events-none`} />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-white z-[100]" align="start">
@@ -196,16 +204,20 @@ export default function CreateExhibitionSettingsPage({
                   {/* End Date */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button className="flex-1 h-[48.2px] relative" data-name="Date Picker">
+                      <button
+                        disabled={!isPublic}
+                        className="flex-1 h-[48.2px] relative"
+                        data-name="Date Picker"
+                      >
                         <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                           <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
                             <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${endDate ? 'text-[#4a5565]' : 'text-[#99a1af]'}`}>
                               {endDate ? formatDate(endDate) : '종료일'}
                             </span>
-                            <CalendarIcon className="size-4 text-[#4a5565]" />
+                            <CalendarIcon className={`size-4 ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
                           </div>
                         </div>
-                        <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                        <div aria-hidden="true" className={`absolute border-[1.6px] ${!isPublic ? 'border-[#99a1af]' : 'border-black'} border-solid inset-0 pointer-events-none`} />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-white z-[100]" align="start">
