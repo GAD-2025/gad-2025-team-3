@@ -261,6 +261,16 @@ app.post('/api/exhibitions', async (req, res) => {
         return res.status(400).json({ message: 'Missing required exhibition fields.' });
     }
 
+    // Validate startDate: must be today or in the future
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+    const exhibitionStartDate = new Date(startDate);
+    exhibitionStartDate.setHours(0, 0, 0, 0); // Set to start of startDate
+
+    if (exhibitionStartDate < today) {
+        return res.status(400).json({ message: 'Exhibition start date cannot be in the past.' });
+    }
+
     try {
         const connection = await pool.getConnection();
         await connection.beginTransaction();
