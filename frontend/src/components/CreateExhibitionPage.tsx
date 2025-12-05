@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft } from 'react-feather';
+import * as svgPaths from '../imports/svgPaths'; // svgPaths 임포트 추가
 
 interface CreateExhibitionPageProps {
   onBack: () => void;
