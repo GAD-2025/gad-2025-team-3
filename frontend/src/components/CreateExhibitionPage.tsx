@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft } from 'react-feather';
-import * as svgPaths from '../imports/svgPaths'; // svgPaths 임포트 추가
+import { Image, Video } from 'lucide-react';
 
 interface CreateExhibitionPageProps {
   onBack: () => void;
@@ -104,13 +104,7 @@ export default function CreateExhibitionPage({ onBack, onNext }: CreateExhibitio
                 <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                 <div className="content-stretch flex flex-col gap-[12px] h-[138.5px] items-center justify-center relative shrink-0 w-full" data-name="Container">
                   <div className="relative shrink-0 size-[40px]" data-name="Icon">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 40 40">
-                      <g id="Icon">
-                        <path d={svgPaths.p1093e00} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.33333" />
-                        <path d="M5 15H35" id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.33333" />
-                        <path d="M15 35V15" id="Vector_3" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.33333" />
-                      </g>
-                    </svg>
+                    <Image className="size-full text-black" />
                   </div>
                   <div className="relative shrink-0" data-name="Container">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[4px] items-start relative">
@@ -140,12 +134,7 @@ export default function CreateExhibitionPage({ onBack, onNext }: CreateExhibitio
                 <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                 <div className="content-stretch flex flex-col gap-[12px] h-[138.5px] items-center justify-center relative shrink-0 w-full" data-name="Container">
                   <div className="relative shrink-0 size-[40px]" data-name="Icon">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 40 40">
-                      <g id="Icon">
-                        <path d={svgPaths.p28af1900} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.33333" />
-                        <path d={svgPaths.p14561f00} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.33333" />
-                      </g>
-                    </svg>
+                    <Video className="size-full text-black" />
                   </div>
                   <div className="relative shrink-0" data-name="Container">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[4px] items-start relative">
