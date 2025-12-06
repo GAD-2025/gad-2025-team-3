@@ -34,7 +34,7 @@ export default function CreateExhibitionSettingsPage({
   setIsPublic,
 }: CreateExhibitionSettingsPageProps) {
   useEffect(() => {
-    setStartDate(new Date());
+    setStartDate(normalizeDateToMidnight(new Date()));
   }, [setStartDate]);
 
   const formatDate = (date: Date | undefined) => {
@@ -42,12 +42,18 @@ export default function CreateExhibitionSettingsPage({
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
+  const normalizeDateToMidnight = (date: Date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  };
+
   const isButtonEnabled =
     exhibitionTitle.trim() !== '' &&
     description.trim() !== '' &&
     startDate !== undefined &&
     endDate !== undefined &&
-    startDate <= endDate; // 시작일이 종료일보다 이르거나 같아야 함
+    normalizeDateToMidnight(startDate) <= normalizeDateToMidnight(endDate); // 시작일이 종료일보다 이르거나 같아야 함
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -228,7 +234,7 @@ export default function CreateExhibitionSettingsPage({
                         disabled={(date) => {
                           // 시작일이 선택되어 있으면, 시작일보다 이른 날짜는 비활성화
                           if (startDate) {
-                            return date < startDate;
+                            return normalizeDateToMidnight(date) < normalizeDateToMidnight(startDate);
                           }
                           return false;
                         }}

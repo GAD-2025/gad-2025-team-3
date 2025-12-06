@@ -63,6 +63,12 @@ interface ExhibitionData {
   // Add other fields as per your backend response
 }
 
+const normalizeDateToMidnight = (date: Date) => {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
+};
+
 
 export default function App() {
   const navigate = useNavigate();
@@ -366,6 +372,28 @@ export default function App() {
       return;
     }
 
+    let finalStartDate = startDate;
+    const todayNormalized = normalizeDateToMidnight(new Date());
+    const startDateNormalized = startDate ? normalizeDateToMidnight(startDate) : undefined;
+
+    if (startDateNormalized && startDateNormalized.getTime() <= todayNormalized.getTime()) {
+      // If startDate is today or in the past, set it to tomorrow's midnight
+      const tomorrow = new Date(todayNormalized);
+      tomorrow.setDate(todayNormalized.getDate() + 1);
+      finalStartDate = tomorrow;
+      console.log("Adjusted startDate to tomorrow for backend:", finalStartDate.toISOString().split('T')[0]);
+    }
+
+    console.log('Submitting exhibition data:', {
+      userId: currentUser.id,
+      title: exhibitionTitle,
+      description,
+      startDate: finalStartDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      isPublic,
+      uploadedFiles,
+    });
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions`, {
         method: 'POST',
@@ -377,7 +405,7 @@ export default function App() {
           userId: currentUser.id,
           title: exhibitionTitle,
           description,
-          startDate: startDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
+          startDate: finalStartDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
           endDate: endDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
           isPublic,
           uploadedFiles, // Array of file URLs
@@ -392,12 +420,12 @@ export default function App() {
       const result = await response.json();
       console.log('Exhibition created successfully:', result);
       // Reset exhibition creation states
-      setExhibitionTitle('');
+      // setExhibitionTitle(''); // Removed this line
       setDescription('');
       setStartDate(undefined);
       setEndDate(undefined);
       setIsPublic(true);
-      setUploadedFiles([]);
+      // setUploadedFiles([]); // Removed this line
       navigate('/create-exhibition/complete');
 
     } catch (error: any) {
