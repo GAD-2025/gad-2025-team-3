@@ -211,7 +211,7 @@ export default function CreateExhibitionSettingsPage({
                       >
                         <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                           <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
-                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${endDate ? 'text-[#4a5565]' : 'text-[#99a1af]'}`}>
+                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!isPublic || !endDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
                               {endDate ? formatDate(endDate) : '종료일'}
                             </span>
                             <CalendarIcon className={`size-4 ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />

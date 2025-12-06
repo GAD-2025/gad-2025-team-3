@@ -11,9 +11,7 @@ interface FavoriteExhibitionCardProps {
   likes: number;
   roomId: number;
   onNavigateToDetail: (id: number) => void;
-  isEditMode: boolean;
-  isSelected: boolean;
-  onSelect: (id: number) => void;
+
 }
 
 const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
@@ -24,34 +22,17 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   likes,
   roomId,
   onNavigateToDetail,
-  isEditMode,
-  isSelected,
-  onSelect,
 }) => {
   const handleClick = () => {
-    if (isEditMode) {
-      onSelect(id);
-    } else {
-      onNavigateToDetail(id);
-    }
+    onNavigateToDetail(id);
   };
 
   return (
     <div
-      className={`border-[1.6px] border-black border-solid w-full p-[1.6px] relative ${isEditMode ? 'cursor-pointer' : ''}`}
+      className={`border-[1.6px] border-black border-solid w-full p-[1.6px] relative`}
       onClick={handleClick}
     >
-      {isEditMode && (
-        <div className="absolute top-[16px] right-[16px] z-10 w-5 h-5 flex items-center justify-center">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            readOnly
-            className="appearance-none w-full h-full border-2 border-black rounded-full checked:bg-black checked:border-white checked:ring-2 checked:ring-black"
-          />
-        </div>
-      )}
-      <div className={`${isSelected ? 'opacity-50' : ''}`}>
+      <div>
         <div className="bg-gray-100 border-b-[1.6px] border-black h-[190.575px] w-full" />
         <div className="flex flex-col gap-[8px] h-[109.3px] pt-[16px] px-[16px]">
           <div className="flex h-[41.5px] justify-between items-start w-full">
