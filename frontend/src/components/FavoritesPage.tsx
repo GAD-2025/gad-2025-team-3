@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ChevronLeft } from 'react-feather';
 import FavoriteExhibitionCard from './FavoriteExhibitionCard';
 
 const imgVector = "https://www.figma.com/api/mcp/asset/545e3b9c-df95-4aaf-8afb-da7d9c237ef4"; // Back button icon
@@ -125,23 +126,30 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   return (
     <div className="bg-[#fbfaf9] flex justify-center min-h-screen">
       <div className="w-[390px] bg-white flex flex-col">
-        {/* Header */}
-        <div className="border-b-[1.6px] border-black h-[70.6px] flex-shrink-0">
-          <div className="flex h-[69px] items-center justify-between px-[24px]">
-            <button className="w-[20px] h-[20px]" onClick={onBack}>
-              <img src={imgVector} alt="Back" className="w-full h-full" />
-            </button>
-            <h1 className="font-['Apple_Garamond:Bold',sans-serif] text-[18px] leading-[28px] text-center">
-              Favorites
-            </h1>
-            <button
-              className="font-['Pretendard:Regular',sans-serif] text-[16px] leading-[24px] tracking-[-0.32px] w-[50px] text-right"
-              onClick={isEditMode ? handleCancel : () => setIsEditMode(true)}
-            >
-              {isEditMode ? 'Cancel' : 'Select'}
-            </button>
+      {/* Header */}
+      <div className="box-border content-stretch flex flex-col h-[70.083px] items-center justify-between pb-[1.108px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
+        <div className="h-[68.976px] relative shrink-0 w-full" data-name="Container">
+          <div className="flex flex-row items-center size-full">
+            <div className="box-border content-stretch flex h-[68.976px] items-center justify-between px-[23.99px] py-0 relative w-full">
+              {/* Back Button */}
+              <button onClick={onBack} className="relative shrink-0 w-[20px] h-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
+                <ChevronLeft className="size-5 text-black" />
+              </button>
+              {/* Heading */}
+              <div className="h-[20.996px] relative shrink-0 w-[99.525px]" data-name="Heading 1">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex h-[20.996px] items-start justify-center relative w-[99.525px]">
+                  <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Favorites</p>
+                </div>
+              </div>
+              {/* Empty Container */}
+              <div className="h-0 relative shrink-0 w-[20px]" data-name="Container">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-0 w-[20px]" />
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
         {/* Status Area */}
         <div className="border-b-[1.6px] border-black flex items-center h-[69.6px] px-[24px] gap-[12px] flex-shrink-0">
