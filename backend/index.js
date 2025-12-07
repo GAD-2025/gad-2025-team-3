@@ -504,6 +504,78 @@ app.delete('/api/exhibitions/:id', async (req, res) => {
     }
 });
 
+// API for updating an exhibition
+app.put('/api/exhibitions/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, description, start_date, end_date, is_public, username } = req.body;
+
+    if (!id || !title || !start_date || !end_date || username === undefined) {
+        return res.status(400).json({ message: 'Missing required exhibition fields or authorization info.' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. Verify exhibition exists and get its owner's user_id
+        const [exhibitionRows] = await connection.execute(
+            'SELECT user_id FROM exhibitions WHERE id = ?',
+            [id]
+        );
+
+        if (exhibitionRows.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'Exhibition not found.' });
+        }
+        const exhibitionOwnerUserId = exhibitionRows[0].user_id;
+
+        // 2. Get the user_id of the requesting user based on username
+        const [userRows] = await connection.execute(
+            'SELECT id FROM users WHERE username = ?',
+            [username]
+        );
+
+        if (userRows.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(401).json({ message: 'Unauthorized: User not found.' });
+        }
+        const requestingUserId = userRows[0].id;
+
+        // 3. Authorize: check if the requesting user is the owner of the exhibition
+        if (requestingUserId !== exhibitionOwnerUserId) {
+            await connection.rollback();
+            connection.release();
+            return res.status(403).json({ message: 'Forbidden: You are not authorized to update this exhibition.' });
+        }
+
+        // 4. Update the exhibition
+        const [updateResult] = await connection.execute(
+            'UPDATE exhibitions SET title = ?, description = ?, start_date = ?, end_date = ?, is_public = ? WHERE id = ?',
+            [title, description, start_date, end_date, is_public, id]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'Exhibition not found or no changes made.' });
+        }
+
+        await connection.commit();
+        connection.release();
+        res.status(200).json({ message: 'Exhibition updated successfully.' });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Update exhibition error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for fetching comments for an exhibition
 app.get('/api/exhibitions/:id/comments', async (req, res) => {
     const { id } = req.params;

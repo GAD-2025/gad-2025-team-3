@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart, X, ChevronRight } from 'react-feather';
+import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart, X, ChevronRight, MoreVertical } from 'react-feather';
 import ShareExhibitionModal from './ShareExhibitionModal';
+import EditExhibitionModal from './EditExhibitionModal.tsx'; // Import the new modal component
 
 interface User {
   id: number;
@@ -19,6 +20,9 @@ interface ExhibitionData {
   likes: string;
   shares: string;
   description: string;
+  start_date: string; // Added for edit functionality
+  end_date: string; // Added for edit functionality
+  is_public: boolean; // Added for edit functionality
   imageUrls: string[];
 }
 
@@ -50,12 +54,27 @@ export default function ExhibitionDetailPage({
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup visibility
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for the index of the image to display in popup
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false); // State for the "More" options menu visibility
+  const [showEditModal, setShowEditModal] = useState(false); // State for Edit Exhibition Modal visibility
 
   // Derived state for the current image URL
   const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
 
   const loggedInUserId = currentUser?.id;
   const isOwner = exhibitionData?.user_id === loggedInUserId;
+  const optionsMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target as Node)) {
+        setShowOptionsMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [optionsMenuRef]);
 
   const truncateTitle = (title: string, maxLength: number) => {
     if (title.length > maxLength) {
@@ -115,11 +134,11 @@ export default function ExhibitionDetailPage({
 
   useEffect(() => {
     fetchExhibitionAndComments();
-    if (loggedInUserId) {
+    if (loggedInUserId && !showEditModal) { // Only set interval if edit modal is not open
         const intervalId = setInterval(fetchExhibitionAndComments, 5000);
         return () => clearInterval(intervalId);
     }
-  }, [id, loggedInUserId]);
+  }, [id, loggedInUserId, showEditModal]);
 
   const handleLikeClick = async () => {
     if (!id || !loggedInUserId || !exhibitionData) return;
@@ -289,6 +308,36 @@ export default function ExhibitionDetailPage({
   
   const onShare = () => setShareModalOpen(true);
 
+  const handleSaveExhibition = async (updatedExhibition: ExhibitionData) => {
+    if (!id || !currentUser?.username) {
+        alert("전시회 정보를 저장할 수 없습니다. 사용자 정보가 없거나 전시회 ID가 누락되었습니다.");
+        return;
+    }
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...updatedExhibition, username: currentUser.username }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update exhibition.');
+        }
+
+        alert('전시회 정보가 성공적으로 업데이트되었습니다.');
+        setShowEditModal(false);
+        fetchExhibitionAndComments(); // Refresh data
+
+    } catch (err: any) {
+        console.error('Save exhibition error:', err.message);
+        setError('Failed to save exhibition.');
+        alert(`전시회 정보 저장 중 오류가 발생했습니다: ${err.message}`);
+    }
+  };
+
   const handlePrevImage = () => {
     if (exhibitionData && currentImageIndex > 0) {
       setCurrentImageIndex(currentImageIndex - 1);
@@ -328,23 +377,48 @@ export default function ExhibitionDetailPage({
                 <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
                   <ChevronLeft className="size-5 text-black" />
                 </button>
-                <div className={`h-[36px] relative shrink-0 ${isOwner ? 'w-[116px]' : 'w-[80px]'}`} data-name="Container">
-                  <div className={`bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[8px] h-[36px] items-center relative ${isOwner ? 'w-[116px]' : 'w-[80px]'}`}>
-                    {isOwner && (
-                      <button onClick={handleDelete} className="relative shrink-0 size-[36px] cursor-pointer hover:bg-[#f360c0] hover:text-white transition-all group" data-name="Delete Button">
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-center justify-center relative size-[36px]">
-                          <Trash2 className="size-5 text-black group-hover:text-white transition-colors" />
-                        </div>
-                      </button>
-                    )}
-                    <button onClick={handleFavoriteClick} className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
-                      <Star size={24} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
-                    </button>
-                    <button onClick={onShare} className="basis-0 grow h-[36px] min-h-px min-w-px relative shrink-0 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
-                      <Share2 className="size-5 text-black" />
-                    </button>
-                  </div>
-                </div>
+                                <div className="flex items-center gap-[8px]">
+                                  <button onClick={handleFavoriteClick} className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
+                                    <Star size={24} color={isFavorited ? "#f360c0" : "black"} fill={isFavorited ? "#f360c0" : "none"} />
+                                  </button>
+                                  <button onClick={onShare} className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer" data-name="Button">
+                                    <Share2 className="size-5 text-black" />
+                                  </button>
+                                  {isOwner && (
+                                    <div className="relative" ref={optionsMenuRef}>
+                                      <button
+                                        onClick={() => setShowOptionsMenu((prev) => !prev)}
+                                        className="relative shrink-0 size-[36px] flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer"
+                                        aria-label="More options"
+                                      >
+                                        <MoreVertical className="size-5 text-black" />
+                                      </button>
+                                      {showOptionsMenu && (
+                                        <div className="absolute top-[44px] right-0 bg-white border-[1.6px] border-black border-solid shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] z-10 w-[120px] p-[1.6px]">
+                                                                                                                                          <button
+                                                                                                                                            onClick={() => {
+                                                                                                                                              console.log('Setting showEditModal to true');
+                                                                                                                                              setShowEditModal(true);
+                                                                                                                                              setShowOptionsMenu(false);
+                                                                                                                                            }}
+                                                                                                                                            className="w-full h-[46.6px] flex items-center justify-start hover:bg-gray-50 transition-colors"
+                                                                                                                                          >
+                                                                                                                                            <p className="font-['Pretendard',sans-serif] leading-[21px] not-italic text-base text-black tracking-[-0.28px] whitespace-nowrap pl-[20px]">수정</p>
+                                                                                                                                          </button>
+                                                                            <div className="h-[1.6px] bg-black mx-auto w-full"></div>
+                                                                            <button
+                                                                            onClick={() => {
+                                                                              handleDelete(); // This is the exhibition delete
+                                                                              setShowOptionsMenu(false);
+                                                                            }}
+                                                                            className="w-full h-[45px] flex items-center justify-start hover:bg-gray-50 transition-colors"
+                                                                          >
+                                                                            <p className="font-['Pretendard',sans-serif] leading-[21px] not-italic text-base text-black tracking-[-0.28px] whitespace-nowrap pl-[20px]">삭제</p>
+                                                                          </button>                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
               </div>
             </div>
           </div>
@@ -623,6 +697,15 @@ export default function ExhibitionDetailPage({
             </div>
           </div>
         </div>
+      )}
+
+      {showEditModal && exhibitionData && (
+        <EditExhibitionModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            exhibition={exhibitionData}
+            onSave={handleSaveExhibition}
+        />
       )}
     </div>
   );
