@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart } from 'react-feather';
+import { ChevronLeft, Share2, Eye, Star, ArrowUp, Trash2, Heart, X, ChevronRight } from 'react-feather';
 import ShareExhibitionModal from './ShareExhibitionModal';
 
 interface User {
@@ -48,6 +48,11 @@ export default function ExhibitionDetailPage({
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [showImagePopup, setShowImagePopup] = useState(false); // State for image popup visibility
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for the index of the image to display in popup
+
+  // Derived state for the current image URL
+  const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
 
   const loggedInUserId = currentUser?.id;
   const isOwner = exhibitionData?.user_id === loggedInUserId;
@@ -247,6 +252,18 @@ export default function ExhibitionDetailPage({
   
   const onShare = () => setShareModalOpen(true);
 
+  const handlePrevImage = () => {
+    if (exhibitionData && currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (exhibitionData && currentImageIndex < exhibitionData.imageUrls.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading exhibition...</div>;
   }
@@ -258,6 +275,10 @@ export default function ExhibitionDetailPage({
   if (!exhibitionData) {
     return <div className="flex justify-center items-center h-screen">No exhibition data found.</div>;
   }
+
+  const totalImages = exhibitionData.imageUrls.length;
+  const isFirstImage = currentImageIndex === 0;
+  const isLastImage = currentImageIndex === totalImages - 1;
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto">
@@ -401,7 +422,15 @@ export default function ExhibitionDetailPage({
               <div className="overflow-y-auto w-full">
                 <div className="flex flex-wrap gap-[8px] w-full h-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
-                    <div key={index} className="relative bg-gray-100 flex items-center justify-center overflow-hidden" style={{ width: '109px', height: '109px' }}>
+                    <div
+                      key={index}
+                      className="relative bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
+                      style={{ width: '109px', height: '109px' }}
+                      onClick={() => {
+                        setCurrentImageIndex(index);
+                        setShowImagePopup(true);
+                      }}
+                    >
                       <img src={imageUrl} alt={`Exhibition Image ${index + 1}`} className="object-cover w-full h-full" />
                     </div>
                   ))}
@@ -484,6 +513,58 @@ export default function ExhibitionDetailPage({
             }}
             onShareSuccess={handleShareSuccess}
         />
+      )}
+
+      {showImagePopup && (
+        <div
+          className="fixed inset-0 flex flex-col items-center justify-center z-[100] p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+          onClick={() => setShowImagePopup(false)} // Close when clicking outside the image
+        >
+          <div
+            className="relative max-w-[393px] max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+          >
+            <div className="content-stretch flex h-[44px] items-center justify-between relative shrink-0 w-full mb-4 px-2 flex-shrink-0" data-name="Container">
+              {/* Image counter */}
+              <div className="bg-white border-[1.6px] border-black border-solid h-[40.2px] relative shrink-0 w-[59.838px] flex items-center justify-center px-[17.6px]" data-name="Container">
+                <p className="font-['EB_Garamond:Regular',sans-serif] font-normal leading-[21px] text-[14px] text-black">{(currentImageIndex + 1)} / {totalImages}</p>
+              </div>
+
+              <button
+                className="bg-white border-[1.6px] border-black border-solid relative shrink-0 size-[44px] flex items-center justify-center cursor-pointer flex-shrink-0"
+                onClick={() => setShowImagePopup(false)}
+                aria-label="Close image popup"
+              >
+                <X size={24} color="black" />
+              </button>
+            </div>
+            
+            <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col items-start pb-[1.6px] pt-[13.6px] px-[13.6px] relative shrink-0 w-full max-w-full overflow-hidden" data-name="Container">
+              <div className="bg-[rgba(0,0,0,0.6)] content-stretch flex items-center justify-center relative shrink-0 w-full h-full" data-name="Container">
+                <img src={currentImage} alt="Enlarged Exhibition Image" className="w-full h-auto max-h-full border-[0.8px] border-gray-200 border-solid" />
+              </div>
+            </div>
+
+            {/* Navigation buttons */}
+            <div className="content-stretch flex gap-[12px] h-[44px] items-start justify-center relative shrink-0 w-full mt-4 flex-shrink-0" data-name="Container">
+              <button
+                className={`bg-white border-[1.6px] border-black border-solid relative shrink-0 size-[44px] flex items-center justify-center ${isFirstImage ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={handlePrevImage}
+                disabled={isFirstImage}
+              >
+                <ChevronLeft size={24} color="black" />
+              </button>
+              <button
+                className={`bg-white border-[1.6px] border-black border-solid relative shrink-0 size-[44px] flex items-center justify-center ${isLastImage ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={handleNextImage}
+                disabled={isLastImage}
+              >
+                <ChevronRight size={24} color="black" />
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

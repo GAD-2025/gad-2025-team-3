@@ -79,7 +79,7 @@ app.post('/api/upload', upload.array('files', 20), (req, res) => {
 
 // ----------------------------------------------------------------------------------
 
-// 🎯 메인 API 로직: DB 연결 풀(pool)을 사용하도록 수정
+// 🎯 메인 API 로직: DB 연결 풀(당구)을 사용하도록 수정
 app.post('/api/signup', async (req, res) => {
     const { username, password, email, nickname, bio, age14, terms, privacy, marketing, selectedArtists } = req.body;
 
