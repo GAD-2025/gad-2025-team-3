@@ -54,7 +54,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
           <p className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">{message}</p>
         </div>
       )}
-      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] gap-[12px]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] gap-[12px] h-auto pt-[12px] pb-[16px]" onClick={(e) => e.stopPropagation()}>
         <div className="border-b-[1.108px] border-black border-solid flex h-[70px] items-center justify-between px-[24px]">
           <h2 className="font-['EB_Garamond',serif] text-[18px]">
             Share Exhibition
@@ -67,22 +67,23 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
           </button>
         </div>
         <div className="px-[24px] py-[24px] flex flex-col gap-[20px]">
-          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[8px] py-[28px] text-start">
-            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[4px] pb-12 pt-[12px] text-start">
+            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[20px]">
               Room {exhibition.room}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]">
+            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[20px]">
               {exhibition.title}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">
+            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-12 pl-[20px]">
               by {exhibition.author}
             </p>
+             <div className="h-[12px] w-full shrink-0"></div>
           </div>
           <div className="flex flex-col gap-[8px]">
             <label className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">
               전시관 링크
             </label>
-            <div className="flex gap-[8px]">
+            <div className="flex gap-[8px] w-full">
               <input
                 id="share-url-input"
                 type="text"
@@ -91,7 +92,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
                 className="flex-1 h-[40px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
                 style={{ paddingLeft: '10px' }}
               />
-              <button onClick={handleCopy} className="w-[62px] h-[44px] border border-black flex items-center justify-center">
+              <button onClick={handleCopy} className="w-[80px] h-[44px] border border-black flex items-center justify-center shrink-0">
                 <div className="w-5 h-5 relative">
                     <img alt="copy" src={imgVector7} className="absolute inset-[33.33%_8.33%_8.33%_33.33%] w-auto h-auto"/>
                     <img alt="copy" src={imgVector8} className="absolute inset-[8.33%_33.33%_33.33%_8.33%] w-auto h-auto"/>
@@ -99,8 +100,8 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
               </button>
             </div>
           </div>
-          <div className="border-[1.108px] border-black border-solid p-4 h-[200px] flex items-center justify-center">
-            <div className="bg-gray-50 border-[1.108px] border-gray-200 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
+          <div className="border-[1.108px] border-black border-solid p-4 h-[200px] flex items-center justify-center pt-[12px] pb-[12px]">
+            <div className="bg-gray-50 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
               <QRCodeCanvas
                 value={shareUrl}
                 size={120}
@@ -112,15 +113,16 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
               <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px] mt-2">
                 QR 코드
               </p>
+               <div className="h-[8px] w-full shrink-0"></div>
             </div>
           </div>
           <div className="flex flex-col gap-[8px] mb-4">
-            <button onClick={handleKakaoShare} className="h-[50px] border border-black text-left px-3">
+            <button onClick={handleKakaoShare} className="h-[54px] border border-black text-left px-3">
               <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
                 카카오톡으로 공유
               </span>
             </button>
-            <button onClick={handleXShare} className="h-[50px] border border-black text-left px-3">
+            <button onClick={handleXShare} className="h-[54px] border border-black text-left px-3">
               <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
                 x로 공유
               </span>
@@ -137,6 +139,8 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             </span>
           </button>
         </div>
+
+        <div className="h-[12px] w-full shrink-0"></div>
       </div>
     </div>
   );
