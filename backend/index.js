@@ -276,9 +276,26 @@ app.post('/api/exhibitions', async (req, res) => {
         await connection.beginTransaction();
 
         try {
+            // room_number와 room_creation_count 결정
+            const [maxRoomNumberResult] = await connection.execute(
+                'SELECT MAX(CAST(room_number AS UNSIGNED)) AS max_room_number FROM exhibitions'
+            );
+            let nextRoomNumber = 101;
+            if (maxRoomNumberResult[0].max_room_number) {
+                nextRoomNumber = parseInt(maxRoomNumberResult[0].max_room_number, 10) + 1;
+            }
+            const room_number = String(nextRoomNumber);
+
+            // 해당 room_number의 creation_count 결정
+            const [creationCountResult] = await connection.execute(
+                'SELECT COUNT(*) AS count FROM exhibitions WHERE room_number = ?',
+                [room_number]
+            );
+            const room_creation_count = creationCountResult[0].count + 1;
+
             const [exhibitionResult] = await connection.execute(
-                'INSERT INTO exhibitions (user_id, title, description, start_date, end_date, is_public) VALUES (?, ?, ?, ?, ?, ?)',
-                [userId, title, description, startDate, endDate, isPublic]
+                'INSERT INTO exhibitions (user_id, title, description, start_date, end_date, is_public, room_number, room_creation_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [userId, title, description, startDate, endDate, isPublic, room_number, room_creation_count]
             );
 
             const exhibitionId = exhibitionResult.insertId;
@@ -328,6 +345,8 @@ app.get('/api/exhibitions', async (req, res) => {
                 e.likes, 
                 e.shares, 
                 e.created_at,
+                e.room_number,
+                e.room_creation_count,
                 u.nickname as author
             FROM 
                 exhibitions e
@@ -381,6 +400,8 @@ app.get('/api/exhibitions/:id', async (req, res) => {
                 e.likes, 
                 e.shares, 
                 e.created_at,
+                e.room_number,
+                e.room_creation_count,
                 u.nickname as author
             FROM 
                 exhibitions e
@@ -711,7 +732,7 @@ async function startServer() {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
+            database: process.env.DB_DATABASE,
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0

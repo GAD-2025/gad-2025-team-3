@@ -13,7 +13,8 @@ interface ExhibitionData {
   user_id: number;
   title: string;
   author: string;
-  room: string;
+  room_number: string; // Changed from 'room' to 'room_number'
+  room_creation_count?: number; // New field
   views: string;
   likes: string;
   shares: string;
@@ -326,7 +327,7 @@ export default function ExhibitionDetailPage({
                           <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">Room</p>
                         </div>
                         <div className="box-border content-stretch flex gap-[10px] items-center justify-center mb-[-4px] relative shrink-0 w-full" data-name="Container">
-                          <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black">{exhibitionData.room}</p>
+                          <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black">{exhibitionData.room_number}</p>
                         </div>
                       </div>
                     </div>
@@ -475,7 +476,12 @@ export default function ExhibitionDetailPage({
         <ShareExhibitionModal
             isOpen={isShareModalOpen}
             onClose={() => setShareModalOpen(false)}
-            exhibition={exhibitionData}
+            exhibition={{
+              room: exhibitionData.room_number,
+              creationCount: exhibitionData.room_creation_count,
+              title: exhibitionData.title,
+              author: exhibitionData.author
+            }}
             onShareSuccess={handleShareSuccess}
         />
       )}

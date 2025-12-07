@@ -11,6 +11,7 @@ interface ShareExhibitionModalProps {
     room: string;
     title: string;
     author: string;
+    creationCount?: number;
   };
   onShareSuccess: () => void;
 }
@@ -20,7 +21,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
 
   if (!isOpen) return null;
 
-  const shareUrl = `https://exhibition.hotel/room/${exhibition.room}`;
+  const shareUrl = `https://showcase.hotel/room/${exhibition.room}${exhibition.creationCount ? `/${exhibition.creationCount}` : ''}`;
 
   const showMessage = (msg: string) => {
     setMessage(msg);

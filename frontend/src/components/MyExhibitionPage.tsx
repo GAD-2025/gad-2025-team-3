@@ -30,7 +30,8 @@ interface Exhibition {
   shares: number;
   created_at: string;
   author: string;
-  room?: string;
+  room_number?: string;
+  room_creation_count?: number;
 }
 
 interface MyExhibitionPageProps {
@@ -276,7 +277,8 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
           isOpen={shareModalOpen}
           onClose={() => setShareModalOpen(false)}
           exhibition={{
-            room: selectedExhibition.room || getRoomNumber(exhibitions.indexOf(selectedExhibition)),
+            room: selectedExhibition.room_number || getRoomNumber(exhibitions.indexOf(selectedExhibition)),
+            creationCount: selectedExhibition.room_creation_count,
             title: selectedExhibition.title,
             author: currentUser?.nickname || 'Unknown'
           }}
