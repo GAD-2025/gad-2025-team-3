@@ -57,6 +57,13 @@ export default function ExhibitionDetailPage({
   const loggedInUserId = currentUser?.id;
   const isOwner = exhibitionData?.user_id === loggedInUserId;
 
+  const truncateTitle = (title: string, maxLength: number) => {
+    if (title.length > maxLength) {
+      return title.substring(0, maxLength) + '...';
+    }
+    return title;
+  };
+
   const fetchExhibitionAndComments = async () => {
     if (!id) {
       setError("Exhibition ID is missing.");
@@ -249,6 +256,36 @@ export default function ExhibitionDetailPage({
       alert(`삭제 중 오류가 발생했습니다: ${err.message}`);
     }
   };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!window.confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      // Assuming a backend endpoint DELETE /api/comments/:commentId
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: currentUser?.username }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete comment: ${response.statusText}`);
+      }
+
+      // Update local state to remove the deleted comment
+      setComments((prevComments) => prevComments.filter(comment => comment.id !== commentId));
+      alert('댓글이 삭제되었습니다.');
+
+    } catch (err: any) {
+      console.error('Comment deletion error:', err.message);
+      setError('Failed to delete comment.');
+      alert(`댓글 삭제 중 오류가 발생했습니다: ${err.message}`);
+    }
+  };
   
   const onShare = () => setShareModalOpen(true);
 
@@ -334,7 +371,7 @@ export default function ExhibitionDetailPage({
                     <div className="basis-0 grow min-h-px min-w-px relative shrink-0" data-name="Container">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[8px] items-start relative w-full">
                         <div className="h-[35px] relative shrink-0 w-full" data-name="Heading 1">
-                          <p className="absolute font-['Pretendard',sans-serif] font-semibold leading-[32px] left-0 not-italic text-[24px] text-black text-nowrap top-[-0.6px] tracking-[-0.48px] whitespace-pre">{exhibitionData.title}</p>
+                          <p className="absolute font-['Pretendard',sans-serif] font-semibold leading-[32px] left-0 not-italic text-[24px] text-black text-nowrap top-[-0.6px] tracking-[-0.48px] whitespace-pre">{truncateTitle(exhibitionData.title, 13)}</p>
                         </div>
                         <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
                           <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">by {exhibitionData.author}</p>
@@ -448,10 +485,10 @@ export default function ExhibitionDetailPage({
               </div>
               <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
                 {comments.map((comment) => (
-                  <div key={comment.id} className="h-[40px] relative shrink-0 w-full" data-name="Container">
+                  <div key={comment.id} className="h-auto relative w-full" data-name="Container">
                     <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
                     <div className="size-full">
-                      <div className="box-border content-stretch flex flex-col gap-[4px] h-[40px] items-start pl-[17.6px] pr-0 py-0 relative w-full">
+                      <div className="box-border content-stretch flex flex-col gap-[4px] h-auto items-start pl-[17.6px] pr-0 py-0 relative w-full">
                         <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
                           <div className="h-[16.5px] relative shrink-0 flex-shrink-0 max-w-full" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
@@ -469,8 +506,17 @@ export default function ExhibitionDetailPage({
                             </div>
                           </div>
                         </div>
-                        <div className="h-[19.5px] relative shrink-0 w-full" data-name="Paragraph">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-[14px] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">{comment.content}</p>
+                        <div className="relative w-full flex justify-between items-start" data-name="Paragraph">
+                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic text-[#4a5565] text-[14px] tracking-[-0.28px] break-words mr-2">{comment.content}</p>
+                          {currentUser && currentUser.username === comment.author && (
+                            <button
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                              aria-label="Delete comment"
+                            >
+                              <X size={16} color="currentColor" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -483,10 +529,22 @@ export default function ExhibitionDetailPage({
         
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
           <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-4 pr-2">
+            <button
+              onClick={handleLikeClick}
+              className="flex items-center justify-center shrink-0 size-[59px] cursor-pointer hover:bg-gray-100 transition-colors"
+              aria-label="Like exhibition"
+            >
+              <Heart size={24} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
+            </button>
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleCommentSubmit();
+                }
+              }}
               placeholder="응원 댓글을 입력해보세요."
               className="font-['Pretendard',sans-serif] leading-[20px] not-italic w-full h-full text-[14px] text-black placeholder:text-gray-400 tracking-[-0.28px] bg-transparent border-none outline-none"
             />

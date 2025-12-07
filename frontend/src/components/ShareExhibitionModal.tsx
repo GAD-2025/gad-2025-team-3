@@ -19,6 +19,13 @@ interface ShareExhibitionModalProps {
 export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onShareSuccess }: ShareExhibitionModalProps) {
   const [message, setMessage] = useState('');
 
+  const truncateTitle = (title: string, maxLength: number) => {
+    if (title.length > maxLength) {
+      return title.substring(0, maxLength) + '...';
+    }
+    return title;
+  };
+
   if (!isOpen) return null;
 
   const shareUrl = `https://showcase.hotel/room/${exhibition.room}${exhibition.creationCount ? `/${exhibition.creationCount}` : ''}`;
@@ -72,7 +79,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
               Room {exhibition.room}
             </p>
             <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[20px]">
-              {exhibition.title}
+              {truncateTitle(exhibition.title, 13)}
             </p>
             <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-12 pl-[20px]">
               by {exhibition.author}

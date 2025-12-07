@@ -555,6 +555,66 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
     }
 });
 
+// API for deleting a comment
+app.delete('/api/comments/:commentId', async (req, res) => {
+    const { commentId } = req.params;
+    const { username } = req.body; // Assuming username is passed for authorization
+
+    if (!username) {
+        return res.status(401).json({ message: 'Authorization information (username) is required.' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. Get the comment to verify author
+        const [comments] = await connection.execute(
+            'SELECT author FROM comments WHERE id = ?',
+            [commentId]
+        );
+
+        if (comments.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'Comment not found.' });
+        }
+
+        const commentAuthor = comments[0].author;
+
+        // 2. Authorize: check if the requesting user is the author of the comment
+        if (commentAuthor !== username) {
+            await connection.rollback();
+            connection.release();
+            return res.status(403).json({ message: 'You are not authorized to delete this comment.' });
+        }
+
+        // 3. Delete the comment
+        const [deleteResult] = await connection.execute(
+            'DELETE FROM comments WHERE id = ?',
+            [commentId]
+        );
+
+        if (deleteResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'Comment not found after authorization check.' });
+        }
+
+        await connection.commit();
+        connection.release();
+        res.status(200).json({ message: 'Comment deleted successfully.' });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Delete comment error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for liking/unliking an exhibition
 app.post('/api/exhibitions/:id/like', async (req, res) => {
     const { id: exhibitionId } = req.params;
