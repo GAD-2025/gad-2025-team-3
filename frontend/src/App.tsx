@@ -448,7 +448,8 @@ export default function App() {
   // Removed: if (currentView === 'loading') { return <div>Loading...</div>; }
   
   return (
-    <Routes>
+    <div className="min-h-screen">
+      <Routes>
       <Route path="/login" element={
         <Login 
           onLogin={handleLoginSuccess}
@@ -606,6 +607,7 @@ export default function App() {
         />
       } />
       <Route path="*" element={<Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />} />
-    </Routes>
+      </Routes>
+    </div>
   );
 }

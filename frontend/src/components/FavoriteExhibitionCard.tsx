@@ -1,7 +1,5 @@
 import React from 'react';
-
-const imgIcon1 = "https://www.figma.com/api/mcp/asset/145044ef-da44-4c1f-b251-dfedcacfd17d"; // Views icon
-const imgIcon2 = "https://www.figma.com/api/mcp/asset/3f7565ae-eca4-4ece-ba6c-2d8f059a56fe"; // Likes icon
+import { Eye, Heart } from 'lucide-react'; // Import Eye and Heart from lucide-react
 
 interface FavoriteExhibitionCardProps {
   id: number;
@@ -11,7 +9,9 @@ interface FavoriteExhibitionCardProps {
   likes: number;
   roomId: number;
   onNavigateToDetail: (id: number) => void;
-
+  isEditMode: boolean;
+  isSelected: boolean;
+  onSelect: (id: number) => void;
 }
 
 const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
@@ -22,52 +22,73 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   likes,
   roomId,
   onNavigateToDetail,
+  isEditMode,
+  isSelected,
+  onSelect,
 }) => {
-  const handleClick = () => {
-    onNavigateToDetail(id);
-  };
-
-  return (
-    <div
-      className={`border-[1.6px] border-black border-solid w-full p-[1.6px] relative`}
-      onClick={handleClick}
-    >
-      <div>
-        <div className="bg-gray-100 border-b-[1.6px] border-black h-[190.575px] w-full" />
-        <div className="flex flex-col gap-[8px] h-[109.3px] pt-[16px] px-[16px]">
-          <div className="flex h-[41.5px] justify-between items-start w-full">
-            <div className="flex flex-col gap-[4px]">
-              <h3 className="font-['Pretendard:Regular',sans-serif] text-[12px] leading-[18px] tracking-[-0.24px] text-black h-[21px]">
+    const handleClick = () => {
+      if (isEditMode) {
+        onSelect(id);
+      } else {
+        onNavigateToDetail(id);
+      }
+    };
+  
+    return (
+      <div
+        className={`relative w-full border border-gray-200 rounded-lg overflow-hidden flex flex-row cursor-pointer h-40
+                    ${isEditMode && isSelected ? 'border-blue-500 shadow-md' : 'hover:shadow-md transition-all duration-200'}`}
+        onClick={handleClick}
+      >
+        {/* Image Placeholder */}
+        <div className="w-[100px] flex-shrink-0 bg-gray-100 h-full border-r border-gray-100">
+          {/* 실제 이미지가 있다면 여기에 img 태그를 넣습니다 */}
+        </div>
+  
+        {/* Content Area */}
+        <div className="flex flex-col flex-grow p-3 justify-between">
+          <div className="flex justify-between items-start w-full">
+            <div className="flex flex-col gap-0.5 flex-grow pr-2"> {/* Added pr-2 for spacing */}
+              {/* Title and Author */}
+              <h3 className="font-['Pretendard:SemiBold',sans-serif] text-base leading-tight text-black overflow-hidden line-clamp-2">
                 {exhibitionTitle}
               </h3>
-              <p className="font-['Apple_Garamond:Regular',sans-serif] text-[12px] leading-[16px] tracking-[0.3px] text-[#4a5565] h-[16.5px]">
+              <p className="font-['EB_Garamond:Regular',serif] font-normal text-xs leading-tight text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">
                 by {authorName}
               </p>
             </div>
-            <div className="border-[0.8px] border-black h-[23.1px] w-[34.7px] flex items-center justify-center">
-              <p className="font-['Apple_Garamond:Regular',sans-serif] text-[12px] leading-[16px] tracking-[0.3px] text-[#4a5565]">
-                {roomId}
-              </p>
+            {/* Room ID Box - Integrated into flex layout */}
+            <div className="border border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] flex-shrink-0">
+              {roomId}
             </div>
           </div>
-          <div className="border-t-[0.8px] border-gray-100 flex gap-[16px] h-[27.8px] items-center w-full pt-[0.8px]">
-            <div className="flex items-center gap-[4px] h-[15px]">
-              <img alt="views" src={imgIcon1} className="w-[12px] h-[12px]" />
-              <p className="font-['Apple_Garamond:Regular',sans-serif] text-[12px] leading-[16px] tracking-[0.3px] text-[#4a5565]">
+  
+          {/* Views and Likes */}
+          <div className="border-t border-gray-100 pt-2 mt-2 flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <Eye className="w-4 h-4 text-gray-500" />
+              <p className="font-['EB_Garamond:Regular',sans-serif] font-normal text-xs leading-tight text-gray-500">
                 {views.toLocaleString()}
               </p>
             </div>
-            <div className="flex items-center gap-[4px] h-[15px]">
-              <img alt="likes" src={imgIcon2} className="w-[12px] h-[12px]" />
-              <p className="font-['Apple_Garamond:Regular',sans-serif] text-[12px] leading-[16px] tracking-[0.3px] text-[#4a5565]">
+            <div className="flex items-center gap-1">
+              <Heart className="w-4 h-4 text-gray-500" />
+              <p className="font-['EB_Garamond:Regular',sans-serif] font-normal text-xs leading-tight text-gray-500">
                 {likes.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
+        {isEditMode && (
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onSelect(id)}
+            className="absolute top-2 right-2 z-10 appearance-none w-5 h-5 border-2 border-black rounded-full checked:bg-black checked:border-white checked:ring-2 checked:ring-black cursor-pointer"
+          />
+        )}
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default FavoriteExhibitionCard;
