@@ -146,6 +146,7 @@ export default function App() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [hashtags, setHashtags] = useState<string[]>([]); // hashtags 상태 추가
 
   const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionData | null>(null);
 
@@ -297,9 +298,34 @@ export default function App() {
       } else {
         if (currentSelectedArtists.length < 5) {
           return { ...prev, selectedArtists: [...currentSelectedArtists, artistId] };
+        } else {
+          alert('최대 5개까지 선택할 수 있습니다.'); // 제한 초과 시 알림
+          return prev;
         }
       }
-      return prev;
+    });
+  };
+
+  const handleAddCustomArtist = (artistName: string) => {
+    const trimmedArtistName = artistName.trim();
+    if (!trimmedArtistName) {
+      alert('아티스트 이름을 입력해주세요.');
+      return;
+    }
+    setSignupData(prev => {
+      const currentSelectedArtists = prev.selectedArtists || [];
+      // 중복 방지
+      if (currentSelectedArtists.includes(trimmedArtistName)) {
+        alert('이미 추가된 아티스트입니다.');
+        return prev;
+      }
+      // 5개 선택 제한 (미리 정의된 + 직접 추가된 아티스트 포함)
+      if (currentSelectedArtists.length < 5) {
+        return { ...prev, selectedArtists: [...currentSelectedArtists, trimmedArtistName] };
+      } else {
+        alert('최대 5개까지 선택할 수 있습니다.'); // 제한 초과 시 알림
+        return prev;
+      }
     });
   };
 
@@ -392,6 +418,7 @@ export default function App() {
       endDate: endDate.toISOString().split('T')[0],
       isPublic,
       uploadedFiles,
+      hashtags, // 추가
     });
 
     try {
@@ -409,6 +436,7 @@ export default function App() {
           endDate: endDate.toISOString().split('T')[0], // Format to YYYY-MM-DD
           isPublic,
           uploadedFiles, // Array of file URLs
+          hashtags, // 추가
         }),
       });
 
@@ -499,6 +527,7 @@ export default function App() {
               onBack={() => setSignupStep(3)}
               formData={signupData} // Pass signupData
               handleArtistToggle={handleArtistToggle} // Pass handler
+              handleAddCustomArtist={handleAddCustomArtist} // 새로운 prop 추가
             />
           )}
         </>
@@ -566,10 +595,11 @@ export default function App() {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
-          isPublic={isPublic}
-          setIsPublic={setIsPublic}
-        />
-      } />
+                        isPublic={isPublic}
+                        setIsPublic={setIsPublic}
+                        hashtags={hashtags} // 추가
+                        setHashtags={setHashtags} // 추가
+                      />      } />
       <Route path="/create-exhibition/complete" element={
         <CreateExhibitionCompletePage 
           onNavigateToGallery={() => navigate('/myexhibition')}

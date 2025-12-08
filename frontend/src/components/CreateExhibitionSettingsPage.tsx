@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft } from 'react-feather';
+import { ChevronLeft, X } from 'react-feather'; // X 아이콘 임포트
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -17,6 +17,8 @@ interface CreateExhibitionSettingsPageProps {
   setEndDate: (date: Date | undefined) => void;
   isPublic: boolean;
   setIsPublic: (isPublic: boolean) => void;
+  hashtags: string[]; // 추가
+  setHashtags: React.Dispatch<React.SetStateAction<string[]>>; // 추가
 }
 
 export default function CreateExhibitionSettingsPage({
@@ -32,7 +34,11 @@ export default function CreateExhibitionSettingsPage({
   setEndDate,
   isPublic,
   setIsPublic,
+  hashtags,
+  setHashtags,
 }: CreateExhibitionSettingsPageProps) {
+  const [newHashtag, setNewHashtag] = useState(''); // newHashtag 상태 추가
+  
   useEffect(() => {
     setStartDate(normalizeDateToMidnight(new Date()));
   }, [setStartDate]);
@@ -46,6 +52,42 @@ export default function CreateExhibitionSettingsPage({
     const newDate = new Date(date);
     newDate.setHours(0, 0, 0, 0);
     return newDate;
+  };
+
+  const handleTagAdd = () => {
+    const trimmedTag = newHashtag.trim();
+    if (trimmedTag === '') {
+      alert('해시태그를 입력해주세요.');
+      return;
+    }
+    // '#' 기호로 시작하지 않으면 자동으로 추가
+    const formattedTag = trimmedTag.startsWith('#') ? trimmedTag : `#${trimmedTag}`;
+
+    // 띄어쓰기 및 '_' 외 특수문자 검사 로직 추가
+    const tagContent = formattedTag.substring(1); // # 제거 후 내용만 검사
+    if (/\s/.test(tagContent)) {
+      alert('해시태그에는 띄어쓰기를 사용할 수 없습니다.');
+      return;
+    }
+    if (/[^a-zA-Z0-9가-힣_]/.test(tagContent)) {
+      alert('해시태그에는 영문, 숫자, 한글, 언더바(_)만 사용할 수 있습니다.');
+      return;
+    }
+
+    if (hashtags.includes(formattedTag)) {
+      alert('이미 추가된 해시태그입니다.');
+      return;
+    }
+    if (hashtags.length >= 10) {
+      alert('해시태그는 최대 10개까지 추가할 수 있습니다.');
+      return;
+    }
+    setHashtags(prev => [...prev, formattedTag]);
+    setNewHashtag('');
+  };
+
+  const handleTagRemove = (tagToRemove: string) => {
+    setHashtags(prev => prev.filter(tag => tag !== tagToRemove));
   };
 
   const isButtonEnabled =
@@ -282,6 +324,60 @@ export default function CreateExhibitionSettingsPage({
                     </div>
                     <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                   </button>
+                </div>
+              </div>
+
+              {/* Hashtag Field */}
+              <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Container">
+                <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-name="Container">
+                  <div className="content-stretch flex items-start relative shrink-0" data-name="Label">
+                    <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">관련 해시태그 (선택)</p>
+                  </div>
+                  <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#99a1af] text-[12px] text-nowrap tracking-[-0.24px] whitespace-pre">{hashtags.length}/10</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-[8px] w-full">
+                  <input
+                    type="text"
+                    value={newHashtag}
+                    onChange={(e) => setNewHashtag(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleTagAdd();
+                      }
+                    }}
+                    placeholder="해시태그 입력 (최대 10개)"
+                    className="flex-1 h-[48.2px] px-[16px] py-[12px] font-['Pretendard',sans-serif] text-[14px] text-black tracking-[-0.28px] outline-none border-[1.6px] border-black border-solid placeholder:text-[#99a1af]"
+                  />
+                  <button
+                    onClick={handleTagAdd}
+                    className="h-[48.2px] relative shrink-0 w-[48.2px] cursor-pointer bg-black flex items-center justify-center"
+                    data-name="Button"
+                  >
+                    <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] text-white text-nowrap tracking-[-0.28px] whitespace-pre">+</p>
+                  </button>
+                </div>
+
+                {/* Display added hashtags */}
+                <div className="flex flex-wrap gap-[8px] mt-[8px]">
+                  {hashtags.map((tag, index) => (
+                    <div 
+                      key={tag} 
+                      className="flex items-center bg-white border-[0.8px] border-black border-solid rounded-[20px] pl-[12.8px] pr-[0.8px] py-[0.8px] h-[33.6px]"
+                    >
+                      <p className="font-['Pretendard',sans-serif] leading-[20px] text-[#4a5565] text-[14px] tracking-[-0.28px] whitespace-nowrap">
+                        {tag}
+                      </p>
+                      <button
+                        onClick={() => handleTagRemove(tag)}
+                        className="ml-[8px] size-[14px] flex items-center justify-center cursor-pointer"
+                      >
+                        <X size={14} color="#4a5565" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

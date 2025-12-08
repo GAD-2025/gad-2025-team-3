@@ -32,10 +32,36 @@ interface ProfilePageProps {
 export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToMyExhibition, onLogout }: ProfilePageProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleDeleteAccount = (reason: string) => {
-    console.log("Account deletion requested with reason:", reason);
-    setIsDeleteModalOpen(false);
-    // By not calling a prop, we avoid an error since App.tsx doesn't pass it.
+  const handleDeleteAccount = async () => { // reason 매개변수 제거
+    if (!user || !user.id || !user.username) {
+      alert("사용자 정보가 없어 탈퇴를 진행할 수 없습니다.");
+      setIsDeleteModalOpen(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: user.username }), // 현재 로그인한 사용자인지 백엔드에서 확인
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '회원 탈퇴에 실패했습니다.');
+      }
+
+      alert('회원 탈퇴가 완료되었습니다.');
+      setIsDeleteModalOpen(false);
+      onLogout(); // App.tsx의 onLogout 함수 호출 -> localStorage에서 사용자 제거 및 /login으로 이동
+
+    } catch (error: any) {
+      console.error('회원 탈퇴 오류:', error);
+      alert(`회원 탈퇴 중 오류가 발생했습니다: ${error.message}`);
+      setIsDeleteModalOpen(false);
+    }
   };
 
   const handleFeatureClick = (featureName: string) => {

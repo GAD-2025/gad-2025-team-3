@@ -24,6 +24,7 @@ interface ExhibitionData {
   end_date: string; // Added for edit functionality
   is_public: boolean; // Added for edit functionality
   imageUrls: string[];
+  hashtags: string[];
 }
 
 interface Comment {
@@ -101,11 +102,17 @@ export default function ExhibitionDetailPage({
       if (!itemsRes.ok) throw new Error(`Failed to fetch exhibition items: ${itemsRes.statusText}`);
       if (!commentsRes.ok) throw new Error(`Failed to fetch comments: ${commentsRes.statusText}`);
 
-      const exhibition: ExhibitionData = await exhibitionRes.json();
+      const exhibition = await exhibitionRes.json(); // Type inference will handle this better
       const imageUrls: string[] = await itemsRes.json();
       const fetchedComments: Comment[] = await commentsRes.json();
       
-      setExhibitionData({ ...exhibition, imageUrls });
+      // Convert hashtags string to array if it exists
+      const processedExhibition: ExhibitionData = {
+        ...exhibition,
+        imageUrls,
+        hashtags: exhibition.hashtags ? exhibition.hashtags.split(',') : [],
+      };
+      setExhibitionData(processedExhibition);
       setComments(fetchedComments);
 
       if (loggedInUserId) {
@@ -519,6 +526,15 @@ export default function ExhibitionDetailPage({
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
                 <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black tracking-[-0.24px] w-[336px]">{exhibitionData.description}</p>
               </div>
+              {exhibitionData.hashtags && exhibitionData.hashtags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {exhibitionData.hashtags.map((tag, index) => (
+                    <span key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

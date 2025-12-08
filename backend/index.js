@@ -255,7 +255,7 @@ app.post('/api/check-nickname', async (req, res) => {
 
 // API for creating an exhibition
 app.post('/api/exhibitions', async (req, res) => {
-    const { userId, title, description, startDate, endDate, isPublic, uploadedFiles } = req.body;
+    const { userId, title, description, startDate, endDate, isPublic, uploadedFiles, hashtags } = req.body;
 
     if (!userId || !title || !startDate || !endDate) {
         return res.status(400).json({ message: 'Missing required exhibition fields.' });
@@ -294,8 +294,8 @@ app.post('/api/exhibitions', async (req, res) => {
             const room_creation_count = creationCountResult[0].count + 1;
 
             const [exhibitionResult] = await connection.execute(
-                'INSERT INTO exhibitions (user_id, title, description, start_date, end_date, is_public, room_number, room_creation_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [userId, title, description, startDate, endDate, isPublic, room_number, room_creation_count]
+                'INSERT INTO exhibitions (user_id, title, description, hashtags, start_date, end_date, is_public, room_number, room_creation_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [userId, title, description, (hashtags && hashtags.length > 0) ? hashtags.join(',') : null, startDate, endDate, isPublic, room_number, room_creation_count]
             );
 
             const exhibitionId = exhibitionResult.insertId;
@@ -393,6 +393,7 @@ app.get('/api/exhibitions/:id', async (req, res) => {
                 e.user_id,
                 e.title, 
                 e.description, 
+                e.hashtags, 
                 e.start_date, 
                 e.end_date, 
                 e.is_public, 
@@ -682,11 +683,80 @@ app.delete('/api/comments/:commentId', async (req, res) => {
             await connection.rollback();
             connection.release();
         }
-        console.error('Delete comment error:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
+                    console.error('Delete comment error:', error);
+                    res.status(500).json({ message: 'Internal server error' });
+                }
+            });
+        
+        // API for deleting a user account
+        app.delete('/api/users/:userId', async (req, res) => {
+            const { userId } = req.params;
+            const { username } = req.body; // Assuming username is passed for authorization
+        
+            if (!username) {
+                return res.status(401).json({ message: 'Authorization information (username) is required.' });
+            }
+        
+            const parsedUserId = parseInt(userId, 10);
+            if (isNaN(parsedUserId)) {
+                return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+            }
+        
+            const connection = await pool.getConnection();
+            try {
+                await connection.beginTransaction();
+        
+                // 1. Get the user to verify authorization
+                const [users] = await connection.execute(
+                    'SELECT id, username FROM users WHERE id = ?',
+                    [parsedUserId]
+                );
+        
+                if (users.length === 0) {
+                    await connection.rollback();
+                    connection.release();
+                    return res.status(404).json({ message: 'User not found.' });
+                }
+        
+                const targetUser = users[0];
+        
+                // 2. Authorize: check if the requesting user is the target user
+                if (targetUser.username !== username) {
+                    await connection.rollback();
+                    connection.release();
+                    return res.status(403).json({ message: 'You are not authorized to delete this account.' });
+                }
+        
+                        // 3. Delete related data from user_artists first
+                        await connection.execute(
+                            'DELETE FROM user_artists WHERE user_id = ?',
+                            [parsedUserId]
+                        );
+                
+                        // 4. Delete the user
+                        const [deleteResult] = await connection.execute(
+                            'DELETE FROM users WHERE id = ?',
+                            [parsedUserId]
+                        );        
+                if (deleteResult.affectedRows === 0) {
+                    await connection.rollback();
+                    connection.release();
+                    return res.status(404).json({ message: 'User not found after authorization check.' });
+                }
+        
+                await connection.commit();
+                connection.release();
+                res.status(200).json({ message: 'User account deleted successfully.' });
+        
+            } catch (error) {
+                if (connection) {
+                    await connection.rollback();
+                    connection.release();
+                }
+                console.error('Delete user error:', error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        });
 // API for liking/unliking an exhibition
 app.post('/api/exhibitions/:id/like', async (req, res) => {
     const { id: exhibitionId } = req.params;
@@ -876,9 +946,9 @@ async function startServer() {
         console.log('✅ MySQL Pool 연결 성공!');
 
         // 서버 리스닝 시작
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-        });
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
     } catch (error) {
         // DB 연결 실패 시 에러 출력 후 서버 시작 중단

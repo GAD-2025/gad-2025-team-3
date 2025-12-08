@@ -2,7 +2,7 @@ import { useState } from "react";
 
 interface DeleteAccountModalProps {
   onClose: () => void;
-  onDelete: (reason: string) => void;
+  onDelete: () => void; // (reason: string) => void 에서 변경
 }
 
 export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountModalProps) {
@@ -19,9 +19,9 @@ export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountM
 
   const handleConfirm = () => {
     const finalReason = selectedReason === "기타" ? otherReason : selectedReason;
-    if (finalReason) {
-      onDelete(finalReason);
-    }
+    // if (finalReason) { // reason은 이제 백엔드에서 사용하지 않으므로 체크 불필요
+      onDelete(); // finalReason 전달 안함
+    // }
   };
 
   const isConfirmDisabled = !selectedReason || (selectedReason === "기타" && !otherReason.trim());

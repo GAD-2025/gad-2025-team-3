@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeft } from 'react-feather';
 import { SignupData } from '../App';
+import svgPaths from "../imports/svg-cnim5xb21f";
 
 interface SignupStep2Props {
   onNext: () => void;

@@ -33,7 +33,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
     // ... (rest of the rendering logic is the same)
     if (profileType === 'profile_1_l') {
       return (
-        <div className="absolute flex inset-[-12%_-62.49%_-56.53%_-29%] items-center justify-center">
+        <div className="absolute flex inset-0 items-center justify-center">
           <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
             <div className="relative size-full" data-name="Vector">
               <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
@@ -46,7 +46,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
     }
     if (profileType === 'profile_2_l') {
       return (
-        <div className="absolute flex inset-[-68.5%_-35.49%_-0.03%_-56%] items-center justify-center">
+        <div className="absolute flex inset-0 items-center justify-center">
           <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
             <div className="relative size-full" data-name="Vector">
               <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
@@ -59,7 +59,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
     }
     if (profileType === 'profile_3_l') {
       return (
-        <div className="absolute flex inset-[-12%_15.01%_-56.53%_-106.5%] items-center justify-center">
+        <div className="absolute flex inset-0 items-center justify-center">
           <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
             <div className="relative size-full" data-name="Vector">
               <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
@@ -72,7 +72,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
     }
     // profile_4_l
     return (
-      <div className="absolute flex inset-[-68.5%_-102.99%_-0.03%_11.5%] items-center justify-center">
+      <div className="absolute flex inset-0 items-center justify-center">
         <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
           <div className="relative size-full" data-name="Vector">
             <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
@@ -129,7 +129,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
       </motion.div>
 
       {/* Main Content */}
-      <div className="absolute content-stretch flex flex-col gap-[16px] items-center left-[calc(50%+0.5px)] top-[219px] translate-x-[-50%]">
+      <div className="absolute content-stretch flex flex-col gap-[16px] items-center left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         {/* Profile Icon */}
         <motion.div 
           className="bg-[#fef7fc] overflow-clip relative shrink-0 size-[128px]" 

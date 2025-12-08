@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_artists (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     artist_id VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS exhibitions (
@@ -24,13 +24,14 @@ CREATE TABLE IF NOT EXISTS exhibitions (
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
+    hashtags TEXT, -- 해시태그 필드 추가
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     is_public BOOLEAN DEFAULT FALSE,
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
     shares INT DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     room_number VARCHAR(255),
     room_creation_count INT DEFAULT 1
 );
