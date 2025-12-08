@@ -4,7 +4,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback'; // ImageWithFallb
 
 interface FavoriteExhibitionCardProps {
   id: number;
-  exhibitionTitle: string;
+  title: string; // exhibitionTitle을 title로 변경
   authorName: string;
   views: number;
   likes: number;
@@ -18,12 +18,12 @@ interface FavoriteExhibitionCardProps {
 
 const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   id,
-  exhibitionTitle,
+  title, // exhibitionTitle을 title로 변경
   authorName,
   views,
   likes,
   roomId,
-  imageUrls, // imageUrls 추가
+  imageUrls,
   onNavigateToDetail,
   isEditMode,
   isSelected,
@@ -46,7 +46,7 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
         {/* Image Placeholder */}
         <div className="w-[100px] flex-shrink-0 bg-gray-100 h-full border-r border-black overflow-hidden">
           {imageUrls && imageUrls.length > 0 ? (
-            <ImageWithFallback src={imageUrls[0]} alt={exhibitionTitle} className="object-cover w-full h-full" />
+            <ImageWithFallback src={imageUrls[0]} alt={title} className="object-cover w-full h-full" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           )}
@@ -57,9 +57,9 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
           <div className="flex justify-between items-start w-full">
             <div className="flex flex-col gap-0.5 flex-grow pr-2"> {/* Added pr-2 for spacing */}
               {/* Title and Author */}
-              <h3 className="font-['Pretendard:SemiBold',sans-serif] text-base leading-tight text-black overflow-hidden line-clamp-2">
-                {exhibitionTitle}
-              </h3>
+              <p className="font-['Pretendard:Regular',sans-serif] text-xs leading-tight text-black overflow-hidden whitespace-nowrap text-ellipsis">
+                {title}
+              </p>
               <p className="font-['EB_Garamond:Regular',serif] font-normal text-xs leading-tight text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">
                 by {authorName}
               </p>

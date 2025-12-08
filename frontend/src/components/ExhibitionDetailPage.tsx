@@ -659,7 +659,7 @@ export default function ExhibitionDetailPage({
           >
             <div className="content-stretch flex h-[44px] items-center justify-between relative shrink-0 w-full mb-4 px-2 flex-shrink-0" data-name="Container">
               {/* Image counter */}
-              <div className="bg-white border-[1.6px] border-black border-solid h-[40.2px] relative shrink-0 w-[59.838px] flex items-center justify-center px-[17.6px]" data-name="Container">
+              <div className="bg-white border-[1.6px] border-black border-solid h-[40.2px] relative shrink-0 w-auto min-w-[70px] flex items-center justify-center px-[8px]" data-name="Container">
                 <p className="font-['EB_Garamond:Regular',sans-serif] font-normal leading-[21px] text-[14px] text-black">{(currentImageIndex + 1)} / {totalImages}</p>
               </div>
 
@@ -672,9 +672,9 @@ export default function ExhibitionDetailPage({
               </button>
             </div>
             
-            <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col items-start pb-[1.6px] pt-[13.6px] px-[13.6px] relative shrink-0 w-full max-w-full overflow-hidden" data-name="Container">
+            <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col items-start p-0 relative shrink-0 w-full max-w-full overflow-hidden" data-name="Container">
               <div className="bg-[rgba(0,0,0,0.6)] content-stretch flex items-center justify-center relative shrink-0 w-full h-full" data-name="Container">
-                <img src={currentImage} alt="Enlarged Exhibition Image" className="w-full h-auto max-h-full border-[0.8px] border-gray-200 border-solid" />
+                <img src={currentImage} alt="Enlarged Exhibition Image" className="w-full h-auto max-h-full" />
               </div>
             </div>
 

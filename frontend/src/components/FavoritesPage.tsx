@@ -15,7 +15,7 @@ interface FavoritesPageProps {
 
 interface FavoriteExhibition {
   id: number;
-  exhibitionTitle: string;
+  title: string; // exhibitionTitle을 title로 변경
   authorName: string;
   views: number;
   likes: number;
@@ -50,6 +50,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
         const data: FavoriteExhibition[] = await response.json();
         
         const favoriteExhibitionsData: FavoriteExhibition[] = data;
+        console.log("Fetched favorite exhibitions raw data:", favoriteExhibitionsData); // 추가된 로그
 
         // 각 전시관의 imageUrls를 가져오는 Promise 배열 생성
         const exhibitionsWithImagesPromises = favoriteExhibitionsData.map(async (exhibition) => {
@@ -65,7 +66,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
 
         const updatedExhibitions = await Promise.all(exhibitionsWithImagesPromises);
         setExhibitions(updatedExhibitions);
-        // console.log("Fetched favorite exhibitions:", data); // Debugging log
+        console.log("Updated exhibitions data with images:", updatedExhibitions); // 추가된 로그
       } catch (err: any) {
         console.error("Error fetching favorites:", err);
         setError(err.message);
@@ -174,7 +175,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
             <div className="border-b border-gray-200 py-4 px-[20px] flex items-center flex-shrink-0 h-[70px] w-full"> 
             {!isEditMode ? (
                 <div className="flex items-center gap-2">
-                <Star className="size-5 text-black fill-current text-yellow-400" /> {/* Changed to Star, added fill for Figma look */}
+                <Star className="size-5" color="#f360c0" fill="#f360c0" /> {/* color 속성 추가 */}
                 <p className="font-['Pretendard:Regular',sans-serif] text-[16px] text-black tracking-[-0.32px]">
                     저장한 전시관 {exhibitions.length}개
                 </p>
