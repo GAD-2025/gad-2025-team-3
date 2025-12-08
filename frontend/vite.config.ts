@@ -2,6 +2,8 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
+import tailwindcss from 'tailwindcss'; // tailwindcss 임포트
+import autoprefixer from 'autoprefixer'; // autoprefixer 임포트
 
   export default defineConfig({
     plugins: [react()],
@@ -51,6 +53,15 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+    },
+    css: {
+      postcss: {
+        plugins: [
+          tailwindcss(),
+          autoprefixer(),
+        ],
+        from: path.resolve(__dirname, 'src/index.css'),
+      },
     },
     server: {
       port: 5173,

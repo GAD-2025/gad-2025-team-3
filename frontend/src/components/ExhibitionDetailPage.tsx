@@ -555,7 +555,7 @@ export default function ExhibitionDetailPage({
           <div className="size-full">
             <div className="box-border content-stretch flex flex-col gap-[16px] items-start px-[24px] pb-[24px] pt-[24px] relative w-full">
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] w-[95px]">Comments {comments.length}</p>
+                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Comments <span class="text-[12px]">{comments.length}</span></p>
               </div>
               <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
                 {comments.map((comment) => (
@@ -602,7 +602,7 @@ export default function ExhibitionDetailPage({
         </div>
         
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
-          <div className="flex items-center w-full h-[59px] border-[1.6px] border-black rounded-lg overflow-hidden bg-white pl-4 pr-2">
+          <div className="flex items-center justify-between w-full h-[59px] border-[1.6px] border-black overflow-hidden bg-white">
             <button
               onClick={handleLikeClick}
               className="flex items-center justify-center shrink-0 size-[59px] cursor-pointer hover:bg-gray-100 transition-colors"

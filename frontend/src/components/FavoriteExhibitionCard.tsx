@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, Heart } from 'lucide-react'; // Import Eye and Heart from lucide-react
+import { ImageWithFallback } from './figma/ImageWithFallback'; // ImageWithFallback 컴포넌트 임포트 (named import로 변경)
 
 interface FavoriteExhibitionCardProps {
   id: number;
@@ -8,6 +9,7 @@ interface FavoriteExhibitionCardProps {
   views: number;
   likes: number;
   roomId: number;
+  imageUrls: string[]; // imageUrls 속성 추가
   onNavigateToDetail: (id: number) => void;
   isEditMode: boolean;
   isSelected: boolean;
@@ -21,6 +23,7 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   views,
   likes,
   roomId,
+  imageUrls, // imageUrls 추가
   onNavigateToDetail,
   isEditMode,
   isSelected,
@@ -36,13 +39,17 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   
     return (
       <div
-        className={`relative w-full border border-gray-200 rounded-lg overflow-hidden flex flex-row cursor-pointer h-40
-                    ${isEditMode && isSelected ? 'border-blue-500 shadow-md' : 'hover:shadow-md transition-all duration-200'}`}
+        className={`relative w-full border-[1.6px] border-black overflow-hidden flex flex-row cursor-pointer h-40
+                    ${isEditMode && isSelected ? 'border-blue-500 shadow-md' : 'transition-all duration-200'}`}
         onClick={handleClick}
       >
         {/* Image Placeholder */}
-        <div className="w-[100px] flex-shrink-0 bg-gray-100 h-full border-r border-gray-100">
-          {/* 실제 이미지가 있다면 여기에 img 태그를 넣습니다 */}
+        <div className="w-[100px] flex-shrink-0 bg-gray-100 h-full border-r border-black overflow-hidden">
+          {imageUrls && imageUrls.length > 0 ? (
+            <ImageWithFallback src={imageUrls[0]} alt={exhibitionTitle} className="object-cover w-full h-full" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+          )}
         </div>
   
         {/* Content Area */}

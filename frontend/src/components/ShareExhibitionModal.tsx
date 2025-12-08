@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-
-const imgVector7 = "https://www.figma.com/api/mcp/asset/5365ce12-9ceb-4d38-af85-2372d596dcbb";
-const imgVector8 = "https://www.figma.com/api/mcp/asset/ebe12498-4b11-4f49-80d3-2d574fa78460";
+import { Copy, X } from 'react-feather';
 
 interface ShareExhibitionModalProps {
   isOpen: boolean;
@@ -61,30 +59,25 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
           <p className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">{message}</p>
         </div>
       )}
-      <div className="bg-white border-[1.108px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] gap-[12px] h-auto pt-[12px] pb-[16px]" onClick={(e) => e.stopPropagation()}>
-        <div className="border-b-[1.108px] border-black border-solid flex h-[70px] items-center justify-between px-[24px]">
-          <h2 className="font-['EB_Garamond',serif] text-[18px]">
+      <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] max-h-[90vh] overflow-y-auto gap-[8px] pt-[8px] pb-[10px]" onClick={(e) => e.stopPropagation()}>
+                  <div className="border-b-[1.6px] border-black border-l-0 border-r-0 border-solid border-t-0 content-stretch flex h-[60px] items-center justify-between pb-0 pt-0 px-[24px] relative shrink-0 w-full">          <h2 className="font-['Pretendard',sans-serif] font-bold leading-[30px] text-[20px] text-black">
             Share Exhibition
           </h2>
-          <button onClick={onClose} className="w-5 h-5 flex items-center justify-center hover:opacity-70">
-            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
-              <path d="M10.8288 0.832986L0.832986 10.8288" stroke="black" strokeWidth="1.666" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M0.832986 0.832986L10.8288 10.8288" stroke="black" strokeWidth="1.666" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={onClose} className="relative shrink-0 size-[36px] flex items-center justify-center hover:opacity-70">
+            <X size={20} color="black" />
           </button>
         </div>
-        <div className="px-[24px] py-[24px] flex flex-col gap-[20px]">
-          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[4px] pb-12 pt-[12px] text-start">
-            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[20px]">
+        <div className="px-[24px] py-[10px] flex flex-col gap-[8px]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[2px] pb-[8px] pt-[8px] text-start">
+            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[10px]">
               Room {exhibition.room}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[20px]">
+            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[10px]">
               {truncateTitle(exhibition.title, 13)}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-12 pl-[20px]">
+            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-[8px] pl-[10px]">
               by {exhibition.author}
             </p>
-             <div className="h-[12px] w-full shrink-0"></div>
           </div>
           <div className="flex flex-col gap-[8px]">
             <label className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px]">
@@ -100,14 +93,11 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
                 style={{ paddingLeft: '10px' }}
               />
               <button onClick={handleCopy} className="w-[80px] h-[44px] border border-black flex items-center justify-center shrink-0">
-                <div className="w-5 h-5 relative">
-                    <img alt="copy" src={imgVector7} className="absolute inset-[33.33%_8.33%_8.33%_33.33%] w-auto h-auto"/>
-                    <img alt="copy" src={imgVector8} className="absolute inset-[8.33%_33.33%_33.33%_8.33%] w-auto h-auto"/>
-                </div>
+                <Copy size={20} />
               </button>
             </div>
           </div>
-          <div className="border-[1.108px] border-black border-solid p-4 h-[200px] flex items-center justify-center pt-[12px] pb-[12px]">
+          <div className="border-[1.108px] border-black border-solid p-4 min-h-[140px] flex items-center justify-center pt-[12px] pb-[12px]">
             <div className="bg-gray-50 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
               <QRCodeCanvas
                 value={shareUrl}
@@ -136,7 +126,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             </button>
           </div>
         </div>
-        <div className="px-[24px] pb-[25px] pt-[25px] border-t-[1.108px] border-black">
+        <div className="px-[24px] pb-[15px] pt-[15px] border-t-[1.108px] border-black">
           <button onClick={onClose} className="w-full h-[56px] bg-black text-white flex items-center">
             <span 
               className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]" 

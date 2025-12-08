@@ -20,6 +20,7 @@ interface FavoriteExhibition {
   views: number;
   likes: number;
   roomId: number;
+  imageUrls: string[]; // imageUrls 속성 추가
 }
 
 const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNavigateToDetail }) => {
@@ -47,7 +48,23 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
           throw new Error(`Failed to fetch favorites: ${response.statusText}`);
         }
         const data: FavoriteExhibition[] = await response.json();
-        setExhibitions(data);
+        
+        const favoriteExhibitionsData: FavoriteExhibition[] = data;
+
+        // 각 전시관의 imageUrls를 가져오는 Promise 배열 생성
+        const exhibitionsWithImagesPromises = favoriteExhibitionsData.map(async (exhibition) => {
+          const itemsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${exhibition.id}/items`);
+          if (!itemsResponse.ok) {
+            // 이미지 가져오기 실패 시 빈 배열 반환 또는 오류 처리
+            console.warn(`Failed to fetch items for exhibition ${exhibition.id}: ${itemsResponse.statusText}`);
+            return { ...exhibition, imageUrls: [] };
+          }
+          const imageUrls: string[] = await itemsResponse.json();
+          return { ...exhibition, imageUrls };
+        });
+
+        const updatedExhibitions = await Promise.all(exhibitionsWithImagesPromises);
+        setExhibitions(updatedExhibitions);
         // console.log("Fetched favorite exhibitions:", data); // Debugging log
       } catch (err: any) {
         console.error("Error fetching favorites:", err);
