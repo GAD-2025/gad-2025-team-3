@@ -253,7 +253,7 @@ export default function ExhibitionDetailPage({
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("팝업 테스트 대신, 즉시 삭제됩니다. 정말로 이 전시관을 삭제하시겠습니까?")) {
+    if (!window.confirm("정말로 이 전시관을 삭제하시겠습니까?")) {
       return;
     }
 
