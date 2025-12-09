@@ -57,6 +57,7 @@ export default function ExhibitionDetailPage({
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for the index of the image to display in popup
   const [showOptionsMenu, setShowOptionsMenu] = useState(false); // State for the "More" options menu visibility
   const [showEditModal, setShowEditModal] = useState(false); // State for Edit Exhibition Modal visibility
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   // Derived state for the current image URL
   const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
@@ -228,8 +229,9 @@ export default function ExhibitionDetailPage({
   };
 
   const handleCommentSubmit = async () => {
-    if (!newComment.trim() || !id) return;
+    if (!newComment.trim() || !id || isSubmittingComment) return;
 
+    setIsSubmittingComment(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/comments`, {
         method: 'POST',
@@ -249,6 +251,8 @@ export default function ExhibitionDetailPage({
     } catch (err: any) {
       console.error('Error posting comment:', err.message);
       setError('Failed to post comment.');
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
@@ -632,7 +636,10 @@ export default function ExhibitionDetailPage({
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  handleCommentSubmit();
+                  e.preventDefault(); // Prevent default form submission
+                  if (newComment.trim()) { // Only submit if comment is not empty
+                    handleCommentSubmit();
+                  }
                 }
               }}
               placeholder="응원 댓글을 입력해보세요."
@@ -642,6 +649,7 @@ export default function ExhibitionDetailPage({
               onClick={handleCommentSubmit}
               className="bg-black flex items-center justify-center shrink-0 h-full w-[59px] cursor-pointer hover:bg-[#f360c0] transition-colors"
               data-name="Button"
+              disabled={isSubmittingComment}
             >
               <ArrowUp size={20} color="white" />
             </button>
