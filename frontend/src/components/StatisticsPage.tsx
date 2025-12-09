@@ -54,17 +54,7 @@ export default function StatisticsPage({
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  ] 
-}: StatisticsPageProps) {). Original old_string was (  ] 
-}: StatisticsPageProps) {) in /Users/parkjibin/Desktop/gad new/gad-2025-team-3/frontend/src/components/StatisticsPage.tsx. No edits made. The exact text in old_string was not found. Ensure you're not escaping content incorrectly and check whitespace, indentation, and context. Use read_file tool to verify.</div>;
-  }). Original old_string was (  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  ] 
-}: StatisticsPageProps) {). Original old_string was (  ] 
-}: StatisticsPageProps) {) in /Users/parkjibin/Desktop/gad new/gad-2025-team-3/frontend/src/components/StatisticsPage.tsx. No edits made. The exact text in old_string was not found. Ensure you're not escaping content incorrectly and check whitespace, indentation, and context. Use read_file tool to verify.</div>;
-  }) in /Users/parkjibin/Desktop/gad new/gad-2025-team-3/frontend/src/components/StatisticsPage.tsx. No edits made. The exact text in old_string was not found. Ensure you're not escaping content incorrectly and check whitespace, indentation, and context. Use read_file tool to verify.</div>;
+    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
   }
 
   if (!statistics) {
