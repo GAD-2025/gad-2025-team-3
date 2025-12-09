@@ -380,12 +380,14 @@ app.get('/api/exhibitions/:id', async (req, res) => {
 
     try {
         const connection = await pool.getConnection();
+        console.error('DEBUG: Connection obtained for /api/exhibitions/:id');
 
         // Increment view count
         await connection.execute(
             'UPDATE exhibitions SET views = views + 1 WHERE id = ?',
             [id]
         );
+        console.error('DEBUG: View count incremented for /api/exhibitions/:id');
 
         const [rows] = await connection.execute(
             `
@@ -416,15 +418,21 @@ app.get('/api/exhibitions/:id', async (req, res) => {
             [id]
         );
         connection.release();
+        console.error('DEBUG: Query executed and connection released for /api/exhibitions/:id');
 
         if (rows.length === 0) {
+            console.error('DEBUG: Exhibition not found for /api/exhibitions/:id');
             return res.status(404).json({ message: 'Exhibition not found.' });
         }
 
         res.status(200).json(rows[0]);
+        console.error('DEBUG: Response sent for /api/exhibitions/:id');
 
     } catch (error) {
-        console.error('Fetch single exhibition error:', error);
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.error('!!! FETCH SINGLE EXHIBITION ERROR !!!');
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.error('Error details:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
