@@ -1,28 +1,73 @@
+import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'react-feather';
+
+interface User {
+  id: number;
+}
 
 interface StatisticsPageProps {
   onBack: () => void;
-  totalViews?: number;
-  views?: number;
-  likes?: number;
-  shares?: number;
-  exhibitionCount?: number;
-  activityLog?: Array<{
-    date: string;
-    number: number;
-    title: string;
-    subtitle: string;
-  }>;
+  currentUser: User | null;
+}
+
+interface UserStatistics {
+  exhibition_count: number;
+  total_views: number;
+  total_likes: number;
+  total_shares: number;
 }
 
 export default function StatisticsPage({ 
   onBack,
-  totalViews = 0,
-  views = 0,
-  likes = 0,
-  shares = 0,
-  exhibitionCount = 0,
-  activityLog = [
+  currentUser,
+}: StatisticsPageProps) {
+
+  useEffect(() => {
+    if (!currentUser?.id) {
+      setLoading(false);
+      setError('User not logged in.');
+      return;
+    }
+
+    const fetchStatistics = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser.id}/statistics`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch statistics');
+        }
+        const data: UserStatistics = await response.json();
+        setStatistics(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading statistics...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen">Error: Failed to edit, 0 occurrences found for old_string (  ]
+}: StatisticsPageProps) {). Original old_string was (  ]
+}: StatisticsPageProps) {) in /Users/parkjibin/Desktop/gad new/gad-2025-team-3/frontend/src/components/StatisticsPage.tsx. No edits made. The exact text in old_string was not found. Ensure you're not escaping content incorrectly and check whitespace, indentation, and context. Use read_file tool to verify.</div>;
+  }
+
+  if (!statistics) {
+    return <div className="flex justify-center items-center h-screen">No statistics data found.</div>;
+  }
+  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Hardcoded activityLog for now, will be replaced by dynamic data later if needed
+  const activityLog = [
     {
       date: '2024.10.15',
       number: 101,
@@ -41,8 +86,7 @@ export default function StatisticsPage({
       title: 'SEVENTEEN 팬미팅 전시관 생성',
       subtitle: '첫 전시관!'
     }
-  ]
-}: StatisticsPageProps) {
+  ];
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
       {/* Header */}
@@ -77,7 +121,7 @@ export default function StatisticsPage({
           <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">이번 달</p>
         </div>
         <div className="h-[56px] relative shrink-0 w-full" data-name="Container">
-          <p className="absolute font-['EB_Garamond',serif] font-bold leading-[48px] left-0 not-italic text-[48px] text-black text-nowrap top-[0.4px] whitespace-pre">{totalViews.toLocaleString()}</p>
+          <p className="absolute font-['EB_Garamond',serif] font-bold leading-[48px] left-0 not-italic text-[48px] text-black text-nowrap top-[0.4px] whitespace-pre">{statistics.total_views.toLocaleString()}</p>
         </div>
         <div className="h-[18px] relative shrink-0 w-full" data-name="Container">
           <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] text-nowrap top-[-0.2px] tracking-[-0.24px] whitespace-pre">총 조회수</p>
@@ -95,7 +139,7 @@ export default function StatisticsPage({
               <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">조회수</p>
             </div>
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Container">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{views.toLocaleString()}</p>
+              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{statistics.total_views.toLocaleString()}</p>
             </div>
           </div>
 
@@ -106,7 +150,7 @@ export default function StatisticsPage({
               <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">좋아요</p>
             </div>
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Container">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{likes.toLocaleString()}</p>
+              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{statistics.total_likes.toLocaleString()}</p>
             </div>
           </div>
 
@@ -117,7 +161,7 @@ export default function StatisticsPage({
               <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">공유</p>
             </div>
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Container">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{shares.toLocaleString()}</p>
+              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{statistics.total_shares.toLocaleString()}</p>
             </div>
           </div>
 
@@ -128,7 +172,7 @@ export default function StatisticsPage({
               <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">전시관 수</p>
             </div>
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Container">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{exhibitionCount}</p>
+              <p className="font-['EB_Garamond',serif] font-bold leading-[36px] not-italic relative shrink-0 text-[30px] text-black text-nowrap whitespace-pre">{statistics.exhibition_count}</p>
             </div>
           </div>
         </div>

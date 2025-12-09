@@ -1014,6 +1014,52 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
     }
 });
 
+// API for fetching aggregated user statistics
+app.get('/api/users/:userId/statistics', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `
+            SELECT
+                COUNT(e.id) AS exhibition_count,
+                SUM(e.views) AS total_views,
+                SUM(e.likes) AS total_likes,
+                SUM(e.shares) AS total_shares
+            FROM
+                exhibitions e
+            WHERE
+                e.user_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+
+        // If no exhibitions found, SUM returns null, COUNT returns 0
+        const stats = rows[0];
+        res.status(200).json({
+            exhibition_count: stats.exhibition_count || 0,
+            total_views: stats.total_views || 0,
+            total_likes: stats.total_likes || 0,
+            total_shares: stats.total_shares || 0,
+        });
+
+    } catch (error) {
+        console.error('Fetch user statistics error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // ----------------------------------------------------------------------------------
 
 // 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
