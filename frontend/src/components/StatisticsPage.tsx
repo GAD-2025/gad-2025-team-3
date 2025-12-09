@@ -54,7 +54,7 @@ export default function StatisticsPage({
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
+    return <div className="flex justify-center items-center h-screen"></div>;
   }
 
   if (!statistics) {
