@@ -59,7 +59,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
           <p className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">{message}</p>
         </div>
       )}
-      <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] max-h-[90vh] overflow-y-auto gap-[8px] pt-[8px] pb-[10px]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col w-[345px] max-w-[95vw] max-h-[90vh] overflow-y-auto gap-[10px] pt-[2px] pb-[0px]" onClick={(e) => e.stopPropagation()}>
                   <div className="border-b-[1.6px] border-black border-l-0 border-r-0 border-solid border-t-0 content-stretch flex h-[60px] items-center justify-between pb-0 pt-0 px-[24px] relative shrink-0 w-full">          <h2 className="font-['Pretendard',sans-serif] font-bold leading-[30px] text-[20px] text-black">
             Share Exhibition
           </h2>
@@ -67,8 +67,8 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             <X size={20} color="black" />
           </button>
         </div>
-        <div className="px-[24px] py-[10px] flex flex-col gap-[8px]">
-          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[2px] pb-[8px] pt-[8px] text-start">
+        <div className="px-[24px] py-[10px] flex flex-col gap-[12px]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[2px] pb-[0px] pt-[8px] text-start">
             <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[10px]">
               Room {exhibition.room}
             </p>
@@ -136,8 +136,6 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             </span>
           </button>
         </div>
-
-        <div className="h-[12px] w-full shrink-0"></div>
       </div>
     </div>
   );

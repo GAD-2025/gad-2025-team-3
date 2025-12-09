@@ -365,7 +365,7 @@ export default function CreateExhibitionSettingsPage({
                   {hashtags.map((tag, index) => (
                     <div 
                       key={tag} 
-                      className="flex items-center bg-white border-[0.8px] border-black border-solid rounded-[20px] pl-[12.8px] pr-[0.8px] py-[0.8px] h-[33.6px]"
+                      className="flex items-center bg-white border-[0.8px] border-black border-solid rounded-[20px] pl-[12.8px] pr-[10px] py-[0.8px] h-[33.6px]"
                     >
                       <p className="font-['Pretendard',sans-serif] leading-[20px] text-[#4a5565] text-[14px] tracking-[-0.28px] whitespace-nowrap">
                         {tag}

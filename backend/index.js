@@ -347,6 +347,7 @@ app.get('/api/exhibitions', async (req, res) => {
                 e.created_at,
                 e.room_number,
                 e.room_creation_count,
+                e.hashtags,
                 u.nickname as author
             FROM 
                 exhibitions e
@@ -403,6 +404,7 @@ app.get('/api/exhibitions/:id', async (req, res) => {
                 e.created_at,
                 e.room_number,
                 e.room_creation_count,
+                e.hashtags,
                 u.nickname as author
             FROM 
                 exhibitions e
