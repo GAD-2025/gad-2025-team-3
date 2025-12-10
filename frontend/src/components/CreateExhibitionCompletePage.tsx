@@ -192,7 +192,7 @@ export default function CreateExhibitionCompletePage({
 
       {/* Image Grid - Top Section with continuous horizontal scroll */}
 
-      <div className="absolute left-1/2 top-[153px] translate-x-[-50%] w-[341px] overflow-hidden">
+      <div className="absolute left-1/2 top-[153px] translate-x-[-45%] w-[800px] overflow-hidden">
 
         <motion.div
 
@@ -264,7 +264,7 @@ export default function CreateExhibitionCompletePage({
 
       {/* Image Grid - Bottom Section with continuous horizontal scroll (opposite direction) */}
 
-      <div className="absolute left-1/2 top-[313px] translate-x-[-50%] w-[341px] overflow-hidden">
+      <div className="absolute left-1/2 top-[313px] translate-x-[-45%] w-[800px] overflow-hidden">
 
         <motion.div
 
@@ -348,9 +348,9 @@ export default function CreateExhibitionCompletePage({
 
       >
 
-        <div className="content-stretch flex flex-col gap-[8px] items-center not-italic relative shrink-0 text-nowrap whitespace-pre">
+        <div className="content-stretch flex flex-col gap-[8px] items-center not-italic relative shrink-0">
 
-                    <p className="font-['Pretendard',sans-serif] font-semibold leading-[32px] relative shrink-0 text-[24px] text-black text-center tracking-[-0.48px]">
+                    <p className="w-[320px] font-['Pretendard',sans-serif] font-semibold leading-[32px] relative shrink-0 text-[24px] text-black text-center tracking-[-0.48px] whitespace-pre-wrap break-all">
 
                       {exhibitionTitle || '나의 전시관'}
 

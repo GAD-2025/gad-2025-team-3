@@ -206,7 +206,7 @@ export default function CreateExhibitionSettingsPage({
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="전시관에 대한 설명을 입력하세요"
-                        className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] min-h-px min-w-px not-italic relative shrink-0 text-[14px] tracking-[-0.28px] bg-transparent border-none outline-none resize-none placeholder:text-[#99a1af] text-[#4a5565]"
+                        className="basis-0 font-['Pretendard',sans-serif] grow leading-[20px] h-[85px] min-h-px min-w-px not-italic relative shrink-0 text-[14px] tracking-[-0.28px] bg-transparent border-none outline-none resize-none placeholder:text-[#99a1af] text-[#4a5565]"
                       />
                     </div>
                   </div>
@@ -230,7 +230,7 @@ export default function CreateExhibitionSettingsPage({
                       >
                         <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                           <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
-                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!isPublic || !startDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
+                            <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!isPublic || !startDate ? 'text-[#99a1af]' : 'text-[#99a1af]'}`}>
                               {startDate ? formatDate(startDate) : '시작일'}
                             </span>
                             <CalendarIcon className={`size-4 ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
