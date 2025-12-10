@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cron = require('node-cron'); // Add node-cron import
 
 // 1. 🟢 필수 수정: .env 파일 경로 명시
 require('dotenv').config();
@@ -277,14 +278,12 @@ app.post('/api/exhibitions', async (req, res) => {
 
         try {
             // room_number와 room_creation_count 결정
-            const [maxRoomNumberResult] = await connection.execute(
-                'SELECT MAX(CAST(room_number AS UNSIGNED)) AS max_room_number FROM exhibitions'
+            const [exhibitionCountResult] = await connection.execute(
+                'SELECT COUNT(*) AS count FROM exhibitions'
             );
-            let nextRoomNumber = 101;
-            if (maxRoomNumberResult[0].max_room_number) {
-                nextRoomNumber = parseInt(maxRoomNumberResult[0].max_room_number, 10) + 1;
-            }
-            const room_number = String(nextRoomNumber);
+            const exhibitionCount = exhibitionCountResult[0].count;
+            let nextRoomNumber = 200 + (exhibitionCount + 1);
+            const room_number = String(nextRoomNumber).padStart(3, '0');
 
             // 해당 room_number의 creation_count 결정
             const [creationCountResult] = await connection.execute(
@@ -861,11 +860,16 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
         return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
     }
 
+    const parsedExhibitionId = parseInt(exhibitionId, 10);
+    if (isNaN(parsedExhibitionId)) {
+        return res.status(400).json({ message: 'Invalid Exhibition ID format. Must be a number.' });
+    }
+
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
             'SELECT * FROM exhibition_likes WHERE user_id = ? AND exhibition_id = ?',
-            [parsedUserId, exhibitionId]
+            [parsedUserId, parsedExhibitionId]
         );
         connection.release();
 
@@ -1082,6 +1086,26 @@ async function startServer() {
         const connection = await pool.getConnection();
         await connection.release();
         console.log('✅ MySQL Pool 연결 성공!');
+
+        // Schedule a task to run every day at midnight
+        cron.schedule('0 0 * * * ', async () => { // Runs at 00:00 every day
+            console.log('Running daily exhibition privacy check...');
+            let connection;
+            try {
+                connection = await pool.getConnection();
+                const [result] = await connection.execute(
+                    'UPDATE exhibitions SET is_public = FALSE WHERE end_date < CURDATE() AND is_public = TRUE'
+                );
+                console.log(`Updated ${result.affectedRows} exhibitions to private.`);
+            } catch (error) {
+                console.error('Error in daily exhibition privacy check:', error);
+            } finally {
+                if (connection) connection.release();
+            }
+        }, {
+            scheduled: true,
+            timezone: "Asia/Seoul" // Set your desired timezone
+        });
 
         // 서버 리스닝 시작
 app.listen(PORT, () => {

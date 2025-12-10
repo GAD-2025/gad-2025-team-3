@@ -60,7 +60,6 @@ import autoprefixer from 'autoprefixer'; // autoprefixer 임포트
           tailwindcss(),
           autoprefixer(),
         ],
-        from: path.resolve(__dirname, 'src/index.css'),
       },
     },
     server: {
