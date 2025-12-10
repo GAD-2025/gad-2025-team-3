@@ -193,7 +193,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                   key={exhibition.id}
                   onClick={() => handleExhibitionClick(exhibition)}
                   // ✅ [수정됨] overflow-hidden 강제 적용
-                  className="box-border content-stretch flex flex-col h-[206.8px] items-start p-[1.6px] relative shrink-0 w-full cursor-pointer hover:shadow-lg transition-shadow overflow-hidden rounded-sm"
+                  className="box-border content-stretch flex flex-col h-[206.8px] items-start relative shrink-0 w-full cursor-pointer hover:shadow-lg transition-shadow overflow-hidden rounded-sm"
                   style={{ overflow: 'hidden' }}
                   data-name="Container"
                 >
@@ -218,7 +218,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
                     <div className="size-full">
                       <div className="box-border content-stretch flex flex-col gap-[12px] h-[126px] items-start pb-0 pt-[16px] px-[16px] relative w-full">
                         <div className="h-[32px] overflow-clip relative shrink-0 w-full" data-name="Heading 3">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.8px] tracking-[-0.28px] whitespace-pre">{exhibition.title}</p>
+                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black top-[-0.8px] tracking-[-0.28px] truncate max-w-[140px]">{exhibition.title}</p>
                         </div>
 
                         <div className="content-stretch flex h-[38px] items-center justify-between relative shrink-0 w-full" data-name="Container">
