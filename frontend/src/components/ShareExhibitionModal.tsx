@@ -67,15 +67,15 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             <X size={20} color="black" />
           </button>
         </div>
-        <div className="px-[24px] py-[10px] flex flex-col gap-[12px]">
-          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[2px] pb-[0px] pt-[8px] text-start">
-            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[10px]">
+        <div className="px-[24px] py-[10px] flex flex-col gap-[16px]">
+          <div className="border-[1.108px] border-black border-solid flex flex-col gap-[4px] pb-[0px] pt-[8px] text-start">
+            <p className="font-['EB_Garamond',serif] text-[14px] text-[#4a5565] pl-[12px]">
               Room {exhibition.room}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[10px]">
-              {truncateTitle(exhibition.title, 13)}
+            <p className="font-['Pretendard',sans-serif] text-[16px] tracking-[-0.32px]  pl-[12px]">
+              {truncateTitle(exhibition.title, 24)}
             </p>
-            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-[8px] pl-[10px]">
+            <p className="font-['Pretendard',sans-serif] text-[12px] text-[#4a5565] tracking-[-0.24px] pb-[8px] pl-[12px]">
               by {exhibition.author}
             </p>
           </div>
@@ -89,16 +89,16 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="flex-1 h-[40px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
+                className="flex-1 h-[44px] px-4 bg-gray-50 border border-black font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px]"
                 style={{ paddingLeft: '10px' }}
               />
-              <button onClick={handleCopy} className="w-[80px] h-[44px] border border-black flex items-center justify-center shrink-0">
+              <button onClick={handleCopy} className="w-[64px] h-[44px] border border-black flex items-center justify-center shrink-0">
                 <Copy size={20} />
               </button>
             </div>
           </div>
-          <div className="border-[1.108px] border-black border-solid p-4 min-h-[140px] flex items-center justify-center pt-[12px] pb-[12px]">
-            <div className="bg-gray-50 w-full p-4 flex flex-col items-center justify-center gap-[6px]">
+          <div className="border-[1.108px] border-black border-solid p-4 min-h-[100px] flex items-center justify-center pt-[12px] pb-[0px]">
+            <div className="w-full p-4 flex flex-col items-center justify-center gap-[6px]">
               <QRCodeCanvas
                 value={shareUrl}
                 size={120}
@@ -108,12 +108,12 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
                 includeMargin={false}
               />
               <p className="font-['Pretendard',sans-serif] text-[14px] text-[#4a5565] tracking-[-0.28px] mt-2">
-                QR 코드
+                QR 코드 인식
               </p>
                <div className="h-[8px] w-full shrink-0"></div>
             </div>
           </div>
-          <div className="flex flex-col gap-[8px] mb-4">
+          <div className="flex flex-col gap-[10px] mb-0">
             <button onClick={handleKakaoShare} className="h-[54px] border border-black text-left px-3">
               <span className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]">
                 카카오톡으로 공유
@@ -126,7 +126,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
             </button>
           </div>
         </div>
-        <div className="px-[24px] pb-[15px] pt-[15px] border-t-[1.108px] border-black">
+        <div className="px-[24px] pb-[20px] pt-[20px] border-t-[1.108px] border-black">
           <button onClick={onClose} className="w-full h-[56px] bg-black text-white flex items-center">
             <span 
               className="font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px]" 

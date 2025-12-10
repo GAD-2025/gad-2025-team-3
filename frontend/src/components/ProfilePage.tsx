@@ -148,7 +148,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       <div className="h-auto relative shrink-0 w-full pb-[24px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[24px] h-[180px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[24px] h-[110px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             {/* Profile Info */}
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
@@ -234,7 +234,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
 
 
       {/* Account Section */}
-      <div className="relative shrink-0 w-full mt-[24px] pb-[8px]" data-name="Container">
+      <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] items-start p-[24px] relative w-full">
@@ -320,7 +320,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
 
 
       {/* Privacy Section */}
-      <div className="relative shrink-0 w-full mt-[24px] pb-[8px]" data-name="Container">
+      <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-auto items-start pb-[24px] pt-[24px] px-[24px] relative w-full">
