@@ -45,6 +45,15 @@ CREATE TABLE IF NOT EXISTS exhibition_items (
     FOREIGN KEY (exhibition_id) REFERENCES exhibitions(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS exhibition_likes (
+    user_id INT NOT NULL,
+    exhibition_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, exhibition_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (exhibition_id) REFERENCES exhibitions(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS user_favorites (
     user_id INT NOT NULL,
     exhibition_id INT NOT NULL,

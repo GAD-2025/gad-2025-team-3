@@ -772,16 +772,16 @@ app.post('/api/exhibitions/:id/like', async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // Check if the user has already liked the exhibition
-        const [favoriteRows] = await connection.execute(
-            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+        // Check if the user has already liked the exhibition in exhibition_likes
+        const [likeRows] = await connection.execute(
+            'SELECT * FROM exhibition_likes WHERE user_id = ? AND exhibition_id = ?',
             [userId, exhibitionId]
         );
 
-        if (favoriteRows.length > 0) {
+        if (likeRows.length > 0) {
             // User has already liked, so unlike it
             await connection.execute(
-                'DELETE FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+                'DELETE FROM exhibition_likes WHERE user_id = ? AND exhibition_id = ?',
                 [userId, exhibitionId]
             );
 
@@ -797,7 +797,7 @@ app.post('/api/exhibitions/:id/like', async (req, res) => {
         } else {
             // User has not liked yet, so like it
             await connection.execute(
-                'INSERT INTO user_favorites (user_id, exhibition_id) VALUES (?, ?)',
+                'INSERT INTO exhibition_likes (user_id, exhibition_id) VALUES (?, ?)',
                 [userId, exhibitionId]
             );
 
@@ -856,7 +856,7 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
-            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            'SELECT * FROM exhibition_likes WHERE user_id = ? AND exhibition_id = ?',
             [parsedUserId, exhibitionId]
         );
         connection.release();
@@ -865,6 +865,88 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
 
     } catch (error) {
         console.error('Check is-liked error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for adding an exhibition to favorites
+app.post('/api/favorites', async (req, res) => {
+    const { userId, exhibitionId } = req.body;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute(
+            'INSERT INTO user_favorites (user_id, exhibition_id) VALUES (?, ?)',
+            [userId, exhibitionId]
+        );
+        connection.release();
+        res.status(201).json({ message: 'Exhibition added to favorites successfully.' });
+    } catch (error) {
+        console.error('Add to favorites error:', error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Exhibition already in favorites.' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for removing an exhibition from favorites
+app.delete('/api/favorites', async (req, res) => {
+    const { userId, exhibitionId } = req.body;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [result] = await connection.execute(
+            'DELETE FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [userId, exhibitionId]
+        );
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Favorite not found.' });
+        }
+        res.status(200).json({ message: 'Exhibition removed from favorites successfully.' });
+    } catch (error) {
+        console.error('Remove from favorites error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for checking if a user has favorited an exhibition
+app.get('/api/favorites/check', async (req, res) => {
+    const { userId, exhibitionId } = req.query;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    const parsedExhibitionId = parseInt(exhibitionId, 10);
+
+    if (isNaN(parsedUserId) || isNaN(parsedExhibitionId)) {
+        return res.status(400).json({ message: 'Invalid User ID or Exhibition ID format. Must be numbers.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [parsedUserId, parsedExhibitionId]
+        );
+        connection.release();
+
+        res.status(200).json({ isFavorited: rows.length > 0 });
+
+    } catch (error) {
+        console.error('Check is-favorited error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

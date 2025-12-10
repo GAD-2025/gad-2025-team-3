@@ -119,15 +119,14 @@ export default function ExhibitionDetailPage({
       if (loggedInUserId) {
         const [isLikedRes, isFavoritedRes] = await Promise.all([
             fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/is-liked?userId=${loggedInUserId}`),
-            fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}/favorites`),
+            fetch(`${import.meta.env.VITE_API_URL}/api/favorites/check?userId=${loggedInUserId}&exhibitionId=${id}`),
         ]);
 
         if (!isLikedRes.ok) throw new Error(`Failed to fetch like status: ${isLikedRes.statusText}`);
         if (!isFavoritedRes.ok) throw new Error(`Failed to fetch favorite status: ${isFavoritedRes.statusText}`);
         
         const { isLiked } = await isLikedRes.json();
-        const favorites = await isFavoritedRes.json();
-        const isFavorited = favorites.some((fav: any) => fav.id === parseInt(id, 10));
+        const { isFavorited } = await isFavoritedRes.json();
 
         setIsLiked(isLiked);
         setIsFavorited(isFavorited);
@@ -181,24 +180,23 @@ export default function ExhibitionDetailPage({
     if (!id || !loggedInUserId || !exhibitionData) return;
   
     const originalIsFavorited = isFavorited;
-  
-    setIsFavorited(!originalIsFavorited);
+    setIsFavorited(!originalIsFavorited); // Optimistic UI update
   
     try {
-      // Note: The backend uses the same 'like' endpoint for favorites.
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions/${id}/like`, {
-        method: 'POST',
+      const method = originalIsFavorited ? 'DELETE' : 'POST';
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorites`, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: loggedInUserId }),
+        body: JSON.stringify({ userId: loggedInUserId, exhibitionId: id }),
       });
   
       if (!response.ok) {
-        setIsFavorited(originalIsFavorited);
-      } else {
-        fetchExhibitionAndComments();
+        setIsFavorited(originalIsFavorited); // Revert on failure
+        console.error(`Failed to ${method === 'POST' ? 'add to' : 'remove from'} favorites`);
       }
     } catch (error) {
-      setIsFavorited(originalIsFavorited);
+      setIsFavorited(originalIsFavorited); // Revert on error
+      console.error("An error occurred while toggling favorite status:", error);
     }
   };
 
