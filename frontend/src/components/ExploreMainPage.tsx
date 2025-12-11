@@ -198,7 +198,7 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
                       <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[12px] text-black text-nowrap top-[0.2px] tracking-[-0.24px] whitespace-pre">{exhibition.title}</p>
                     </div>
                     <div className="content-stretch flex h-[13.5px] items-start relative shrink-0 w-full" data-name="Container">
-                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">{exhibition.author}</p>
+                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px]">{exhibition.author}</p>
                     </div>
                   </div>
                 </button>

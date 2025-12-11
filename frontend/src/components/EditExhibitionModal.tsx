@@ -93,6 +93,11 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Ignore Enter key press if IME composition is in progress
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
       const trimmedInput = newHashtagInput.trim();
@@ -278,7 +283,7 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-[12px] w-full mt-[20px]">
+            <div className="flex gap-[12px] w-full mt-[10px]">
               <button type="submit" className="bg-black border-[1.6px] border-black border-solid w-full h-[52.2px] text-white font-['Pretendard',sans-serif] text-[14px] tracking-[-0.28px] hover:bg-[#f360c0] transition-colors">
                 저장
               </button>
