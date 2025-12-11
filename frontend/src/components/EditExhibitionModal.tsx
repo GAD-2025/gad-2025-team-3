@@ -105,7 +105,7 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
         // Ensure hashtag starts with '#'
         const formattedTag = trimmedInput.startsWith('#') ? trimmedInput : `#${trimmedInput}`;
         if (!hashtags.includes(formattedTag)) {
-          setHashtags([...hashtags, formattedTag]);
+          setHashtags((prevTags) => [...prevTags, formattedTag]); // Use functional update
           setNewHashtagInput('');
         }
       }
