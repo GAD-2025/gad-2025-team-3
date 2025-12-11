@@ -113,7 +113,7 @@ app.post('/api/signup', async (req, res) => {
             await connection.commit();
 
             // Fetch the newly created user to return it in the response
-            const [rows] = await connection.execute('SELECT * FROM users WHERE id = ?', [userId]);
+            const [rows] = await connection.execute('SELECT id, username, email, nickname, bio, age14, terms, privacy, marketing, profileIcon, created_at FROM users WHERE id = ?', [userId]);
             const newUser = rows[0];
             const { password: _, ...userWithoutPassword } = newUser;
 
@@ -146,7 +146,7 @@ app.post('/api/login', async (req, res) => {
         const connection = await pool.getConnection();
         try {
             const [rows] = await connection.execute(
-                'SELECT * FROM users WHERE username = ?',
+                'SELECT id, username, email, nickname, bio, age14, terms, privacy, marketing, profileIcon, created_at FROM users WHERE username = ?',
                 [username]
             );
 
@@ -779,6 +779,70 @@ app.delete('/api/comments/:commentId', async (req, res) => {
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+// API for fetching a single user's profile
+app.get('/api/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        
+        // Fetch user details
+        const [userRows] = await connection.execute(
+            'SELECT id, username, email, nickname, bio, profileIcon, created_at FROM users WHERE id = ?',
+            [parsedUserId]
+        );
+
+        if (userRows.length === 0) {
+            connection.release();
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = userRows[0];
+
+        // Fetch exhibition count
+        const [exhibitionCountRows] = await connection.execute(
+            'SELECT COUNT(*) AS exhibition_count FROM exhibitions WHERE user_id = ?',
+            [parsedUserId]
+        );
+        const exhibition_count = exhibitionCountRows[0].exhibition_count;
+
+        // For now, return 0 for follower_count and following_count as these features are not implemented
+        const follower_count = 0;
+        const following_count = 0;
+
+        connection.release();
+
+        res.status(200).json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            nickname: user.nickname,
+            bio: user.bio,
+            profileIcon: user.profileIcon,
+            created_at: user.created_at,
+            exhibition_count,
+            follower_count,
+            following_count,
+            total_views: 0, // Assuming these are not yet tracked per user
+            total_likes: 0, // Assuming these are not yet tracked per user
+            total_shares: 0, // Assuming these are not yet tracked per user
+        });
+
+    } catch (error) {
+        console.error('Fetch single user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for updating a user's profile
 app.put('/api/users/:userId', async (req, res) => {
     const { userId } = req.params;
@@ -855,7 +919,8 @@ app.put('/api/users/:userId', async (req, res) => {
             await connection.rollback();
             connection.release();
         }
-        console.error('Update user profile error:', error);
+        console.error('Update user profile error:', error.message);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     terms BOOLEAN NOT NULL,
     privacy BOOLEAN NOT NULL,
     marketing BOOLEAN,
+    profileIcon VARCHAR(255) DEFAULT 'profile_1_s',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

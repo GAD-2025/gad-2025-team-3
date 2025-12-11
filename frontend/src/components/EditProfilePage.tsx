@@ -14,10 +14,11 @@ interface User {
 interface EditProfilePageProps {
   onBack: () => void;
   currentUser: User | null;
+  onUpdateUser: (updatedUser: User) => void; // Add onUpdateUser prop
   // Add other props as needed
 }
 
-export default function EditProfilePage({ onBack, currentUser }: EditProfilePageProps) {
+export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: EditProfilePageProps) {
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('profile_1_s');
@@ -68,8 +69,7 @@ export default function EditProfilePage({ onBack, currentUser }: EditProfilePage
       }
 
       const updatedUser = await response.json();
-      // You might want to update the currentUser state in App.tsx
-      // For now, just navigate back
+      onUpdateUser(updatedUser); // Call onUpdateUser to update currentUser in App.tsx
       onBack();
     } catch (error: any) {
       console.error('Error updating profile:', error);
