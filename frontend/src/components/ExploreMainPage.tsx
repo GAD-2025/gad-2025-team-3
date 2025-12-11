@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft } from 'react-feather';
-import svgPaths from "../imports/svg-6lwitwjk3d";
+import { ChevronDown, ChevronLeft, Eye, Heart } from 'react-feather';
 
 interface ExploreMainPageProps {
   onBack: () => void;
-  onSearch: (searchQuery: string) => void;
   onExhibitionClick: (id: string) => void;
 }
 
@@ -13,15 +11,19 @@ interface Exhibition {
   id: number;
   title: string;
   author: string;
-  room: string; // Assuming room is part of the data, if not, it needs adjustment
-  // Add any other properties that come from the API
+  views: number;
+  likes: number;
+  createdAt: string;
+  thumbnail: string;
 }
 
-export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }: ExploreMainPageProps) {
+export default function ExploreMainPage({ onBack, onExhibitionClick }: ExploreMainPageProps) {
   const [selectedTag, setSelectedTag] = useState('인기 쇼케이스');
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOption, setSortOption] = useState({ value: 'views', text: '조회수 순' }); // Default sort option
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
 
   const tags = [
@@ -37,11 +39,11 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
   const fetchExhibitions = async (tagToSearch: string) => {
     try {
       setLoading(true);
-      let url = `${import.meta.env.VITE_API_URL}/api/exhibitions`;
+      let url = `${import.meta.env.VITE_API_URL}/api/exhibitions?sort=${sortOption.value}`;
 
       if (tagToSearch !== '인기 쇼케이스') {
         const formattedTag = tagToSearch.startsWith('#') ? tagToSearch : `#${tagToSearch}`;
-        url += `?hashtag=${encodeURIComponent(formattedTag)}`;
+        url += `&hashtag=${encodeURIComponent(formattedTag)}`;
       }
 
       const response = await fetch(url);
@@ -49,8 +51,7 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
         throw new Error('Failed to fetch exhibitions');
       }
       const data: Exhibition[] = await response.json();
-      const exhibitionsWithRoom = data.map(ex => ({ ...ex, room: String(ex.id) }));
-      setExhibitions(exhibitionsWithRoom);
+      setExhibitions(data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -60,7 +61,7 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
 
   useEffect(() => {
     fetchExhibitions(selectedTag);
-  }, [selectedTag]);
+  }, [selectedTag, sortOption]);
 
 
   
@@ -92,31 +93,7 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
                 </div>
               </div>
               
-              {/* Search Button */}
-              <button 
-                onClick={() => onSearch('')}
-                className="relative shrink-0 size-[20px] cursor-pointer" 
-                data-name="Button"
-              >
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start relative size-[20px]">
-                  <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                    <div className="absolute inset-[69.42%_12.5%_12.5%_69.42%]" data-name="Vector">
-                      <div className="absolute inset-[-23.04%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 6 6">
-                          <path d="M4.45 4.45L0.833333 0.833333" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="absolute inset-[12.5%_20.83%_20.83%_12.5%]" data-name="Vector">
-                      <div className="absolute inset-[-6.25%]">
-                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
-                          <path d={svgPaths.p32110270} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </button>
+              <div className="w-5" />
             </div>
           </div>
         </div>
@@ -129,7 +106,7 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
           <div className="size-full">
             <div className="box-border content-stretch flex flex-col gap-[12px] items-start pb-0 pt-[16px] px-[24px] relative w-full">
               <div className="content-stretch flex items-start relative shrink-0" data-name="Container">
-                <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[#4a5565] text-[18px] w-[345px]">★ Featured</p>
+                <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-black text-[18px] w-[345px]">★ Featured</p>
               </div>
               
               <div className="content-start flex flex-wrap gap-[10px] items-start relative shrink-0 w-[349px]">
@@ -159,46 +136,85 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
       </div>
 
       {/* Exhibition Archive Section */}
-      <div className="relative shrink-0 w-full" data-name="Container">
+      <div className="relative shrink-0 w-full pb-[24px] z-0" data-name="Container">
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[18px] items-start pb-0 pt-[20px] px-[24px] relative w-full">
-            <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[#4a5565] text-[18px] text-nowrap whitespace-pre">Exhibition Archive</p>
+            <div className="content-stretch flex justify-between items-center relative shrink-0 w-full" data-name="Heading 2">
+              <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-black text-[18px] text-nowrap whitespace-pre">Exhibition Archive</p>
+              
+              {/* Filter Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="bg-white border border-black px-4 py-2 flex items-center gap-2 cursor-pointer"
+                >
+                  <span className="font-['Pretendard',sans-serif] text-[14px] text-black">
+                    {sortOption.text}
+                  </span>
+                  <ChevronDown className="size-4" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-[120px] bg-white border border-black shadow-lg z-10">
+                    <div className="bg-[#FF69B4] text-white px-4 py-2 font-['Pretendard',sans-serif] text-[14px]">
+                      {sortOption.text}
+                    </div>
+                    {sortOption.value !== 'views' && (
+                      <button
+                        onClick={() => { setSortOption({ value: 'views', text: '조회수 순' }); setIsDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 font-['Pretendard',sans-serif] text-[14px] text-black"
+                      >
+                        조회수 순
+                      </button>
+                    )}
+                    {sortOption.value !== 'likes' && (
+                      <button
+                        onClick={() => { setSortOption({ value: 'likes', text: '좋아요 순' }); setIsDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 font-['Pretendard',sans-serif] text-[14px] text-black"
+                      >
+                        좋아요 순
+                      </button>
+                    )}
+                    {sortOption.value !== 'latest' && (
+                      <button
+                        onClick={() => { setSortOption({ value: 'latest', text: '최신 순' }); setIsDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 font-['Pretendard',sans-serif] text-[14px] text-black"
+                      >
+                        최신 순
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             
-            <div className="content-start flex flex-wrap gap-[16px] items-start relative shrink-0 w-[342px]">
+            <div className="grid grid-cols-2 gap-[16px] items-start relative shrink-0 w-full">
               {exhibitions.map((exhibition) => (
                 <button
                   key={exhibition.id} 
                   onClick={() => onExhibitionClick(String(exhibition.id))} 
-                  className="h-[305.1px] relative shrink-0 w-[163px] cursor-pointer hover:opacity-80 transition-opacity" 
+                  className="flex flex-col relative shrink-0 w-full cursor-pointer hover:opacity-80 transition-opacity border-[1.6px] border-black" 
                   data-name="Container"
                 >
-                  <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-                  
-                  {/* Room Number */}
-                  <div className="absolute bg-white box-border content-stretch flex flex-col h-[64.6px] items-start justify-center left-[1.6px] pb-[4px] pt-0 px-[12px] top-[1.6px] w-[159.8px]" data-name="Container">
-                    <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
-                    <div className="box-border content-stretch flex items-start justify-start mb-[-4px] opacity-60 relative shrink-0 w-full" data-name="Container">
-                      <p className="basis-0 font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[12px] text-black tracking-[0.3px]">Room</p>
-                    </div>
-                    <div className="box-border content-stretch flex gap-[10px] items-center mb-[-4px] relative shrink-0 w-full" data-name="Container">
-                      <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-black text-nowrap whitespace-pre">{exhibition.room}</p>
-                    </div>
-                  </div>
-                  
                   {/* Image Placeholder */}
-                  <div className="absolute bg-gray-50 left-[1.6px] size-[159.8px] top-[66.2px]" data-name="Container">
-                    <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
+                  <div className="h-[160px] w-full bg-gray-50">
+                    <img src={exhibition.thumbnail} alt={exhibition.title} className="w-full h-full object-cover" />
                   </div>
                   
                   {/* Title and Author */}
-                  <div className="absolute box-border content-stretch flex flex-col gap-[8px] h-[77.5px] items-start left-[1.6px] pb-0 pt-[12px] px-[12px] top-[226px] w-[159.8px]" data-name="Container">
-                    <div className="h-[32px] overflow-clip relative shrink-0 w-full" data-name="Heading 3">
-                      <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[12px] text-black text-nowrap top-[0.2px] tracking-[-0.24px] whitespace-pre">{exhibition.title}</p>
+                  <div className="flex flex-col gap-[8px] p-[12px]">
+                    <div className="h-auto overflow-clip relative shrink-0 w-full" data-name="Heading 3">
+                      <div className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[12px] text-black tracking-[-0.24px] whitespace-normal text-left">{exhibition.title}</div>
                     </div>
                     <div className="content-stretch flex h-[13.5px] items-start relative shrink-0 w-full" data-name="Container">
-                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px]">{exhibition.author}</p>
+                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px]">by {exhibition.author}</p>
+                    </div>
+                    <div className="content-stretch flex h-[13.5px] items-center relative shrink-0 w-full" data-name="Container">
+                      <Eye className="size-3 text-[#4a5565] mr-1" />
+                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px] mr-2">{exhibition.views}</p>
+                      <Heart className="size-3 text-[#4a5565] mr-1" />
+                      <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px]">{exhibition.likes}</p>
                     </div>
                   </div>
                 </button>

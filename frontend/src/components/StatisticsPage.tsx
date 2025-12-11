@@ -115,15 +115,7 @@ export default function StatisticsPage({
 
   // 에러 발생 시 (흰 화면 대신 메시지 출력)
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white text-black p-6 text-center">
-        <p className="text-red-500 font-bold mb-2">오류 발생</p>
-        <p className="mb-4 text-gray-600">{error}</p>
-        <button onClick={onBack} className="px-4 py-2 bg-black text-white text-sm rounded hover:bg-gray-800">
-          돌아가기
-        </button>
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
   }
 
   // 데이터가 없을 때

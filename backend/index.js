@@ -328,7 +328,7 @@ app.post('/api/exhibitions', async (req, res) => {
 
 // API for fetching exhibitions
 app.get('/api/exhibitions', async (req, res) => {
-    const { userId, hashtag } = req.query; // Added 'hashtag'
+    const { userId, hashtag, sort } = req.query; // Added 'hashtag' and 'sort'
 
     try {
         const connection = await pool.getConnection();
@@ -344,10 +344,9 @@ app.get('/api/exhibitions', async (req, res) => {
                 e.likes,
                 e.shares,
                 e.created_at,
-                e.room_number,
-                e.room_creation_count,
                 e.hashtags,
-                u.nickname as author
+                u.nickname as author,
+                (SELECT item_url FROM exhibition_items WHERE exhibition_id = e.id ORDER BY id LIMIT 1) as thumbnail
             FROM
                 exhibitions e
             JOIN
@@ -373,7 +372,13 @@ app.get('/api/exhibitions', async (req, res) => {
             query += ' WHERE ' + conditions.join(' AND ');
         }
 
-        query += ' ORDER BY e.created_at DESC';
+        let orderBy = ' ORDER BY e.created_at DESC'; // Default sort
+        if (sort === 'views') {
+            orderBy = ' ORDER BY e.views DESC';
+        } else if (sort === 'likes') {
+            orderBy = ' ORDER BY e.likes DESC';
+        }
+        query += orderBy;
 
         const [rows] = await connection.execute(query, params);
         connection.release();
@@ -413,8 +418,6 @@ app.get('/api/exhibitions/:id', async (req, res) => {
                 e.likes, 
                 e.shares, 
                 e.created_at,
-                e.room_number,
-                e.room_creation_count,
                 e.hashtags,
                 u.nickname as author
             FROM 
