@@ -328,38 +328,49 @@ app.post('/api/exhibitions', async (req, res) => {
 
 // API for fetching exhibitions
 app.get('/api/exhibitions', async (req, res) => {
-    const { userId } = req.query;
+    const { userId, hashtag } = req.query; // Added 'hashtag'
 
     try {
         const connection = await pool.getConnection();
         let query = `
-            SELECT 
-                e.id, 
-                e.title, 
-                e.description, 
-                e.start_date, 
-                e.end_date, 
-                e.is_public, 
-                e.views, 
-                e.likes, 
-                e.shares, 
+            SELECT
+                e.id,
+                e.title,
+                e.description,
+                e.start_date,
+                e.end_date,
+                e.is_public,
+                e.views,
+                e.likes,
+                e.shares,
                 e.created_at,
                 e.room_number,
                 e.room_creation_count,
                 e.hashtags,
                 u.nickname as author
-            FROM 
+            FROM
                 exhibitions e
-            JOIN 
+            JOIN
                 users u ON e.user_id = u.id
         `;
         const params = [];
+        const conditions = [];
 
         if (userId) {
-            query += ' WHERE e.user_id = ?';
+            conditions.push('e.user_id = ?');
             params.push(userId);
         } else {
-            query += ' WHERE e.is_public = TRUE'; // Only show public exhibitions if no specific user is requested
+            conditions.push('e.is_public = TRUE');
+        }
+
+        // Add hashtag filtering
+        if (hashtag) {
+            conditions.push('FIND_IN_SET(?, e.hashtags)');
+            params.push(hashtag);
+        }
+
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
         }
 
         query += ' ORDER BY e.created_at DESC';
@@ -373,7 +384,6 @@ app.get('/api/exhibitions', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 app.get('/api/exhibitions/:id', async (req, res) => {
     const { id } = req.params;
 

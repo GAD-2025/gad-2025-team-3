@@ -23,39 +23,46 @@ export default function ExploreMainPage({ onBack, onSearch, onExhibitionClick }:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
   const tags = [
     '인기 쇼케이스',
-    'nct 127',
-    'New jeans',
-    'exo',
-    'red velvet',
-    '아이유',
-    'seventeen'
+    '#nct 127',
+    '#New jeans',
+    '#exo',
+    '#red velvet',
+    '#아이유',
+    '#seventeen'
   ];
 
-  useEffect(() => {
-    const fetchExhibitions = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch exhibitions');
-        }
-        const data: Exhibition[] = await response.json();
-        // The backend provides 'id' and 'author', but not 'room'. We'll use id as a stand-in for now.
-        const exhibitionsWithRoom = data.map(ex => ({ ...ex, room: String(ex.id) }));
-        setExhibitions(exhibitionsWithRoom);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchExhibitions = async (tagToSearch: string) => {
+    try {
+      setLoading(true);
+      let url = `${import.meta.env.VITE_API_URL}/api/exhibitions`;
+
+      if (tagToSearch !== '인기 쇼케이스') {
+        const formattedTag = tagToSearch.startsWith('#') ? tagToSearch : `#${tagToSearch}`;
+        url += `?hashtag=${encodeURIComponent(formattedTag)}`;
       }
-    };
 
-    fetchExhibitions();
-  }, []); // Empty dependency array means this runs once on mount
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch exhibitions');
+      }
+      const data: Exhibition[] = await response.json();
+      const exhibitionsWithRoom = data.map(ex => ({ ...ex, room: String(ex.id) }));
+      setExhibitions(exhibitionsWithRoom);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // ... (rest of the component will be updated to use the new state)
+  useEffect(() => {
+    fetchExhibitions(selectedTag);
+  }, [selectedTag]);
+
+
   
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;

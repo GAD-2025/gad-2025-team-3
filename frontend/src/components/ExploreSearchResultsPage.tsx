@@ -3,17 +3,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'react-feather';
 import svgPaths from "../imports/svg-jbhf0egdok";
 
+// Define the type for a single exhibition based on the backend response
+interface Exhibition {
+  id: number;
+  title: string;
+  author: string;
+  room_number: string; // Adjusted to match backend `room_number`
+  views: string; // Backend returns number, but UI displays formatted string
+  likes: string; // Backend returns number, but UI displays formatted string
+  shares: string; // Backend returns number, but UI displays formatted string
+  description: string;
+  hashtags: string; // Backend returns comma-separated string
+}
+
 interface ExploreSearchResultsPageProps {
   onBack: () => void;
-  onExhibitionClick?: (data: {
-    id: string;
-    title: string;
-    author: string;
-    room: string;
-    views: string;
-    likes: string;
-    shares: string;
-  }) => void;
+  onExhibitionClick?: (exhibition: Exhibition) => void; // Updated to pass full exhibition object
 }
 
 export default function ExploreSearchResultsPage({
@@ -26,80 +31,62 @@ export default function ExploreSearchResultsPage({
 
   const [inputSearchText, setInputSearchText] = useState(initialSearchQuery);
   const [submittedSearchText, setSubmittedSearchText] = useState(initialSearchQuery);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Effect to redirect if submittedSearchText becomes empty
   useEffect(() => {
     if (submittedSearchText === '') {
-      // Only redirect if it's not the initial empty state from a direct URL access
-      // or if the user explicitly cleared the search.
-      // We can refine this later if needed, but for now, if it's empty, go to trending.
       navigate('/explore/trending');
     }
   }, [submittedSearchText, navigate]);
 
-  const allResults = [
-    {
-      id: 'bts-army-global-exhibition',
-      title: 'BTS ARMY 글로벌 전시관',
-      description: '전 세계 ARMY들의 추억을 모은 특별한 공간입니다.',
-      author: 'army_forever',
-      room: '201',
-      views: '8,900',
-      likes: '1,240',
-      shares: '156'
-    },
-    {
-      id: 'nct-127-fanart-gallery',
-      title: 'NCT 127 팬아트 갤러리',
-      description: 'NCT 127 팬들의 창작물을 모은 갤러리입니다.',
-      author: 'nctzen_art',
-      room: '204',
-      views: '4,327',
-      likes: '567',
-      shares: '89'
-    },
-    {
-      id: 'blackpink-world-tour',
-      title: 'BLACKPINK 월드투어',
-      description: '월드투어의 감동을 함께 나누는 공간입니다.',
-      author: 'blink_official',
-      room: '203',
-      views: '6,543',
-      likes: '892',
-      shares: '123'
-    }
-  ];
-
-  const filteredResults = allResults.filter(result => {
-    if (!submittedSearchText) return false; // No results if no search has been submitted
-
-    const lowerCaseSearchText = submittedSearchText.toLowerCase();
-    const btsKeywords = ['bts', '비티에스'];
-
-    // Check if the submitted search text itself contains a BTS keyword
-    const searchContainsBTSKeyword = btsKeywords.some(keyword => lowerCaseSearchText.includes(keyword));
-
-    // Prepare result fields for case-insensitive comparison
-    const lowerCaseTitle = result.title.toLowerCase();
-    const lowerCaseDescription = result.description.toLowerCase();
-
-    if (searchContainsBTSKeyword) {
-      // If the search query is BTS-related, check if the result's title or description contains 'bts' or '비티에스' (case-insensitive)
-      return lowerCaseTitle.includes('bts') || lowerCaseDescription.includes('bts') ||
-             lowerCaseTitle.includes('비티에스') || lowerCaseDescription.includes('비티에스');
+  const fetchSearchResults = async (query: string) => {
+    if (!query) {
+      setExhibitions([]);
+      return;
     }
 
-    // General search: check if title, description, or author contains the submitted search text (case-insensitive)
-    return lowerCaseTitle.includes(lowerCaseSearchText) ||
-           lowerCaseDescription.includes(lowerCaseSearchText) ||
-           result.author.toLowerCase().includes(lowerCaseSearchText);
-  });
+    setLoading(true);
+    setError(null);
+    try {
+      // Ensure the query starts with '#' for hashtag search, as backend expects it
+      const formattedQuery = query.startsWith('#') ? query : `#${query}`;
+      const url = `${import.meta.env.VITE_API_URL}/api/exhibitions?hashtag=${encodeURIComponent(formattedQuery)}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch search results');
+      }
+      const data = await response.json();
+      // Adjust backend data to match Exhibition interface for 'room' and numeric values if necessary
+      const processedExhibitions = data.map((ex: any) => ({
+        ...ex,
+        room_number: String(ex.room_number),
+        views: String(ex.views),
+        likes: String(ex.likes),
+        shares: String(ex.shares),
+      }));
+      setExhibitions(processedExhibitions);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching search results.');
+      setExhibitions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    fetchSearchResults(submittedSearchText);
+  }, [submittedSearchText]);
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       setSubmittedSearchText(inputSearchText);
     }
   };
+
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
       {/* Header */}
@@ -146,64 +133,70 @@ export default function ExploreSearchResultsPage({
       <div className="h-[370.4px] relative shrink-0 w-full" data-name="Container">
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[24px] h-[370.4px] items-start pb-0 pt-[24px] px-[24px] relative w-full">
-            <div className="h-[18px] relative shrink-0 w-full" data-name="Heading 2">
-              <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] top-[-0.2px] tracking-[-0.24px] w-[84px]">검색 결과 {filteredResults.length}개</p>
-            </div>
-            
-            <div className="content-stretch flex flex-col gap-[16px] h-[280.4px] items-start relative shrink-0 w-full" data-name="Container">
-              {filteredResults.map((result, index) => (
-                <button
-                  key={index}
-                  onClick={() => onExhibitionClick && onExhibitionClick(result)}
-                  className="h-[82.8px] relative shrink-0 w-full cursor-pointer hover:bg-gray-50 transition-colors" 
-                  data-name="Container"
-                >
-                  <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
-                  <div className="size-full">
-                    <div className="box-border content-stretch flex flex-col h-[82.8px] items-start p-[1.6px] relative w-full">
-                      <div className="h-[79.6px] relative shrink-0 w-full" data-name="Container">
-                        <div className="size-full">
-                          <div className="box-border content-stretch flex flex-col gap-[8px] h-[79.6px] items-start pb-0 pt-[16px] px-[16px] relative w-full">
-                            {/* Title and Number */}
-                            <div className="h-[23.1px] relative shrink-0 w-full" data-name="Container">
-                              <div className="flex flex-row items-center size-full">
-                                <div className="content-stretch flex h-[23.1px] items-center justify-between relative w-full">
-                                  <div className="basis-0 grow min-h-px min-w-px relative shrink-0" data-name="Heading 3">
-                                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center relative w-full">
-                                      <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">{result.title}</p>
-                                    </div>
-                                  </div>
-                                  <div className="h-full relative shrink-0" data-name="Container">
-                                    <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
-                                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] h-full items-center justify-center px-[9px] py-[4px] relative">
-                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[0.3px] whitespace-pre">{result.room}</p>
+            {loading && <p className="text-center w-full text-gray-500">검색 중...</p>}
+            {error && <p className="text-center w-full text-red-500">오류: {error}</p>}
+            {!loading && !error && (
+              <>
+                <div className="h-[18px] relative shrink-0 w-full" data-name="Heading 2">
+                  <p className="absolute font-['Pretendard',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] top-[-0.2px] tracking-[-0.24px] w-[84px]">검색 결과 {exhibitions.length}개</p>
+                </div>
+                
+                <div className="content-stretch flex flex-col gap-[16px] h-[280.4px] items-start relative shrink-0 w-full" data-name="Container">
+                  {exhibitions.map((exhibition, index) => (
+                    <button
+                      key={exhibition.id || index} // Use exhibition.id for key
+                      onClick={() => onExhibitionClick && onExhibitionClick(exhibition)}
+                      className="h-[82.8px] relative shrink-0 w-full cursor-pointer hover:bg-gray-50 transition-colors" 
+                      data-name="Container"
+                    >
+                      <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
+                      <div className="size-full">
+                        <div className="box-border content-stretch flex flex-col h-[82.8px] items-start p-[1.6px] relative w-full">
+                          <div className="h-[79.6px] relative shrink-0 w-full" data-name="Container">
+                            <div className="size-full">
+                              <div className="box-border content-stretch flex flex-col gap-[8px] h-[79.6px] items-start pb-0 pt-[16px] px-[16px] relative w-full">
+                                {/* Title and Number */}
+                                <div className="h-[23.1px] relative shrink-0 w-full" data-name="Container">
+                                  <div className="flex flex-row items-center size-full">
+                                    <div className="content-stretch flex h-[23.1px] items-center justify-between relative w-full">
+                                      <div className="basis-0 grow min-h-px min-w-px relative shrink-0" data-name="Heading 3">
+                                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center relative w-full">
+                                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">{exhibition.title}</p>
+                                        </div>
+                                      </div>
+                                      <div className="h-full relative shrink-0" data-name="Container">
+                                        <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
+                                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] h-full items-center justify-center px-[9px] py-[4px] relative">
+                                          <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[0.3px] whitespace-pre">{exhibition.room_number}</p>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
 
-                            {/* Author and Views */}
-                            <div className="content-stretch flex h-[16.5px] items-center justify-between relative shrink-0 w-full" data-name="Container">
-                              <div className="relative shrink-0" data-name="Text">
-                                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-                                  <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">by {result.author}</p>
-                                </div>
-                              </div>
-                              <div className="relative shrink-0" data-name="Text">
-                                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-                                  <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">조회 {result.views}</p>
+                                {/* Author and Views */}
+                                <div className="content-stretch flex h-[16.5px] items-center justify-between relative shrink-0 w-full" data-name="Container">
+                                  <div className="relative shrink-0" data-name="Text">
+                                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">by {exhibition.author}</p>
+                                    </div>
+                                  </div>
+                                  <div className="relative shrink-0" data-name="Text">
+                                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
+                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">조회 {exhibition.views}</p>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
