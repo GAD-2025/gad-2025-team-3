@@ -517,7 +517,7 @@ app.delete('/api/exhibitions/:id', async (req, res) => {
 // API for updating an exhibition
 app.put('/api/exhibitions/:id', async (req, res) => {
     const { id } = req.params;
-    const { title, description, start_date, end_date, is_public, username } = req.body;
+    const { title, description, start_date, end_date, is_public, hashtags, username } = req.body;
 
     if (!id || !title || !start_date || !end_date || username === undefined) {
         return res.status(400).json({ message: 'Missing required exhibition fields or authorization info.' });
@@ -562,8 +562,8 @@ app.put('/api/exhibitions/:id', async (req, res) => {
 
         // 4. Update the exhibition
         const [updateResult] = await connection.execute(
-            'UPDATE exhibitions SET title = ?, description = ?, start_date = ?, end_date = ?, is_public = ? WHERE id = ?',
-            [title, description, start_date, end_date, is_public, id]
+            'UPDATE exhibitions SET title = ?, description = ?, start_date = ?, end_date = ?, is_public = ?, hashtags = ? WHERE id = ?',
+            [title, description, start_date, end_date, is_public, hashtags, id]
         );
 
         if (updateResult.affectedRows === 0) {

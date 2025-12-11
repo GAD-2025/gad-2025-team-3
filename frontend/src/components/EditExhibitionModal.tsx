@@ -31,6 +31,7 @@ interface ExhibitionData {
   end_date: string;
   is_public: boolean;
   imageUrls: string[];
+  hashtags: string[]; // Added hashtags property
 }
 
 interface EditExhibitionModalProps {
@@ -47,6 +48,8 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
   const [startDate] = useState<Date | undefined>(normalizeDateToMidnight(new Date()));
   const [endDate, setEndDate] = useState<Date | undefined>(new Date(exhibition.end_date));
   const [isPublic, setIsPublic] = useState(exhibition.is_public);
+  const [hashtags, setHashtags] = useState<string[]>(exhibition.hashtags || []); // New state for hashtags
+  const [newHashtagInput, setNewHashtagInput] = useState(''); // State for new hashtag input
 
   // Update state if exhibition prop changes (only for editable fields)
   useEffect(() => {
@@ -54,6 +57,7 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
     setDescription(exhibition.description || '');
     setEndDate(new Date(exhibition.end_date));
     setIsPublic(exhibition.is_public);
+    setHashtags(exhibition.hashtags || []); // Update hashtags from prop
   }, [exhibition]);
 
   if (!isOpen) return null;
@@ -78,9 +82,31 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
       start_date: startDate.toISOString().split('T')[0], // Convert Date object back to string for backend
       end_date: endDate.toISOString().split('T')[0],     // Convert Date object back to string for backend
       is_public: isPublic,
+      hashtags: hashtags, // Include hashtags in the updated exhibition
     };
     onSave(updatedExhibition);
     onClose();
+  };
+
+  const handleRemoveHashtag = (tagToRemove: string) => {
+    setHashtags(hashtags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmedInput = newHashtagInput.trim();
+      if (trimmedInput) {
+        // Ensure hashtag starts with '#'
+        const formattedTag = trimmedInput.startsWith('#') ? trimmedInput : `#${trimmedInput}`;
+        if (!hashtags.includes(formattedTag)) {
+          setHashtags([...hashtags, formattedTag]);
+          setNewHashtagInput('');
+        }
+      }
+    } else if (e.key === 'Backspace' && newHashtagInput === '') {
+      setHashtags(hashtags.slice(0, -1));
+    }
   };
 
   return (
@@ -122,6 +148,8 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
               />
             </div>
 
+
+
             {/* Exhibition Period - Calendar Selection */}
             <div className="flex flex-col gap-[8px]">
               <label className="font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px] text-[#4a5565]">전시 기간</label>
@@ -136,7 +164,7 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
                     >
                       <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                         <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
-                          <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!startDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
+                          <span className={`font-['Pretendard',sans-serif] leading-[18px] not-italic text-[12px] tracking-[-0.28px] ${!startDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
                             {startDate ? formatDate(startDate) : '시작일'}
                           </span>
                           <CalendarIcon className={`size-4 ${!startDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
@@ -165,7 +193,7 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
                     >
                       <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
                         <div className="box-border content-stretch flex h-[48.2px] items-center justify-between px-[16px] py-[12px] relative w-full">
-                          <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!endDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
+                          <span className={`font-['Pretendard',sans-serif] leading-[18px] not-italic text-[12px] tracking-[-0.28px] ${!endDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`}>
                             {endDate ? formatDate(endDate) : '종료일'}
                           </span>
                           <CalendarIcon className={`size-4 ${!endDate ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
@@ -222,6 +250,30 @@ export default function EditExhibitionModal({ isOpen, onClose, exhibition, onSav
                   </div>
                   <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                 </button>
+              </div>
+            </div>
+
+            {/* Hashtags */}
+            <div className="flex flex-col gap-[8px]">
+              <label htmlFor="hashtags" className="font-['Pretendard',sans-serif] text-[12px] tracking-[-0.24px] text-[#4a5565]">해시태그</label>
+              <div className="flex items-center gap-[8px] flex-wrap border-[1.6px] border-black border-solid p-[12px] min-h-[48.2px]">
+                {hashtags.map((tag, index) => (
+                  <span key={index} className="flex items-center bg-[#eee] px-[8px] py-[4px] rounded-full text-[12px]">
+                    {tag}
+                    <button type="button" onClick={() => handleRemoveHashtag(tag)} className="ml-[4px] text-gray-500 hover:text-gray-700">
+                      &times;
+                    </button>
+                  </span>
+                ))}
+                <input
+                  id="hashtags"
+                  type="text"
+                  value={newHashtagInput}
+                  onChange={(e) => setNewHashtagInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 min-w-[100px] font-['Pretendard',sans-serif] text-[14px] text-black tracking-[-0.28px] outline-none"
+                  placeholder="해시태그는 최대 10개까지 추가할 수 있습니다."
+                />
               </div>
             </div>
 

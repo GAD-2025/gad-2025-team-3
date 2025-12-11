@@ -58,6 +58,7 @@ export default function ExhibitionDetailPage({
   const [showOptionsMenu, setShowOptionsMenu] = useState(false); // State for the "More" options menu visibility
   const [showEditModal, setShowEditModal] = useState(false); // State for Edit Exhibition Modal visibility
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [hashtagRenderKey, setHashtagRenderKey] = useState(0); // New state to force re-render of hashtags
 
   // Derived state for the current image URL
   const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
@@ -328,7 +329,11 @@ export default function ExhibitionDetailPage({
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ ...updatedExhibition, username: currentUser.username }),
+            body: JSON.stringify({
+                ...updatedExhibition,
+                hashtags: updatedExhibition.hashtags.join(','), // Convert array to comma-separated string
+                username: currentUser.username
+            }),
         });
 
         if (!response.ok) {
@@ -336,11 +341,15 @@ export default function ExhibitionDetailPage({
             throw new Error(errorData.message || 'Failed to update exhibition.');
         }
 
-        alert('전시회 정보가 성공적으로 업데이트되었습니다.');
-        setShowEditModal(false);
-        fetchExhibitionAndComments(); // Refresh data
+                                alert('전시회 정보가 성공적으로 업데이트되었습니다.');
 
-    } catch (err: any) {
+                                setShowEditModal(false);
+
+                                await fetchExhibitionAndComments(); // Refresh data
+
+                                setHashtagRenderKey(prev => prev + 1); // Increment key to force re-render of hashtags
+
+                    } catch (err: any) {
         console.error('Save exhibition error:', err.message);
         setError('Failed to save exhibition.');
         alert(`전시회 정보 저장 중 오류가 발생했습니다: ${err.message}`);
@@ -529,7 +538,7 @@ export default function ExhibitionDetailPage({
                 <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black tracking-[-0.24px] w-[336px]">{exhibitionData.description}</p>
               </div>
               {exhibitionData.hashtags && exhibitionData.hashtags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div key={hashtagRenderKey} className="flex flex-wrap gap-2 mt-4">
                   {exhibitionData.hashtags.map((tag, index) => (
                     <span key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]">
                       {tag}
