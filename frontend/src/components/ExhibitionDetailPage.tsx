@@ -142,10 +142,6 @@ export default function ExhibitionDetailPage({
 
   useEffect(() => {
     fetchExhibitionAndComments();
-    if (loggedInUserId && !showEditModal) { // Only set interval if edit modal is not open
-        const intervalId = setInterval(fetchExhibitionAndComments, 5000);
-        return () => clearInterval(intervalId);
-    }
   }, [id, loggedInUserId, showEditModal]);
 
   const handleLikeClick = async () => {
