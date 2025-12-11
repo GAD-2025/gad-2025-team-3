@@ -225,6 +225,10 @@ export default function ExhibitionDetailPage({
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim() || !id || isSubmittingComment) return;
+    if (!currentUser?.id) { // Ensure user is logged in
+      alert('댓글을 작성하려면 로그인해야 합니다.');
+      return;
+    }
 
     setIsSubmittingComment(true);
     try {
@@ -233,7 +237,7 @@ export default function ExhibitionDetailPage({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newComment, author: currentUser?.username || 'Anonymous' }),
+        body: JSON.stringify({ content: newComment, userId: currentUser.id }), // Use userId
       });
 
       if (!response.ok) {
@@ -288,13 +292,17 @@ export default function ExhibitionDetailPage({
     }
 
     try {
+      if (!currentUser?.id) { // Ensure user is logged in
+        alert('댓글을 삭제하려면 로그인해야 합니다.');
+        return;
+      }
       // Assuming a backend endpoint DELETE /api/comments/:commentId
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comments/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: currentUser?.username }),
+        body: JSON.stringify({ userId: currentUser.id }), // Use userId
       });
 
       if (!response.ok) {

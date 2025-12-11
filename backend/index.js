@@ -606,7 +606,7 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
-            'SELECT id, author, content, created_at FROM comments WHERE exhibition_id = ? ORDER BY created_at DESC',
+            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
             [id]
         );
         connection.release();
@@ -623,22 +623,23 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
 // API for posting a new comment to an exhibition
 app.post('/api/exhibitions/:id/comments', async (req, res) => {
     const { id } = req.params;
-    const { author, content } = req.body;
+    const { userId, content } = req.body; // Expect userId instead of author
 
-    if (!author || !content) {
-        return res.status(400).json({ message: 'Author and content are required for a comment.' });
+    if (!userId || !content) {
+        return res.status(400).json({ message: 'User ID and content are required for a comment.' });
     }
 
     try {
         const connection = await pool.getConnection();
         const [result] = await connection.execute(
-            'INSERT INTO comments (exhibition_id, author, content) VALUES (?, ?, ?)',
-            [id, author, content]
+            'INSERT INTO comments (exhibition_id, user_id, content) VALUES (?, ?, ?)', // Use user_id
+            [id, userId, content]
         );
 
         const newCommentId = result.insertId;
+        // Fetch the new comment along with the user's current nickname
         const [newCommentRows] = await connection.execute(
-            'SELECT id, author, content, created_at FROM comments WHERE id = ?',
+            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?',
             [newCommentId]
         );
         connection.release();
@@ -653,10 +654,10 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
 // API for deleting a comment
 app.delete('/api/comments/:commentId', async (req, res) => {
     const { commentId } = req.params;
-    const { username } = req.body; // Assuming username is passed for authorization
+    const { userId } = req.body; // Expect userId instead of username for authorization
 
-    if (!username) {
-        return res.status(401).json({ message: 'Authorization information (username) is required.' });
+    if (!userId) {
+        return res.status(401).json({ message: 'Authorization information (userId) is required.' });
     }
 
     const connection = await pool.getConnection();
@@ -665,7 +666,7 @@ app.delete('/api/comments/:commentId', async (req, res) => {
 
         // 1. Get the comment to verify author
         const [comments] = await connection.execute(
-            'SELECT author FROM comments WHERE id = ?',
+            'SELECT user_id FROM comments WHERE id = ?', // Select user_id
             [commentId]
         );
 
@@ -675,10 +676,10 @@ app.delete('/api/comments/:commentId', async (req, res) => {
             return res.status(404).json({ message: 'Comment not found.' });
         }
 
-        const commentAuthor = comments[0].author;
+        const commentUserId = comments[0].user_id;
 
         // 2. Authorize: check if the requesting user is the author of the comment
-        if (commentAuthor !== username) {
+        if (commentUserId !== userId) { // Compare user_id
             await connection.rollback();
             connection.release();
             return res.status(403).json({ message: 'You are not authorized to delete this comment.' });
