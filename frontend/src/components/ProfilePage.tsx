@@ -183,7 +183,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   </div>
                   {/* Bio */}
                   <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
-                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{user.bio || 'K-POP을 사랑하는 팬입니다 ❤️'}</p>
+                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{user.bio || 'K-POP을 사랑하는 팬입니다🩷'}</p>
                   </div>
                 </div>
 

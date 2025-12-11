@@ -11,9 +11,14 @@ type TemplateType = 'A' | 'B' | null;
 
 export default function CreateExhibitionPage({ onBack, onNext }: CreateExhibitionPageProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(null);
+  const [showVideoNotReadyPopup, setShowVideoNotReadyPopup] = useState(false); // New state for popup
 
   const handleTemplateClick = (templateId: TemplateType) => {
-    setSelectedTemplate(templateId);
+    if (templateId === 'B') {
+      setShowVideoNotReadyPopup(true); // Show popup for video template
+    } else {
+      setSelectedTemplate(templateId);
+    }
   };
 
   const isButtonEnabled = selectedTemplate !== null;
@@ -175,6 +180,20 @@ export default function CreateExhibitionPage({ onBack, onNext }: CreateExhibitio
           </div>
         </div>
       </div>
+
+      {showVideoNotReadyPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-[100] p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <p className="font-['Pretendard',sans-serif] text-[16px] text-black mb-4">비디오 기능은 준비 중입니다.</p>
+            <button
+              onClick={() => setShowVideoNotReadyPopup(false)}
+              className="bg-black text-white px-4 py-2 rounded hover:bg-[#f360c0] transition-colors"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
