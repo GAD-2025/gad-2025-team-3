@@ -779,6 +779,87 @@ app.delete('/api/comments/:commentId', async (req, res) => {
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+// API for updating a user's profile
+app.put('/api/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const { nickname, bio, profileIcon, username } = req.body;
+
+    if (!nickname || !username) {
+        return res.status(400).json({ message: 'Missing required fields.' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. Verify user exists and get their current details
+        const [users] = await connection.execute(
+            'SELECT * FROM users WHERE id = ?',
+            [userId]
+        );
+
+        if (users.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userToUpdate = users[0];
+
+        // 2. Authorize: check if the requesting user is the one being updated
+        if (userToUpdate.username !== username) {
+            await connection.rollback();
+            connection.release();
+            return res.status(403).json({ message: 'Forbidden: You are not authorized to update this profile.' });
+        }
+
+        // 3. If nickname is being changed, check for duplicates
+        if (nickname !== userToUpdate.nickname) {
+            const [duplicateRows] = await connection.execute(
+                'SELECT id FROM users WHERE nickname = ? AND id != ?',
+                [nickname, userId]
+            );
+            if (duplicateRows.length > 0) {
+                await connection.rollback();
+                connection.release();
+                return res.status(409).json({ message: 'Nickname already in use.' });
+            }
+        }
+
+        // 4. Update the user's profile
+        const [updateResult] = await connection.execute(
+            'UPDATE users SET nickname = ?, bio = ?, profileIcon = ? WHERE id = ?',
+            [nickname, bio, profileIcon, userId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'User not found or no changes made.' });
+        }
+
+        // 5. Fetch the updated user data to return
+        const [updatedUserRows] = await connection.execute(
+            'SELECT * FROM users WHERE id = ?',
+            [userId]
+        );
+
+        await connection.commit();
+        connection.release();
+
+        const { password: _, ...updatedUserWithoutPassword } = updatedUserRows[0];
+        res.status(200).json(updatedUserWithoutPassword);
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Update user profile error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for liking/unliking an exhibition
 app.post('/api/exhibitions/:id/like', async (req, res) => {
     const { id: exhibitionId } = req.params;

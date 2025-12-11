@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronLeft, Eye, Heart } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, Eye, Heart, Search } from 'react-feather';
 
 interface ExploreMainPageProps {
   onBack: () => void;
   onExhibitionClick: (id: string) => void;
+  onSearch: (searchQuery: string) => void;
 }
 
 // Define the type for a single exhibition based on the backend response
@@ -17,13 +19,17 @@ interface Exhibition {
   thumbnail: string;
 }
 
-export default function ExploreMainPage({ onBack, onExhibitionClick }: ExploreMainPageProps) {
+export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }: ExploreMainPageProps) {
   const [selectedTag, setSelectedTag] = useState('인기 쇼케이스');
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState({ value: 'views', text: '조회수 순' }); // Default sort option
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    fetchExhibitions(selectedTag);
+  }, [selectedTag, sortOption]);
 
 
   const tags = [
@@ -93,7 +99,9 @@ export default function ExploreMainPage({ onBack, onExhibitionClick }: ExploreMa
                 </div>
               </div>
               
-              <div className="w-5" />
+              <button onClick={() => onSearch('')} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors">
+                <Search className="size-5 text-black" />
+              </button>
             </div>
           </div>
         </div>

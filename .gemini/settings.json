@@ -2,6 +2,13 @@
   "mcpServers": {
     "figma": {
       "httpUrl": "https://mcp.figma.com/mcp"
+    },
+    "—transport": {
+      "command": "http",
+      "args": [
+        "figma",
+        "https://mcp.figma.com/mcp"
+      ]
     }
   },
   "model": {

@@ -1,4 +1,4 @@
-import { ChevronLeft } from 'react-feather';
+import { ChevronLeft, Edit } from 'react-feather';
 import svgPaths from "../imports/svg-cv3j1aafl9";
 import iconPaths from "../imports/svg-0l1y3hgd5b";
 import settingsSvgPaths from "../imports/svg-menh3de8oj";
@@ -27,9 +27,10 @@ interface ProfilePageProps {
   onNavigateToBadges: () => void;
   onNavigateToMyExhibition: () => void;
   onLogout: () => void;
+  onNavigateToEditProfile: () => void;
 }
 
-export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToMyExhibition, onLogout }: ProfilePageProps) {
+export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToMyExhibition, onLogout, onNavigateToEditProfile }: ProfilePageProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteAccount = async () => { // reason 매개변수 제거
@@ -167,19 +168,11 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                       </div>
                     </div>
                     {/* Edit Icon */}
-                    <div className="relative shrink-0 size-[24px]" data-name="Button">
+                    <button onClick={onNavigateToEditProfile} className="relative shrink-0 size-[24px]" data-name="Button">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[4px] px-[4px] relative size-[24px]">
-                        <div className="h-[16px] overflow-clip relative shrink-0 w-full" data-name="Icon">
-                          <div className="absolute inset-[8.33%_8.33%_8.34%_8.33%]" data-name="Vector">
-                            <div className="absolute inset-[-5%]">
-                              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
-                                <path d={svgPaths.p4290a20} id="Vector" stroke="var(--stroke-0, #99A1AF)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
+                        <Edit className="size-4 text-gray-500" />
                       </div>
-                    </div>
+                    </button>
                   </div>
                   {/* Bio */}
                   <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">

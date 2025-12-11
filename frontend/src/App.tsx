@@ -20,6 +20,7 @@ import ExploreSearchResultsPage from './components/ExploreSearchResultsPage';
 import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 import FavoritesPage from './components/FavoritesPage';
+import EditProfilePage from './components/EditProfilePage';
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -558,9 +559,11 @@ export default function App() {
             onNavigateToBadges={() => navigate('/badges')}
             onNavigateToMyExhibition={() => navigate('/myexhibition')}
             onLogout={handleLogout}
+            onNavigateToEditProfile={() => navigate('/profile/edit')}
           />
         )
       } />
+      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} />} />
       <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
       <Route path="/myexhibition" element={
         <MyExhibitionPage 
