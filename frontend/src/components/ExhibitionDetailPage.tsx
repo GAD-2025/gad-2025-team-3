@@ -60,6 +60,7 @@ export default function ExhibitionDetailPage({
   const [showEditModal, setShowEditModal] = useState(false); // State for Edit Exhibition Modal visibility
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [hashtagRenderKey, setHashtagRenderKey] = useState(0); // New state to force re-render of hashtags
+  const commentTextareaRef = useRef<HTMLTextAreaElement>(null); // Added useRef for textarea
 
   // Derived state for the current image URL
   const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
@@ -248,6 +249,9 @@ export default function ExhibitionDetailPage({
       const postedComment: Comment = await response.json();
       setComments((prevComments) => [postedComment, ...prevComments]);
       setNewComment('');
+      if (commentTextareaRef.current) {
+        commentTextareaRef.current.style.height = 'auto'; // Reset textarea height
+      }
     } catch (err: any) {
       console.error('Error posting comment:', err.message);
       setError('Failed to post comment.');
@@ -634,36 +638,43 @@ export default function ExhibitionDetailPage({
         </div>
         
         <div className="relative shrink-0 w-full px-[24px] pb-[24px]" data-name="Container">
-          <div className="flex items-center justify-between w-full h-[59px] border-[1.6px] border-black overflow-hidden bg-white">
+          <div className="flex items-end w-full border-[1.6px] border-black overflow-hidden bg-white min-h-[59px]">
             <button
               onClick={handleLikeClick}
-              className="flex items-center justify-center shrink-0 size-[59px] cursor-pointer hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-center shrink-0 size-[59px] cursor-pointer hover:bg-gray-100 transition-colors self-start"
               aria-label="Like exhibition"
             >
               <Heart size={24} color={isLiked ? "#f360c0" : "black"} fill={isLiked ? "#f360c0" : "none"} />
             </button>
-            <input
-              type="text"
+            <textarea
+              ref={commentTextareaRef} // Added ref
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = target.scrollHeight + 'px';
+              }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey) { // Submit on Enter, but not on Shift+Enter
                   e.preventDefault(); // Prevent default form submission
                   if (newComment.trim()) { // Only submit if comment is not empty
                     handleCommentSubmit();
                   }
                 }
               }}
+              rows={1} // Initial height
               placeholder="응원 댓글을 입력해보세요."
-              className="font-['Pretendard',sans-serif] leading-[20px] not-italic w-full h-full text-[14px] text-black placeholder:text-gray-400 tracking-[-0.28px] bg-transparent border-none outline-none"
-            />
+              className="font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] text-black placeholder:text-gray-400 tracking-[-0.28px] bg-transparent border-none outline-none resize-none overflow-hidden flex-grow px-2 py-5"
+              style={{ maxHeight: '150px' }} // Optional: set a max height
+            ></textarea>
             <button
               onClick={handleCommentSubmit}
-              className="bg-black flex items-center justify-center shrink-0 h-full w-[59px] cursor-pointer hover:bg-[#f360c0] transition-colors"
+              className="bg-black flex items-center justify-center shrink-0 self-stretch w-auto px-4 cursor-pointer hover:bg-[#f360c0] transition-colors"
               data-name="Button"
               disabled={isSubmittingComment}
             >
-              <ArrowUp size={20} color="white" />
+              <ArrowUp size={24} color="white" />
             </button>
           </div>
         </div>
