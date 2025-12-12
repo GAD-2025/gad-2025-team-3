@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, Eye, Heart, Search } from 'react-feather';
+import ARTISTS from '../constants/artists';
 
 interface ExploreMainPageProps {
   onBack: () => void;
@@ -27,20 +28,52 @@ export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }:
   const [sortOption, setSortOption] = useState({ value: 'views', text: '조회수 순' }); // Default sort option
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // New states for user artists
+  const [userArtists, setUserArtists] = useState<string[]>([]);
+  const [userLoading, setUserLoading] = useState(true);
+  const [userError, setUserError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserArtists = async () => {
+      const loggedInUserId = localStorage.getItem('userId');
+      if (!loggedInUserId) {
+        setUserError("User not logged in.");
+        setUserLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await response.json();
+        setUserArtists(userData.user_artists || []);
+      } catch (err: any) {
+        setUserError(err.message || "Failed to load user artists.");
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUserArtists();
+  }, []); // Run once on mount
+
   useEffect(() => {
     fetchExhibitions(selectedTag);
   }, [selectedTag, sortOption]);
 
 
-  const tags = [
-    '인기 쇼케이스',
-    '#nct 127',
-    '#New jeans',
-    '#exo',
-    '#red velvet',
-    '#아이유',
-    '#seventeen'
+  const baseTags = [
+    '인기 쇼케이스'
   ];
+
+  const allTags = userLoading || userError
+    ? baseTags
+    : [...baseTags, ...userArtists.map(idolId => {
+        const artist = ARTISTS.find(a => a.id === idolId);
+        return artist ? `#${artist.name}` : `#${idolId}`; // Fallback to ID if name not found
+      })];
 
   const fetchExhibitions = async (tagToSearch: string) => {
     try {
@@ -71,12 +104,12 @@ export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }:
 
 
   
-  if (loading) {
+  if (loading || userLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
+  if (error || userError) {
+    return <div className="flex justify-center items-center h-screen">Error: {error || userError}</div>;
   }
 
   return (
@@ -118,7 +151,7 @@ export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }:
               </div>
               
               <div className="content-start flex flex-wrap gap-[10px] items-start relative shrink-0 w-[349px]">
-                {tags.map((tag) => (
+                {allTags.map((tag) => (
                   <button
                     key={tag}
                     onClick={() => setSelectedTag(tag)}

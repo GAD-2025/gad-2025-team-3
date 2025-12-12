@@ -152,10 +152,10 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
       </div>
 
       {/* Profile Section */}
-      <div className="h-auto relative shrink-0 w-full pb-[72px]" data-name="Container" id="profile-section">
+      <div className="h-auto relative shrink-0 w-full pb-[16px]" data-name="Container" id="profile-section">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[24px] h-[110px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             {/* Profile Info */}
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
