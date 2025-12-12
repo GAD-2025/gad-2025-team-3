@@ -3,10 +3,12 @@ import { ChevronLeft, Edit } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
 
-import ARTISTS from '../constants/artists'; // ARTISTS 배열 임포트
-
 import settingsSvgPaths from "../imports/svg-menh3de8oj";
 
+const imgVector = "https://www.figma.com/api/mcp/asset/e8366257-d3f7-496c-ba98-71a545e4dc82";
+const imgVector1 = "https://www.figma.com/api/mcp/asset/99b7134c-b0b4-4e4e-a71c-b1c4312b788c";
+const imgVector2 = "https://www.figma.com/api/mcp/asset/cb0a7f1b-62a6-47b5-a237-362fe7cc1897";
+const imgVector3 = "https://www.figma.com/api/mcp/asset/9499547c-84d7-44d9-a4e4-33d989ba1e04";
 const imgVector5 = "https://www.figma.com/api/mcp/asset/fe295aee-1db6-4175-9fc4-0b5a276c1746"; // OtherUserProfilePage와 통일된 기본 이미지
 
 interface User {
@@ -22,8 +24,7 @@ interface User {
   total_likes: number;
   total_shares: number;
   profile_picture_url: string; // 필수로 변경
-  profileIcon?: string; // profileIcon 필드를 optional로 변경 (백엔드에서 현재 제공 안 함)
-  user_artists: string[];
+  favorite_idols: string[];
 }
 
 interface ProfilePageProps {
@@ -56,7 +57,8 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
           throw new Error('사용자 정보를 가져오는데 실패했습니다.');
         }
         const userData: User = await response.json();
-        setUser(userData);
+        const favoriteIdolsArray = userData.favorite_idol ? userData.favorite_idol.split(',').map((idol: string) => idol.trim()) : [];
+        setUser({ ...userData, favorite_idols: favoriteIdolsArray });
       } catch (err: any) {
         console.error("사용자 정보 fetch 오류:", err);
         setError(err.message || "사용자 정보를 가져오는데 실패했습니다.");
@@ -150,7 +152,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
 
       {/* Profile Section */}
       <div className="h-auto relative shrink-0 w-full pb-[24px]" data-name="Container">
-        
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[24px] h-[110px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             {/* Profile Info */}
@@ -218,31 +220,36 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                       </div>
                     </div>
                   </div>
+                  {/* 최애 아이돌 */}
+                  <div className="relative shrink-0" data-name="Container">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">최애 아이돌</p>
+                      </div>
+                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.favorite_idol || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Favorite Idol Hashtags */}
+            {user.favorite_idols && user.favorite_idols.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4 px-6" data-name="FavoriteIdolHashtags">
+                {user.favorite_idols.map((idol, index) => (
+                  <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-full px-3 py-1 flex items-center justify-center">
+                    <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px]">
+                      #{idol}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Favorite Artists Section */}
-      <div className="h-auto relative shrink-0 w-full px-[24px] pb-[24px] border-b-[1.6px] border-black border-solid" data-name="Favorite Artists Container">
-        <div className="content-stretch flex gap-[8px] flex-wrap items-start relative w-full">
-          {(user.user_artists && user.user_artists.length > 0
-            ? user.user_artists.map(artistId => ARTISTS.find(a => a.id === artistId)?.name || artistId) // artistId를 name으로 변환
-            : ['BTS', 'BLACKPINK', 'NewJeans'] // 플레이스홀더 (name 기반)
-          ).map((artistName, index) => (
-            <div
-              key={index}
-              className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center"
-            >
-              <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
-                  #{artistName}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
 
       {/* Account Section */}
       <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
@@ -456,7 +463,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         </button>
         {/* 문의하기 */}
         <button
-          onClick={() => window.open('https://forms.gle/jYZJprEb7hNwHtum7', '_blank')}
+          onClick={() => handleFeatureClick('문의하기')}
           className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[122.2px] w-[342px] cursor-pointer"
           data-name="Button"
         >
@@ -472,7 +479,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 </svg>
               </div>
               <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
                   <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">문의하기</p>
                 </div>
               </div>
@@ -524,7 +531,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-[0] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#eb210f] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
+              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
             </div>
             {/* 로그아웃 */}
             <button

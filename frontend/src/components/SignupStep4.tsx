@@ -3,6 +3,18 @@ import { ChevronLeft, Search } from 'react-feather'; // Search 아이콘 임포�
 import { SignupData } from '../App';
 import ARTISTS from '../constants/artists'; // ARTISTS 배열 임포트
 
+interface SignupStep4Props {
+  username: string;
+  onNext: () => void;
+  onBack: () => void;
+  formData: SignupData;
+  handleArtistToggle: (artistId: string) => void;
+}
+
+export default function SignupStep4({ username, onNext, onBack, formData, handleArtistToggle }: SignupStep4Props) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'group' | 'solo'>('all');
+
   const filteredArtists = ARTISTS.filter(artist => {
     const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'all' || artist.type === filterType;

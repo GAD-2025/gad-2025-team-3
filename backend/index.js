@@ -927,7 +927,7 @@ app.get('/api/users/:userId/exhibitions', async (req, res) => {
 // API for updating a user's profile
 app.put('/api/users/:userId', async (req, res) => {
     const { userId } = req.params;
-    const { nickname, bio, username } = req.body;
+    const { nickname, bio, username, user_artists } = req.body;
 
     if (!nickname || !username) {
         return res.status(400).json({ message: 'Missing required fields.' });
@@ -971,28 +971,53 @@ app.put('/api/users/:userId', async (req, res) => {
             }
         }
 
-        // 4. Update the user's profile
+        // 4. Update the user's profile (nickname and bio)
         const [updateResult] = await connection.execute(
             'UPDATE users SET nickname = ?, bio = ? WHERE id = ?',
             [nickname, bio, userId]
         );
 
-        if (updateResult.affectedRows === 0) {
-            await connection.rollback();
-            connection.release();
-            return res.status(404).json({ message: 'User not found or no changes made.' });
-        }
-
-        // 5. Fetch the updated user data to return
-        const [updatedUserRows] = await connection.execute(
-            'SELECT * FROM users WHERE id = ?',
+        // 5. Update user_artists
+        // Delete existing user_artists first
+        await connection.execute(
+            'DELETE FROM user_artists WHERE user_id = ?',
             [userId]
         );
+
+        // Insert new user_artists if provided
+        if (user_artists && user_artists.length > 0) {
+            const artistValues = user_artists.map(artistId => [userId, artistId]);
+            await connection.query(
+                'INSERT INTO user_artists (user_id, artist_id) VALUES ?',
+                [artistValues]
+            );
+        }
+
+        if (updateResult.affectedRows === 0 && (!user_artists || user_artists.length === 0)) {
+             // If no user fields were updated and no artists were added/removed
+            await connection.rollback();
+            connection.release();
+            return res.status(200).json({ message: 'No changes made.' }); // Or 404/304 depending on desired behavior
+        }
+
+        // 6. Fetch the updated user data to return
+        const [updatedUserRows] = await connection.execute(
+            'SELECT id, username, email, nickname, bio, created_at FROM users WHERE id = ?', // Select specific fields
+            [userId]
+        );
+        const updatedUser = updatedUserRows[0];
+
+        // Fetch updated user_artists
+        const [updatedArtistRows] = await connection.execute(
+            'SELECT artist_id FROM user_artists WHERE user_id = ?',
+            [userId]
+        );
+        updatedUser.user_artists = updatedArtistRows.map(row => row.artist_id); // Add updated artists
 
         await connection.commit();
         connection.release();
 
-        const { password: _, ...updatedUserWithoutPassword } = updatedUserRows[0];
+        const { password: _, ...updatedUserWithoutPassword } = updatedUser;
         res.status(200).json(updatedUserWithoutPassword);
 
     } catch (error) {
