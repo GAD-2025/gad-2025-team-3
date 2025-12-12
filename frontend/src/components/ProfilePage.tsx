@@ -3,7 +3,7 @@ import { ChevronLeft, Edit } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
 
-import settingsSvgPaths from "../imports/svg-menh3de8oj";
+import ARTISTS from '../constants/artists';
 
 const imgVector = "https://www.figma.com/api/mcp/asset/e8366257-d3f7-496c-ba98-71a545e4dc82";
 const imgVector1 = "https://www.figma.com/api/mcp/asset/99b7134c-b0b4-4e4e-a71c-b1c4312b788c";
@@ -220,16 +220,26 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                       </div>
                     </div>
                   </div>
-                  {/* 최애 아이돌 */}
-                  <div className="relative shrink-0" data-name="Container">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
-                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">최애 아이돌</p>
+                  {/* 최애 아이돌 해시태그 */}
+                  <div className="content-stretch flex flex-wrap gap-[8px] items-start relative shrink-0 w-full" data-name="FavoriteIdolHashtags">
+                    {user.favorite_idols && user.favorite_idols.length > 0 ? (
+                      user.favorite_idols.map((idolId, index) => {
+                        const artist = ARTISTS.find(a => a.id === idolId);
+                        return (
+                          <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
+                            <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
+                              #{artist ? artist.name : idolId}
+                            </p>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="bg-white border-[#99a1af] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
+                        <p className="font-pretendard font-medium leading-[18px] not-italic text-[#99a1af] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
+                          #N/A
+                        </p>
                       </div>
-                      <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.favorite_idol || 'N/A'}</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
