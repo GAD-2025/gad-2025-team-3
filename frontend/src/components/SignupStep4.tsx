@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // useState 임포트 추가
-import { ChevronLeft, Plus } from 'react-feather'; // Plus 아이콘 임포트 추가
+import { ChevronLeft, Search } from 'react-feather'; // Search 아이콘 임포트 추가
 import { SignupData } from '../App';
 
 interface SignupStep4Props {
@@ -8,7 +8,6 @@ interface SignupStep4Props {
   onBack: () => void;
   formData: SignupData;
   handleArtistToggle: (artistId: string) => void;
-  handleAddCustomArtist: (artistName: string) => void; // 새로운 prop 추가
 }
 
 const ARTISTS = [
@@ -83,8 +82,7 @@ const ARTISTS = [
   { id: 'btob', name: 'BTOB', type: 'group' },
 ];
 
-export default function SignupStep4({ username, onNext, onBack, formData, handleArtistToggle, handleAddCustomArtist }: SignupStep4Props) {
-  const [newArtistName, setNewArtistName] = useState(''); // newArtistName 상태 추가
+export default function SignupStep4({ username, onNext, onBack, formData, handleArtistToggle }: SignupStep4Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'group' | 'solo'>('all');
 
@@ -196,26 +194,19 @@ export default function SignupStep4({ username, onNext, onBack, formData, handle
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddCustomArtist(searchTerm);
-                    setSearchTerm(''); // 추가 후 검색어 초기화
-                  }
-                }}
+                
                 placeholder="아티스트 이름을 검색하세요"
                 className="flex-1 h-[47.184px] px-[16px] py-[12px] font-['Pretendard',sans-serif] text-[14px] text-black tracking-[-0.28px] outline-none border-[0.8px] border-black border-solid placeholder:text-[#99a1af]"
               />
               <button
                 onClick={() => {
-                  if (searchTerm.trim()) { // 검색어가 있으면, 검색어 내용을 아티스트로 추가
-                    handleAddCustomArtist(searchTerm);
-                    setSearchTerm(''); // 추가 후 검색어 초기화
-                  }
+                  // 검색 기능만 필요하므로, 아티스트 추가 로직은 제거합니다.
+                  // 검색은 input의 onChange 이벤트로 실시간으로 처리됩니다.
                 }}
                 className="h-[47.184px] relative shrink-0 w-[47.175px] cursor-pointer bg-white border-[0.8px] border-black border-solid flex items-center justify-center"
                 data-name="Button"
               >
-                <Plus size={24} color="black" />
+                <Search size={24} color="black" />
               </button>
             </div>
 

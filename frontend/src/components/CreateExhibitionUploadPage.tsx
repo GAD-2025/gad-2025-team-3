@@ -1,5 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft } from 'react-feather';
+
+interface DisplayItem {
+  url: string;
+  type: 'image' | 'video';
+  isLocal: boolean; // True if it's a local data URL, false if it's a server URL
+}
 
 interface CreateExhibitionUploadPageProps {
   onBack: () => void;
@@ -10,8 +16,22 @@ interface CreateExhibitionUploadPageProps {
 
 export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFiles, setUploadedFiles }: CreateExhibitionUploadPageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [allDisplayItems, setAllDisplayItems] = useState<DisplayItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Initialize allDisplayItems from uploadedFiles prop
+  useEffect(() => {
+    // Only initialize if uploadedFiles has changed and local state is empty
+    if (uploadedFiles.length > 0 && allDisplayItems.length === 0) {
+      const initialItems: DisplayItem[] = uploadedFiles.map(url => ({
+        url,
+        // Determine type based on URL extension, or default to image for server URLs
+        type: url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image',
+        isLocal: false,
+      }));
+      setAllDisplayItems(initialItems);
+    }
+  }, [uploadedFiles, allDisplayItems.length]);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -20,66 +40,89 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
     setIsUploading(true);
 
     try {
-      // Create previews for immediate display
-      const newPreviews: string[] = await Promise.all(
-        Array.from(files).map((file) => {
-          return new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              resolve(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-          });
-        })
-      );
+      const newLocalPreviewItems: DisplayItem[] = await Promise.all(
+          Array.from(files).map((file) => {
+            const type = file.type.startsWith('image/') ? 'image' : 'video';
+            return new Promise<DisplayItem>((resolve) => {
+              if (type === 'image') {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  resolve({ url: reader.result as string, type: 'image', isLocal: true });
+                };
+                reader.readAsDataURL(file);
+              } else { // Video - use a placeholder
+                const videoPlaceholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='5 3 19 12 5 21 5 3'%3E%3C/polygon%3E%3C/svg%3E`;
+                resolve({ url: videoPlaceholderSvg, type: 'video', isLocal: true });
+              }
+            });
+          })
+        );
 
-      // Upload files to server
-      const formData = new FormData();
-      Array.from(files).forEach((file) => {
-        formData.append('files', file);
-      });
+        // Add new local previews to the display immediately
+        setAllDisplayItems(prev => [...prev, ...newLocalPreviewItems]);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
-        method: 'POST',
-        body: formData,
-      });
+        // Upload files to server
+        const formData = new FormData();
+        Array.from(files).forEach((file) => {
+          formData.append('files', file);
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload failed');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Upload failed');
+        }
+
+        const result = await response.json();
+        const serverUrls: string[] = result.urls;
+
+        // Update `allDisplayItems` to replace local previews with server URLs
+        setAllDisplayItems(currentItems => {
+          const updatedItems = [...currentItems];
+          let localCount = 0;
+          for (let i = 0; i < updatedItems.length; i++) {
+            if (updatedItems[i].isLocal && localCount < serverUrls.length) {
+              updatedItems[i] = { ...updatedItems[i], url: serverUrls[localCount], isLocal: false };
+              localCount++;
+            }
+          }
+          return updatedItems;
+        });
+
+        // Update the parent state with the new server URLs
+        setUploadedFiles([...uploadedFiles, ...serverUrls]);
+
+      } catch (error: any) {
+        console.error('File upload error:', error);
+        alert('파일 업로드에 실패했습니다: ' + error.message);
+        // If upload fails, remove the local previews from display
+        setAllDisplayItems(prev => prev.filter(item => !item.isLocal));
+      } finally {
+        setIsUploading(false);
       }
+    };
 
-      const result = await response.json();
-      const serverUrls: string[] = result.urls;
+  const handleRemoveFile = (indexToRemove: number) => {
+    const itemToRemove = allDisplayItems[indexToRemove];
+    const newDisplayItems = allDisplayItems.filter((_, index) => index !== indexToRemove);
+    setAllDisplayItems(newDisplayItems);
 
-      // Update state with server URLs (for database) and previews (for display)
-      setUploadedFiles([...uploadedFiles, ...serverUrls]);
-      setPreviewUrls([...previewUrls, ...newPreviews]);
-
-    } catch (error: any) {
-      console.error('File upload error:', error);
-      alert('파일 업로드에 실패했습니다: ' + error.message);
-    } finally {
-      setIsUploading(false);
+    // If the removed item was a server URL, also update the parent's uploadedFiles state
+    if (!itemToRemove.isLocal) {
+      const newUploadedFiles = uploadedFiles.filter(url => url !== itemToRemove.url);
+      setUploadedFiles(newUploadedFiles);
     }
   };
-
-  const handleRemoveFile = (index: number) => {
-    const newFiles = uploadedFiles.filter((_, i) => i !== index);
-    setUploadedFiles(newFiles);
-    const newPreviews = previewUrls.filter((_, i) => i !== index);
-    setPreviewUrls(newPreviews);
-  };
-
-  // Use server URLs for display if available, otherwise fall back to previews
-  // When page loads with existing uploadedFiles from App state (server URLs), we use those
-  const displayUrls = previewUrls.length > 0 ? previewUrls : uploadedFiles;
 
   const handleAddMoreClick = () => {
     fileInputRef.current?.click();
   };
 
-  const isButtonEnabled = uploadedFiles.length > 0 && !isUploading;
+  const isButtonEnabled = allDisplayItems.length > 0 && !isUploading;
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
@@ -156,7 +199,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
             </div>
 
             {/* File Upload/Display Area */}
-            {uploadedFiles.length === 0 ? (
+            {allDisplayItems.length === 0 ? (
               /* Empty State - File Upload Area */
               <div className="box-border content-stretch flex h-[358px] items-start pb-0 pt-[16px] px-0 relative shrink-0 w-full" data-name="Container">
                 <label 
@@ -210,11 +253,19 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                   <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                   
                   {/* Uploaded Images */}
-                  {displayUrls.map((fileUrl, index) => (
+                  {allDisplayItems.map((item, index) => (
                     <div key={index} className="relative shrink-0 size-[140px]">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
                         <div className="absolute left-0 size-[140px] top-0">
-                          <img alt="" className="absolute inset-0 max-w-none object-50%-50% object-cover pointer-events-none size-full" src={fileUrl} />
+                          {item.type === 'image' ? (
+                            <img alt="" className="absolute inset-0 max-w-none object-50%-50% object-cover pointer-events-none size-full" src={item.url} />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-1/2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                              </svg>
+                            </div>
+                          )}
                         </div>
                         {/* X Button */}
                         <button

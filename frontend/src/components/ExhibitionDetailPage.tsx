@@ -7,6 +7,7 @@ import EditExhibitionModal from './EditExhibitionModal.tsx'; // Import the new m
 interface User {
   id: number;
   username: string;
+  nickname: string;
 }
 
 interface ExhibitionData {
@@ -611,9 +612,9 @@ export default function ExhibitionDetailPage({
                             </div>
                           </div>
                         </div>
-                        <div className="relative w-full flex justify-between items-start" data-name="Paragraph">
-                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic text-[#4a5565] text-[14px] tracking-[-0.28px] break-words mr-2">{comment.content}</p>
-                          {currentUser && currentUser.username === comment.author && (
+                        <div className="relative w-full flex justify-between" data-name="Paragraph">
+                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic text-[#4a5565] text-[14px] tracking-[-0.28px] break-words mr-2 flex-auto max-w-full">{comment.content}</p>
+                          {currentUser && currentUser.nickname === comment.author && (
                             <button
                               onClick={() => handleDeleteComment(comment.id)}
                               className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors"

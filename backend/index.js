@@ -113,7 +113,7 @@ app.post('/api/signup', async (req, res) => {
             await connection.commit();
 
             // Fetch the newly created user to return it in the response
-            const [rows] = await connection.execute('SELECT id, username, email, nickname, bio, age14, terms, privacy, marketing, profileIcon, created_at FROM users WHERE id = ?', [userId]);
+            const [rows] = await connection.execute('SELECT id, username, email, nickname, bio, age14, terms, privacy, marketing, created_at FROM users WHERE id = ?', [userId]);
             const newUser = rows[0];
             const { password: _, ...userWithoutPassword } = newUser;
 
@@ -146,7 +146,7 @@ app.post('/api/login', async (req, res) => {
         const connection = await pool.getConnection();
         try {
             const [rows] = await connection.execute(
-                'SELECT id, username, email, nickname, bio, age14, terms, privacy, marketing, profileIcon, created_at FROM users WHERE username = ?',
+                'SELECT id, username, password, email, nickname, bio, age14, terms, privacy, marketing, created_at FROM users WHERE username = ?',
                 [username]
             );
 
@@ -606,7 +606,7 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
-            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
+            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.author = u.nickname WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
             [id]
         );
         connection.release();
@@ -623,7 +623,7 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
 // API for posting a new comment to an exhibition
 app.post('/api/exhibitions/:id/comments', async (req, res) => {
     const { id } = req.params;
-    const { userId, content } = req.body; // Expect userId instead of author
+    const { userId, content } = req.body;
 
     if (!userId || !content) {
         return res.status(400).json({ message: 'User ID and content are required for a comment.' });
@@ -631,15 +631,27 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
 
     try {
         const connection = await pool.getConnection();
+        // Fetch the nickname of the user
+        const [userRows] = await connection.execute(
+            'SELECT nickname FROM users WHERE id = ?',
+            [userId]
+        );
+
+        if (userRows.length === 0) {
+            connection.release();
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        const authorNickname = userRows[0].nickname;
+
         const [result] = await connection.execute(
-            'INSERT INTO comments (exhibition_id, user_id, content) VALUES (?, ?, ?)', // Use user_id
-            [id, userId, content]
+            'INSERT INTO comments (exhibition_id, author, content) VALUES (?, ?, ?)',
+            [id, authorNickname, content]
         );
 
         const newCommentId = result.insertId;
         // Fetch the new comment along with the user's current nickname
         const [newCommentRows] = await connection.execute(
-            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?',
+            'SELECT c.id, c.author, c.content, c.created_at FROM comments c WHERE c.id = ?',
             [newCommentId]
         );
         connection.release();
@@ -654,7 +666,7 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
 // API for deleting a comment
 app.delete('/api/comments/:commentId', async (req, res) => {
     const { commentId } = req.params;
-    const { userId } = req.body; // Expect userId instead of username for authorization
+    const { userId } = req.body; // Expect userId for authorization
 
     if (!userId) {
         return res.status(401).json({ message: 'Authorization information (userId) is required.' });
@@ -664,9 +676,9 @@ app.delete('/api/comments/:commentId', async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // 1. Get the comment to verify author
+        // 1. Get the comment's author (nickname) and the requesting user's nickname
         const [comments] = await connection.execute(
-            'SELECT user_id FROM comments WHERE id = ?', // Select user_id
+            'SELECT author FROM comments WHERE id = ?',
             [commentId]
         );
 
@@ -675,11 +687,22 @@ app.delete('/api/comments/:commentId', async (req, res) => {
             connection.release();
             return res.status(404).json({ message: 'Comment not found.' });
         }
+        const commentAuthorNickname = comments[0].author;
 
-        const commentUserId = comments[0].user_id;
+        const [users] = await connection.execute(
+            'SELECT nickname FROM users WHERE id = ?',
+            [userId]
+        );
 
-        // 2. Authorize: check if the requesting user is the author of the comment
-        if (commentUserId !== userId) { // Compare user_id
+        if (users.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(401).json({ message: 'Unauthorized: User not found.' });
+        }
+        const requestingUserNickname = users[0].nickname;
+
+        // 2. Authorize: check if the requesting user's nickname matches the comment's author nickname
+        if (commentAuthorNickname !== requestingUserNickname) {
             await connection.rollback();
             connection.release();
             return res.status(403).json({ message: 'You are not authorized to delete this comment.' });
@@ -798,7 +821,7 @@ app.get('/api/users/:userId', async (req, res) => {
         
         // Fetch user details
         const [userRows] = await connection.execute(
-            'SELECT id, username, email, nickname, bio, profileIcon, created_at FROM users WHERE id = ?',
+            'SELECT id, username, email, nickname, bio, created_at FROM users WHERE id = ?',
             [parsedUserId]
         );
 
@@ -847,7 +870,7 @@ app.get('/api/users/:userId', async (req, res) => {
 // API for updating a user's profile
 app.put('/api/users/:userId', async (req, res) => {
     const { userId } = req.params;
-    const { nickname, bio, profileIcon, username } = req.body;
+    const { nickname, bio, username } = req.body;
 
     if (!nickname || !username) {
         return res.status(400).json({ message: 'Missing required fields.' });
@@ -893,8 +916,8 @@ app.put('/api/users/:userId', async (req, res) => {
 
         // 4. Update the user's profile
         const [updateResult] = await connection.execute(
-            'UPDATE users SET nickname = ?, bio = ?, profileIcon = ? WHERE id = ?',
-            [nickname, bio, profileIcon, userId]
+            'UPDATE users SET nickname = ?, bio = ? WHERE id = ?',
+            [nickname, bio, userId]
         );
 
         if (updateResult.affectedRows === 0) {
