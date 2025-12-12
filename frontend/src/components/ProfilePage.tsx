@@ -3,6 +3,8 @@ import { ChevronLeft, Edit } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
 
+import settingsSvgPaths from "../imports/svg-menh3de8oj";
+
 import ARTISTS from '../constants/artists';
 
 const imgVector = "https://www.figma.com/api/mcp/asset/e8366257-d3f7-496c-ba98-71a545e4dc82";
