@@ -135,7 +135,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
       {/* Header */}
       <div className="box-border content-stretch flex flex-col h-[70.083px] items-center justify-between pb-[1.108px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
-        <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="h-[68.976px] relative shrink-0 w-full" data-name="Container">
           <div className="flex flex-row items-center size-full">
             <div className="box-border content-stretch flex h-[68.976px] items-center justify-between px-[23.99px] py-0 relative w-full">
@@ -191,7 +191,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
                           className="bg-transparent border-0 box-border content-stretch flex h-[47.184px] items-center px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                         />
                       </div>
-                      <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
+                      <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                     </div>
                     <button
                       onClick={handleNicknameCheck}
@@ -229,9 +229,9 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
                     placeholder="자신을 소개해주세요 (선택)"
                     className="bg-transparent border-0 box-border content-stretch flex h-[110.119px] items-start px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic resize-none text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
                     maxLength={100}
-                  />
+                  ></textarea>
                 </div>
-                <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
+                <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               </div>
               <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">
                 <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] text-right tracking-[-0.24px]">{bio.length} / 100</p>
@@ -252,7 +252,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
             </div>
           </div>
         </button>
-        <button onClick={handleCancel} className="relative shrink-0 w-full cursor-pointer transition-colors bg-white text-black h-[56.8px] border-[1.108px] border-black mt-2">
+        <button onClick={handleCancel} className="relative shrink-0 w-full cursor-pointer transition-colors bg-white text-black h-[56.8px] border-[1.6px] border-black mt-2">
           <div className="flex flex-col justify-center size-full">
             <div className="box-border content-stretch flex flex-col gap-[10px] items-start justify-center pl-[24px] pr-px py-[20px] relative w-full">
               <div className="content-stretch flex h-[16.616px] items-start relative shrink-0">

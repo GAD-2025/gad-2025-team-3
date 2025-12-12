@@ -146,7 +146,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
 
       {/* Profile Section */}
       <div className="h-auto relative shrink-0 w-full pb-[24px]" data-name="Container">
-        <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
+        
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[24px] h-[110px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             {/* Profile Info */}
@@ -220,6 +220,22 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
           </div>
         </div>
       </div>
+
+      {/* Favorite Artists Section */}
+      <div className="h-auto relative shrink-0 w-full px-[24px] pb-[24px] border-b-[1.6px] border-black border-solid" data-name="Favorite Artists Container">
+        <div className="content-stretch flex gap-[8px] flex-wrap items-start relative w-full">
+          {(user.user_artists && user.user_artists.length > 0 ? user.user_artists : ['BTS', 'BLACKPINK', 'NewJeans']).map((artist, index) => (
+            <div
+              key={index}
+              className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center"
+            >
+              <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
+                  #{artist}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
 
       {/* Account Section */}
       <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
@@ -449,7 +465,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 </svg>
               </div>
               <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
                   <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">문의하기</p>
                 </div>
               </div>
