@@ -26,7 +26,7 @@ interface User {
   total_likes: number;
   total_shares: number;
   profile_picture_url: string; // 필수로 변경
-  favorite_idols: string[];
+  user_artists: string[]; // Change to user_artists
 }
 
 interface ProfilePageProps {
@@ -59,8 +59,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
           throw new Error('사용자 정보를 가져오는데 실패했습니다.');
         }
         const userData: User = await response.json();
-        const favoriteIdolsArray = userData.favorite_idol ? userData.favorite_idol.split(',').map((idol: string) => idol.trim()) : [];
-        setUser({ ...userData, favorite_idols: favoriteIdolsArray });
+        setUser({ ...userData, user_artists: userData.user_artists || [] });
       } catch (err: any) {
         console.error("사용자 정보 fetch 오류:", err);
         setError(err.message || "사용자 정보를 가져오는데 실패했습니다.");
@@ -153,7 +152,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
       </div>
 
       {/* Profile Section */}
-      <div className="h-auto relative shrink-0 w-full pb-[24px]" data-name="Container">
+      <div className="h-auto relative shrink-0 w-full pb-[72px]" data-name="Container" id="profile-section">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[24px] h-[110px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
@@ -222,47 +221,35 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                       </div>
                     </div>
                   </div>
-                  {/* 최애 아이돌 해시태그 */}
-                  <div className="content-stretch flex flex-wrap gap-[8px] items-start relative shrink-0 w-full" data-name="FavoriteIdolHashtags">
-                    {user.favorite_idols && user.favorite_idols.length > 0 ? (
-                      user.favorite_idols.map((idolId, index) => {
-                        const artist = ARTISTS.find(a => a.id === idolId);
-                        return (
-                          <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
-                            <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
-                              #{artist ? artist.name : idolId}
-                            </p>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="bg-white border-[#99a1af] border-[1.6px] border-solid rounded-[4px] px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
-                        <p className="font-pretendard font-medium leading-[18px] not-italic text-[#99a1af] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
-                          #N/A
-                        </p>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Favorite Idol Hashtags */}
-            {user.favorite_idols && user.favorite_idols.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4 px-6" data-name="FavoriteIdolHashtags">
-                {user.favorite_idols.map((idol, index) => (
-                  <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid rounded-full px-3 py-1 flex items-center justify-center">
-                    <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px]">
-                      #{idol}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
+            {/* 최애 아이돌 해시태그 */}
+            <div className="content-stretch flex flex-wrap gap-[8px] items-start relative shrink-0 w-full mt-[4px] mb-[16px]" data-name="FavoriteIdolHashtags">
+              {user.user_artists && user.user_artists.length > 0 ? (
+                user.user_artists.map((idolId, index) => {
+                    const artist = ARTISTS.find(a => a.id === idolId);
+                    return (
+                      <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
+                        <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
+                          #{artist ? artist.name : idolId}
+                        </p>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="bg-white border-[#99a1af] border-[1.6px] border-solid px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
+                    <p className="font-pretendard font-medium leading-[18px] not-italic text-[#99a1af] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
+                      #N/A
+                    </p>
+                  </div>
+                )}
+            </div>
+    </div>
+  </div>
+</div>
       {/* Account Section */}
       <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -511,7 +498,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
           className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer"
           data-name="Button"
         >
-          <div aria-hidden="true" className="absolute border-[#f360c0] border-[1.6px] border-solid inset-0 pointer-events-none" />
+          <div aria-hidden="true" className="absolute border-black border-[1.6px] border-solid inset-0 pointer-events-none" />
           <div className="h-[21px] relative shrink-0 w-[124.05px]" data-name="Container">
             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[124.05px]">
               <div className="relative shrink-0 size-[20px]" data-name="Icon">
