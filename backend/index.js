@@ -832,6 +832,13 @@ app.get('/api/users/:userId', async (req, res) => {
 
         const user = userRows[0];
 
+        // Fetch user artists
+        const [artistRows] = await connection.execute(
+            'SELECT artist_id FROM user_artists WHERE user_id = ?',
+            [parsedUserId]
+        );
+        const user_artists = artistRows.map(row => row.artist_id); // artist_id를 아티스트 이름으로 사용
+
         // Fetch exhibition count
         const [exhibitionCountRows] = await connection.execute(
             'SELECT COUNT(*) AS exhibition_count FROM exhibitions WHERE user_id = ?',
@@ -856,6 +863,7 @@ app.get('/api/users/:userId', async (req, res) => {
             exhibition_count,
             follower_count,
             following_count,
+            user_artists, // Add user_artists to the response
             total_views: 0, // Assuming these are not yet tracked per user
             total_likes: 0, // Assuming these are not yet tracked per user
             total_shares: 0, // Assuming these are not yet tracked per user
