@@ -345,7 +345,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             </div>
             {/* 개인정보 처리방침 */}
             <button
-              onClick={() => handleFeatureClick('개인정보 처리방침')}
+              onClick={() => window.open('https://www.notion.so/SHOWCASE-2c7c35f1b1398051af53ee5d9bf45e18', '_blank')}
               className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
@@ -380,7 +380,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             </button>
             {/* 서비스 이용약관 */}
             <button
-              onClick={() => handleFeatureClick('서비스 이용약관')}
+              onClick={() => window.open('https://www.notion.so/SHOWCASE-2c7c35f1b13980898e82d244731bc957?source=copy_link', '_blank')}
               className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
@@ -425,7 +425,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         </div>
         {/* 자주 묻는 질문 */}
         <button
-          onClick={() => handleFeatureClick('자주 묻는 질문')}
+          onClick={() => window.open('https://www.notion.so/SHOWCASE-FAQ-2c7c35f1b13980caaf67f2f1b98ff25d?source=copy_link', '_blank')}
           className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer"
           data-name="Button"
         >
@@ -463,7 +463,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         </button>
         {/* 문의하기 */}
         <button
-          onClick={() => handleFeatureClick('문의하기')}
+          onClick={() => window.open('https://forms.gle/jYZJprEb7hNwHtum7', '_blank')}
           className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[122.2px] w-[342px] cursor-pointer"
           data-name="Button"
         >
