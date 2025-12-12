@@ -1,11 +1,12 @@
+import { useEffect, useState } from "react";
 import { ChevronLeft, Edit } from 'react-feather';
-import svgPaths from "../imports/svg-cv3j1aafl9";
-import iconPaths from "../imports/svg-0l1y3hgd5b";
-import settingsSvgPaths from "../imports/svg-menh3de8oj";
-import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
 
-// Define a type for the user object for better type safety
+import settingsSvgPaths from "../imports/svg-menh3de8oj";
+
+const imgVector5 = "https://www.figma.com/api/mcp/asset/fe295aee-1db6-4175-9fc4-0b5a276c1746"; // OtherUserProfilePage와 통일된 기본 이미지
+
 interface User {
   id: number;
   username: string;
@@ -18,22 +19,52 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
+  profile_picture_url: string; // 필수로 변경
 }
 
 interface ProfilePageProps {
-  user: User;
-  profileType: 'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l';
   onBack: () => void;
   onNavigateToBadges: () => void;
   onNavigateToMyExhibition: () => void;
-  onLogout: () => void;
   onNavigateToEditProfile: () => void;
 }
 
-export default function ProfilePage({ user, profileType, onBack, onNavigateToBadges, onNavigateToMyExhibition, onLogout, onNavigateToEditProfile }: ProfilePageProps) {
+export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile }: ProfilePageProps) {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleDeleteAccount = async () => { // reason 매개변수 제거
+  useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      const loggedInUserId = localStorage.getItem('userId');
+      if (!loggedInUserId) {
+        setError("로그인된 사용자 정보가 없습니다.");
+        setLoading(false);
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}`);
+        if (!response.ok) {
+          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+        }
+        const userData: User = await response.json();
+        setUser(userData);
+      } catch (err: any) {
+        console.error("사용자 정보 fetch 오류:", err);
+        setError(err.message || "사용자 정보를 가져오는데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLoggedInUser();
+  }, [navigate]);
+
+  const handleDeleteAccount = async () => {
     if (!user || !user.id || !user.username) {
       alert("사용자 정보가 없어 탈퇴를 진행할 수 없습니다.");
       setIsDeleteModalOpen(false);
@@ -46,7 +77,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: user.username }), // 현재 로그인한 사용자인지 백엔드에서 확인
+        body: JSON.stringify({ username: user.username }),
       });
 
       if (!response.ok) {
@@ -56,8 +87,8 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
 
       alert('회원 탈퇴가 완료되었습니다.');
       setIsDeleteModalOpen(false);
-      onLogout(); // App.tsx의 onLogout 함수 호출 -> localStorage에서 사용자 제거 및 /login으로 이동
-
+      localStorage.removeItem('userId');
+      navigate('/login', { replace: true });
     } catch (error: any) {
       console.error('회원 탈퇴 오류:', error);
       alert(`회원 탈퇴 중 오류가 발생했습니다: ${error.message}`);
@@ -65,66 +96,34 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    navigate('/login', { replace: true });
+  };
+
   const handleFeatureClick = (featureName: string) => {
     alert(`${featureName} 기능은 아직 구현되지 않았습니다.`);
   };
 
-  // Render profile icon based on type
-  const renderProfileIcon = () => {
-    // SVG path for profile icon (same as in SignupComplete)
-    const profilePath = "M108.359 0H100.63L0 57.6602V70.9411L100.001 128.251L100.453 128.514H108.193L208.835 70.8534V57.5725L108.359 0Z";
-    
-    if (profileType === 'profile_1_l') {
-      return (
-        <div className="absolute flex inset-[-12%_-62.49%_-56.53%_-29%] items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (profileType === 'profile_2_l') {
-      return (
-        <div className="absolute flex inset-[-68.5%_-35.49%_-0.03%_-56%] items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (profileType === 'profile_3_l') {
-      return (
-        <div className="absolute flex inset-[-12%_15.01%_-56.53%_-106.5%] items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={profilePath} fill="var(--fill-0, #F360C0)" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    // profile_4_l
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen">오류: {error}</div>;
+  }
+
+  if (!user) {
+    return <div className="flex justify-center items-center h-screen">사용자 프로필을 찾을 수 없습니다.</div>;
+  }
+
+  const renderProfileImage = () => {
     return (
-      <div className="absolute flex inset-[-68.5%_-102.99%_-0.03%_11.5%] items-center justify-center">
-        <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-          <div className="relative size-full">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-              <path d={profilePath} fill="var(--fill-0, #F360C0)" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    );
+        <img
+                    src={user.profile_picture_url || imgVector5} // Fallback image
+                    alt="Profile"
+                    className="object-cover size-full rounded-full"
+                />    );
   };
 
   return (
@@ -133,14 +132,14 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       <div className="h-[70.083px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
         <div className="flex flex-row items-center size-full">
-          <div className="box-border content-stretch flex h-[70.083px] items-center justify-between px-[20px] py-0 relative w-full">
+          <div className="box-border content-stretch flex h-[70.083px] items-center justify-between px-[20px] py-[0] relative w-full">
             {/* Back Button */}
             <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
               <ChevronLeft className="size-5 text-black" />
             </button>
-            <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
+            <p className="font-garamond font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
             {/* Empty Container to balance the header */}
-            <div className="h-0 shrink-0 w-[20px]" data-name="Container" />
+            <div className="h-[0] shrink-0 w-[20px]" data-name="Container" />
           </div>
         </div>
       </div>
@@ -153,8 +152,8 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
             {/* Profile Info */}
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
-              <div className="relative shrink-0 size-[80px] bg-[#fef7fc] overflow-clip" data-name="profile">
-                {renderProfileIcon()}
+              <div className="relative shrink-0 size-[80px] bg-[#fef7fc] overflow-clip rounded-full" data-name="profile">
+                {renderProfileImage()}
               </div>
 
               {/* Profile Details */}
@@ -164,19 +163,19 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   <div className="content-stretch flex gap-[8px] h-[30px] items-center relative shrink-0 w-full" data-name="Container">
                     <div className="h-[30px] relative shrink-0" data-name="Heading 2" style={{ maxWidth: '200px' }}>
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[30px] relative">
-                        <p className="font-['Pretendard',sans-serif] font-semibold leading-[28px] not-italic text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre overflow-hidden text-ellipsis">{user.nickname || 'fan_user_123'}</p>
+                        <p className="font-pretendard font-semibold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre overflow-hidden text-ellipsis">{user.nickname || 'fan_user_123'}</p>
                       </div>
                     </div>
                     {/* Edit Icon */}
                     <button onClick={onNavigateToEditProfile} className="relative shrink-0 size-[24px]" data-name="Button">
-                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-0 pt-[4px] px-[4px] relative size-[24px]">
+                      <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col items-start pb-[0] pt-[4px] px-[4px] relative size-[24px]">
                         <Edit className="size-4 text-gray-500" />
                       </div>
                     </button>
                   </div>
                   {/* Bio */}
                   <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
-                    <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{user.bio || 'K-POP을 사랑하는 팬입니다🩷'}</p>
+                    <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] overflow-hidden text-ellipsis whitespace-nowrap">{user.bio || 'K-POP을 사랑하는 팬입니다🩷'}</p>
                   </div>
                 </div>
 
@@ -186,10 +185,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   <div className="relative shrink-0" data-name="Container">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.exhibition_count}</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.exhibition_count}</p>
                       </div>
                     </div>
                   </div>
@@ -197,10 +196,10 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   <div className="relative shrink-0" data-name="Container">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로워</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로워</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.follower_count}</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.follower_count}</p>
                       </div>
                     </div>
                   </div>
@@ -208,23 +207,19 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                   <div className="relative shrink-0" data-name="Container">
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로잉</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로잉</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.following_count}</p>
+                        <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.following_count}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
       </div>
-
-
 
       {/* Account Section */}
       <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
@@ -232,12 +227,12 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] items-start p-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
+              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
             </div>
             {/* 비밀번호 변경 */}
-            <button 
+            <button
               onClick={() => handleFeatureClick('비밀번호 변경')}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -255,7 +250,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                       </div>
                       <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">비밀번호 변경</p>
+                          <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">비밀번호 변경</p>
                         </div>
                       </div>
                     </div>
@@ -271,9 +266,9 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </div>
             </button>
             {/* 이메일 변경 */}
-            <button 
+            <button
               onClick={() => handleFeatureClick('이메일 변경')}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -285,13 +280,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                           <g id="Icon">
                             <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
                           </g>
                         </svg>
                       </div>
                       <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">이메일 변경</p>
+                          <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">이메일 변경</p>
                         </div>
                       </div>
                     </div>
@@ -310,20 +305,18 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
         </div>
       </div>
 
-
-
       {/* Privacy Section */}
       <div className="relative shrink-0 w-full mt-[0px] pb-[8px]" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-auto items-start pb-[24px] pt-[24px] px-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
+              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
             </div>
             {/* 개인정보 처리방침 */}
-            <button 
+            <button
               onClick={() => handleFeatureClick('개인정보 처리방침')}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -340,7 +333,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                       </div>
                       <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">개인정보 처리방침</p>
+                          <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">개인정보 처리방침</p>
                         </div>
                       </div>
                     </div>
@@ -356,9 +349,9 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </div>
             </button>
             {/* 서비스 이용약관 */}
-            <button 
+            <button
               onClick={() => handleFeatureClick('서비스 이용약관')}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -374,8 +367,8 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                         </svg>
                       </div>
                       <div className="h-[21px] relative shrink-0 w-[98.162px]" data-name="Text">
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[98.162px]">
-                          <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">서비스 이용약관</p>
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
+                          <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">서비스 이용약관</p>
                         </div>
                       </div>
                     </div>
@@ -398,12 +391,12 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       <div className="h-[268.2px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="absolute content-stretch flex gap-[12px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
-          <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
+          <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
         </div>
         {/* 자주 묻는 질문 */}
         <button
           onClick={() => handleFeatureClick('자주 묻는 질문')}
-          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer" 
+          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[58px] w-[342px] cursor-pointer"
           data-name="Button"
         >
           <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
@@ -425,7 +418,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </div>
               <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                  <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">자주 묻는 질문</p>
+                  <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">자주 묻는 질문</p>
                 </div>
               </div>
             </div>
@@ -451,13 +444,13 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                 <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                   <g id="Icon">
                     <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
+                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
                   </g>
                 </svg>
               </div>
               <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
-                  <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">문의하기</p>
+                  <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">문의하기</p>
                 </div>
               </div>
             </div>
@@ -488,7 +481,7 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
               </div>
               <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                  <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">Design System</p>
+                  <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">Design System</p>
                 </div>
               </div>
             </div>
@@ -506,14 +499,14 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
       {/* Danger Zone Section */}
       <div className="h-auto relative shrink-0 w-full mb-8 pt-[24px] pd-[24px]" data-name="Container">
         <div className="size-full">
-          <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-0 relative w-full">
+          <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-[0] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-              <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#eb210f] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
+              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#eb210f] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
             </div>
             {/* 로그아웃 */}
-            <button 
-              onClick={onLogout}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+            <button
+              onClick={handleLogout}
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-[#f44336] border-solid inset-0 pointer-events-none" />
@@ -529,17 +522,17 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                     </svg>
                   </div>
                   <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
-                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">로그아웃</p>
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
+                      <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">로그아웃</p>
                     </div>
                   </div>
                 </div>
               </div>
             </button>
             {/* 회원 탈퇴 */}
-            <button 
+            <button
               onClick={() => setIsDeleteModalOpen(true)}
-              className="h-[56.2px] relative shrink-0 w-full cursor-pointer" 
+              className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >
               <div aria-hidden="true" className="absolute border-[1.6px] border-[#f44336] border-solid inset-0 pointer-events-none" />
@@ -557,8 +550,8 @@ export default function ProfilePage({ user, profileType, onBack, onNavigateToBad
                     </svg>
                   </div>
                   <div className="h-[21px] relative shrink-0 w-[57.588px]" data-name="Text">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[57.588px]">
-                      <p className="absolute font-['Pretendard',sans-serif] leading-[20px] left-0 not-italic text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">회원 탈퇴</p>
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
+                      <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-[#f44336] text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">회원 탈퇴</p>
                     </div>
                   </div>
                 </div>

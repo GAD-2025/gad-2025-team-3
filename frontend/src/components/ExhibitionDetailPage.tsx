@@ -475,7 +475,14 @@ export default function ExhibitionDetailPage({
                           <p className="absolute font-['Pretendard',sans-serif] font-semibold leading-[32px] left-0 not-italic text-[24px] text-black text-nowrap top-[-0.6px] tracking-[-0.48px] whitespace-pre">{truncateTitle(exhibitionData.title, 13)}</p>
                         </div>
                         <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
-                          <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">by {exhibitionData.author}</p>
+                          <p
+                            className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px] cursor-pointer hover:underline"
+                            onClick={() => {
+                              if (exhibitionData && exhibitionData.user_id) {
+                                navigate(`/profile/${exhibitionData.user_id}`);
+                              }
+                            }}
+                          >by {exhibitionData.author}</p>
                         </div>
                       </div>
                     </div>
@@ -670,7 +677,7 @@ export default function ExhibitionDetailPage({
             ></textarea>
             <button
               onClick={handleCommentSubmit}
-              className="bg-black flex items-center justify-center shrink-0 self-stretch w-auto px-4 cursor-pointer hover:bg-[#f360c0] transition-colors"
+              className="bg-black flex items-center justify-center self-stretch w-auto px-4 cursor-pointer hover:bg-[#f360c0] transition-colors"
               data-name="Button"
               disabled={isSubmittingComment}
             >

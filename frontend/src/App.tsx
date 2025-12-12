@@ -21,6 +21,7 @@ import ExploreMainPage from './components/ExploreMainPage';
 import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 import FavoritesPage from './components/FavoritesPage';
 import EditProfilePage from './components/EditProfilePage';
+import OtherUserProfilePage from './components/OtherUserProfilePage'; // Import the new component
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -36,7 +37,7 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
-  // Add any other fields your user object has
+  profile_picture_url: string; // 필수로 변경
 }
 
 // Re-defining SignupData directly in App.tsx as context is being removed for this flow
@@ -104,8 +105,10 @@ export default function App() {
   // Effect to save/remove user from localStorage when currentUser state changes
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      localStorage.setItem('userId', currentUser.id.toString()); // currentUser.id 저장
+      localStorage.setItem('currentUser', JSON.stringify(currentUser)); // currentUser 객체도 저장 (다른 곳에서 사용할 경우를 대비)
     } else {
+      localStorage.removeItem('userId');
       localStorage.removeItem('currentUser');
     }
   }, [currentUser]);
@@ -138,7 +141,7 @@ export default function App() {
   const [nicknameValid, setNicknameValid] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
 
-  const [profileType, setProfileType] = useState<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l' | null>(null);
+
 
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
@@ -466,6 +469,7 @@ export default function App() {
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
+    localStorage.setItem('userId', user.id.toString()); // 로그인 성공 시 userId 저장
     navigate('/main');
   };
 
@@ -550,20 +554,17 @@ export default function App() {
           onNavigateToDetail={(id: number) => navigate(`/exhibition/${id}`)}
         />
       } />
-      <Route path="/profile" element={
-        currentUser && (
-          <ProfilePage 
-            user={currentUser}
-            profileType={(profileType || localStorage.getItem('profileType') || 'profile_1_l') as any}
-            onBack={() => navigate('/main')}
-            onNavigateToBadges={() => navigate('/badges')}
-            onNavigateToMyExhibition={() => navigate('/myexhibition')}
-            onLogout={handleLogout}
-            onNavigateToEditProfile={() => navigate('/profile/edit')}
-          />
-        )
-      } />
-      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={setCurrentUser} />} />
+            <Route path="/profile" element={
+              currentUser && (
+                <ProfilePage
+                  onBack={() => navigate('/main')}
+                  onNavigateToBadges={() => navigate('/badges')}
+                  onNavigateToMyExhibition={() => navigate('/myexhibition')}
+                  onNavigateToEditProfile={() => navigate('/profile/edit')}
+                />
+              )
+            } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={setCurrentUser} />} />
+      <Route path="/profile/:userId" element={<OtherUserProfilePage />} />
       <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
       <Route path="/myexhibition" element={
         <MyExhibitionPage 

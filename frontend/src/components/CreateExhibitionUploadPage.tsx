@@ -290,7 +290,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                     className="relative shrink-0 size-[140px] cursor-pointer"
                   >
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
-                      <div className="absolute box-border content-stretch flex items-center justify-center left-[calc(50%+0.41px)] p-[1.6px] rounded-[2.68435e+07px] size-[64px] top-[calc(50%+0.35px)] translate-x-[-50%] translate-y-[-50%]" data-name="Container">
+                      <div className="absolute box-border content-stretch flex items-center justify-center left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 p-[1.6px] rounded-[2.68435e+07px] size-[64px]" data-name="Container">
                         <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none rounded-[2.68435e+07px]" />
                         <div className="h-[32px] relative shrink-0 w-[31px]" data-name="Icon">
                           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 31 32">

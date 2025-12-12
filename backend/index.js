@@ -867,6 +867,55 @@ app.get('/api/users/:userId', async (req, res) => {
     }
 });
 
+// API for fetching a user's exhibitions
+app.get('/api/users/:userId/exhibitions', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `
+            SELECT
+                e.id,
+                e.title,
+                e.description,
+                e.start_date,
+                e.end_date,
+                e.is_public,
+                e.views,
+                e.likes,
+                e.shares,
+                e.created_at,
+                e.hashtags,
+                u.nickname as author,
+                (SELECT item_url FROM exhibition_items WHERE exhibition_id = e.id ORDER BY id LIMIT 1) as thumbnail
+            FROM
+                exhibitions e
+            JOIN
+                users u ON e.user_id = u.id
+            WHERE
+                e.user_id = ?
+            ORDER BY e.created_at DESC
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Fetch user exhibitions error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for updating a user's profile
 app.put('/api/users/:userId', async (req, res) => {
     const { userId } = req.params;

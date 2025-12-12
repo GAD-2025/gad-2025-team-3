@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         garamond: ['EB Garamond', 'serif'],
         'apple-garamond': ['Apple Garamond', 'serif'],
+        pretendard: ['Pretendard', 'sans-serif'],
       },
     },
   },
