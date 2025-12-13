@@ -328,7 +328,7 @@ app.post('/api/exhibitions', async (req, res) => {
 
 // API for fetching exhibitions
 app.get('/api/exhibitions', async (req, res) => {
-    const { userId, hashtag, sort } = req.query; // Added 'hashtag' and 'sort'
+    const { userId, hashtag, title, sort } = req.query; // Added 'title'
 
     try {
         const connection = await pool.getConnection();
@@ -345,6 +345,7 @@ app.get('/api/exhibitions', async (req, res) => {
                 e.shares,
                 e.created_at,
                 e.hashtags,
+                e.room_number,
                 u.nickname as author,
                 (SELECT item_url FROM exhibition_items WHERE exhibition_id = e.id ORDER BY id LIMIT 1) as thumbnail
             FROM
@@ -353,24 +354,44 @@ app.get('/api/exhibitions', async (req, res) => {
                 users u ON e.user_id = u.id
         `;
         const params = [];
-        const conditions = [];
+        const primaryConditions = []; // Conditions for userId or is_public
+        const searchConditions = [];  // Conditions for title or hashtag
 
         if (userId) {
-            conditions.push('e.user_id = ?');
+            primaryConditions.push('e.user_id = ?');
             params.push(userId);
         } else {
-            conditions.push('e.is_public = TRUE');
+            primaryConditions.push('e.is_public = TRUE');
         }
 
-        // Add hashtag filtering
+        if (title) {
+            searchConditions.push('e.title LIKE ?');
+            params.push(`%${title}%`);
+        }
+
         if (hashtag) {
-            conditions.push('FIND_IN_SET(?, e.hashtags)');
-            params.push(hashtag);
+            const cleanHashtag = hashtag.startsWith('#') ? hashtag.substring(1) : hashtag;
+            searchConditions.push('e.hashtags LIKE ?');
+            params.push(`%#${cleanHashtag}%`);
         }
 
-        if (conditions.length > 0) {
-            query += ' WHERE ' + conditions.join(' AND ');
+        let whereClause = '';
+        if (primaryConditions.length > 0) {
+            whereClause += ' WHERE ' + primaryConditions.join(' AND ');
         }
+
+        if (searchConditions.length > 0) {
+            // If primaryConditions exist, add 'AND'
+            if (whereClause.length > 0) {
+                whereClause += ' AND ';
+            } else {
+                whereClause += ' WHERE ';
+            }
+            // Combine search conditions with OR, wrapped in parentheses for precedence
+            whereClause += `(${searchConditions.join(' OR ')})`;
+        }
+        
+        query += whereClause;
 
         let orderBy = ' ORDER BY e.created_at DESC'; // Default sort
         if (sort === 'views') {
@@ -847,9 +868,19 @@ app.get('/api/users/:userId', async (req, res) => {
         );
         const exhibition_count = exhibitionCountRows[0].exhibition_count;
 
-        // For now, return 0 for follower_count and following_count as these features are not implemented
-        const follower_count = 0;
-        const following_count = 0;
+        // Fetch follower count
+        const [followerCountRows] = await connection.execute(
+            'SELECT COUNT(*) AS follower_count FROM user_follows WHERE followed_id = ?',
+            [parsedUserId]
+        );
+        const follower_count = followerCountRows[0].follower_count;
+
+        // Fetch following count
+        const [followingCountRows] = await connection.execute(
+            'SELECT COUNT(*) AS following_count FROM user_follows WHERE follower_id = ?',
+            [parsedUserId]
+        );
+        const following_count = followingCountRows[0].following_count;
 
         connection.release();
 
@@ -1280,6 +1311,92 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
         if (error.sqlMessage) {
             console.error('MySQL Error Message:', error.sqlMessage);
         }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for following a user
+app.post('/api/users/:followedId/follow', async (req, res) => {
+    const { followedId } = req.params;
+    const { followerId } = req.body; // The user who is following
+
+    if (!followerId || !followedId) {
+        return res.status(400).json({ message: 'Follower ID and Followed ID are required.' });
+    }
+
+    if (parseInt(followerId) === parseInt(followedId)) {
+        return res.status(400).json({ message: 'Cannot follow yourself.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute(
+            'INSERT INTO user_follows (follower_id, followed_id) VALUES (?, ?)',
+            [followerId, followedId]
+        );
+        connection.release();
+        res.status(201).json({ message: 'User followed successfully.' });
+    } catch (error) {
+        console.error('Follow user error:', error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Already following this user.' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for unfollowing a user
+app.delete('/api/users/:followedId/follow', async (req, res) => {
+    const { followedId } = req.params;
+    const { followerId } = req.body; // The user who is unfollowing
+
+    if (!followerId || !followedId) {
+        return res.status(400).json({ message: 'Follower ID and Followed ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [result] = await connection.execute(
+            'DELETE FROM user_follows WHERE follower_id = ? AND followed_id = ?',
+            [followerId, followedId]
+        );
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Follow relationship not found.' });
+        }
+        res.status(200).json({ message: 'User unfollowed successfully.' });
+    } catch (error) {
+        console.error('Unfollow user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for checking if a user is following another
+app.get('/api/users/:userId/is-following/:targetUserId', async (req, res) => {
+    const { userId, targetUserId } = req.params;
+
+    if (!userId || !targetUserId) {
+        return res.status(400).json({ message: 'User ID and Target User ID are required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    const parsedTargetUserId = parseInt(targetUserId, 10);
+
+    if (isNaN(parsedUserId) || isNaN(parsedTargetUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT * FROM user_follows WHERE follower_id = ? AND followed_id = ?',
+            [parsedUserId, parsedTargetUserId]
+        );
+        connection.release();
+        res.status(200).json({ isFollowing: rows.length > 0 });
+    } catch (error) {
+        console.error('Check is-following error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

@@ -89,12 +89,11 @@ export default function App() {
       localStorage.setItem('currentUser', JSON.stringify(userData)); // Update localStorage with full data
     } catch (error) {
       console.error("Error fetching current user:", error);
-      setCurrentUser(null);
-      localStorage.removeItem('userId');
-      localStorage.removeItem('currentUser');
-      navigate('/login');
-    }
-  };
+            setCurrentUser(null);
+            localStorage.removeItem('userId');
+            localStorage.removeItem('currentUser');
+          }
+        };;
   
   // Effect to load user from localStorage on initial render
   useEffect(() => {
@@ -102,8 +101,6 @@ export default function App() {
     if (storedUserId) {
       // If userId is in localStorage, fetch the full user data
       fetchCurrentUser(parseInt(storedUserId, 10));
-    } else {
-      navigate('/login'); // Go to login if no user is stored
     }
   }, []); // The empty dependency array ensures this runs only once on mount
 
@@ -117,6 +114,21 @@ export default function App() {
       localStorage.removeItem('currentUser');
     }
   }, [currentUser]);
+
+  // Effect to handle navigation based on currentUser status
+  useEffect(() => {
+    // If currentUser exists and we are on the login page or root, navigate to main
+    if (currentUser) {
+      if (location.pathname === '/login' || location.pathname === '/') {
+        navigate('/main');
+      }
+    } else {
+      // If no currentUser and not already on login/signup-complete, navigate to login
+      if (location.pathname !== '/login' && !location.pathname.startsWith('/signup')) { // Use startsWith for better path checking
+        navigate('/login');
+      }
+    }
+  }, [currentUser, navigate, location.pathname]);
   
   const [signupData, setSignupData] = useState<SignupData>({
     // Step 1
@@ -479,7 +491,6 @@ export default function App() {
   const handleLoginSuccess = (user: User) => {
     localStorage.setItem('userId', user.id.toString());
     fetchCurrentUser(user.id); // Fetch full user data after login
-    navigate('/main');
   };
 
   const handleLogout = () => {

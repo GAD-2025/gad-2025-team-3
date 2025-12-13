@@ -53,11 +53,11 @@ export default function OtherUserProfilePage() {
   const [isFollowing, setIsFollowing] = useState(false); // This would typically come from backend based on logged-in user
 
   useEffect(() => {
-    const loggedInUserId = localStorage.getItem('userId'); // 실제 구현에서는 더 안전한 방법 사용
+    const loggedInUserId = localStorage.getItem('userId');
 
     if (loggedInUserId && userId && loggedInUserId === userId) {
-      navigate('/profile', { replace: true }); // ProfilePage 경로로 리디렉션 (replace: true는 뒤로가기 시 이 페이지로 돌아오지 않게 함)
-      return; // 리디렉션 후 추가 작업 방지
+      navigate('/profile', { replace: true });
+      return;
     }
 
     const fetchUserProfile = async () => {
@@ -67,22 +67,23 @@ export default function OtherUserProfilePage() {
         return;
       }
       try {
-        const [profileRes, exhibitionsRes] = await Promise.all([
+        const [profileRes, exhibitionsRes, isFollowingRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`),
           fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/exhibitions`),
+          loggedInUserId ? fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}/is-following/${userId}`) : Promise.resolve(new Response(JSON.stringify({ isFollowing: false }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
         ]);
 
         if (!profileRes.ok) throw new Error(`Failed to fetch user profile: ${profileRes.statusText}`);
         if (!exhibitionsRes.ok) throw new Error(`Failed to fetch user exhibitions: ${exhibitionsRes.statusText}`);
+        if (!isFollowingRes.ok) throw new Error(`Failed to fetch follow status: ${isFollowingRes.statusText}`);
 
         const userProfileData: UserProfile = await profileRes.json();
         const userExhibitionsData: UserExhibition[] = await exhibitionsRes.json();
-        console.log("백엔드에서 받은 전시회 데이터:", userExhibitionsData); // 디버깅을 위해 추가
-
+        const { isFollowing: initialIsFollowing } = await isFollowingRes.json();
+        
         setProfile(userProfileData);
         setUserExhibitions(userExhibitionsData);
-        // Assuming backend provides isFollowing status for the logged-in user
-        // setIsFollowing(userProfileData.is_following); // Uncomment and implement if backend supports
+        setIsFollowing(initialIsFollowing);
 
       } catch (err: any) {
         console.error("Error fetching user profile:", err);
@@ -96,15 +97,28 @@ export default function OtherUserProfilePage() {
   }, [userId, navigate]);
 
   const handleFollowToggle = async () => {
-    // Implement follow/unfollow logic here
-    console.log(`Toggle follow for user ${userId}`);
-    setIsFollowing(!isFollowing); // Optimistic update
+    const loggedInUserId = localStorage.getItem('userId');
+    if (!loggedInUserId || !profile) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    // Optimistic update
+    setIsFollowing(prev => !prev);
+    setProfile(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        follower_count: isFollowing ? prev.follower_count - 1 : prev.follower_count + 1
+      };
+    });
+
     try {
       const method = isFollowing ? 'DELETE' : 'POST';
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/follow`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${profile.id}/follow`, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        // body: JSON.stringify({ currentUserId: loggedInUserId }), // If needed
+        body: JSON.stringify({ followerId: parseInt(loggedInUserId, 10) }),
       });
 
       if (!response.ok) {
@@ -112,7 +126,15 @@ export default function OtherUserProfilePage() {
       }
     } catch (error) {
       console.error("Error toggling follow status:", error);
-      setIsFollowing(!isFollowing); // Revert optimistic update on error
+      // Revert optimistic update on error
+      setIsFollowing(prev => !prev);
+      setProfile(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          follower_count: isFollowing ? prev.follower_count + 1 : prev.follower_count - 1
+        };
+      });
       alert("팔로우/언팔로우 실패");
     }
   };

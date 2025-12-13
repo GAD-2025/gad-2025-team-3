@@ -51,9 +51,20 @@ export default function ExploreSearchResultsPage({
     setLoading(true);
     setError(null);
     try {
-      // Ensure the query starts with '#' for hashtag search, as backend expects it
-      const formattedQuery = query.startsWith('#') ? query : `#${query}`;
-      const url = `${import.meta.env.VITE_API_URL}/api/exhibitions?hashtag=${encodeURIComponent(formattedQuery)}`;
+      let url = `${import.meta.env.VITE_API_URL}/api/exhibitions?`;
+      
+      const params = new URLSearchParams();
+
+      if (query.startsWith('#')) {
+        // If query starts with '#', search only by hashtag (remove '#' for backend)
+        params.append('hashtag', query.substring(1));
+      } else {
+        // Otherwise, search by title OR hashtag
+        params.append('title', query);
+        params.append('hashtag', query); // Send the same query as a hashtag as well
+      }
+      
+      url += params.toString();
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -61,13 +72,15 @@ export default function ExploreSearchResultsPage({
       }
       const data = await response.json();
       // Adjust backend data to match Exhibition interface for 'room' and numeric values if necessary
-      const processedExhibitions = data.map((ex: any) => ({
-        ...ex,
-        room_number: String(ex.room_number),
-        views: String(ex.views),
-        likes: String(ex.likes),
-        shares: String(ex.shares),
-      }));
+      const processedExhibitions = data.map((ex: any) => {
+        return {
+          ...ex,
+          room_number: String(ex.room_number),
+          views: String(ex.views),
+          likes: String(ex.likes),
+          shares: String(ex.shares),
+        };
+      });
       setExhibitions(processedExhibitions);
     } catch (err: any) {
       setError(err.message || 'An error occurred while fetching search results.');
