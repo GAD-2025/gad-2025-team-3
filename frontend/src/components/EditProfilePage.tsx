@@ -238,13 +238,13 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="자신을 소개해주세요 (선택)"
                     className="bg-transparent border-0 box-border content-stretch flex h-[110.119px] items-start px-[16px] py-[12px] relative w-full font-['Pretendard',sans-serif] leading-[20px] not-italic resize-none text-[14px] tracking-[-0.28px] text-[#4a5565] placeholder:text-[#99a1af] outline-none"
-                    maxLength={100}
+                    maxLength={20}
                   ></textarea>
                 </div>
                 <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
               </div>
               <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Paragraph">
-                <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] text-right tracking-[-0.24px]">{bio.length} / 100</p>
+                <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] text-right tracking-[-0.24px]">{bio.length} / 20</p>
               </div>
             </div>
             {/* 구분선 */}
