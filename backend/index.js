@@ -15,8 +15,11 @@ const app = express();
 app.use(cors({
     origin: ['http://localhost:5173', 'https://gad-2025-team-3.web.app'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json({ limit: '50mb' }));
+app.options('*', cors());
 
 // Serve static files from img_save folder
 app.use('/uploads', express.static(path.join(__dirname, 'img_save')));
@@ -91,7 +94,7 @@ app.post('/api/signup', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const connection = await pool.getConnection(); 
+        const connection = await pool.getConnection();
         await connection.beginTransaction();
 
         try {
@@ -390,7 +393,7 @@ app.get('/api/exhibitions', async (req, res) => {
             // Combine search conditions with OR, wrapped in parentheses for precedence
             whereClause += `(${searchConditions.join(' OR ')})`;
         }
-        
+
         query += whereClause;
 
         let orderBy = ' ORDER BY e.created_at DESC'; // Default sort
@@ -752,80 +755,80 @@ app.delete('/api/comments/:commentId', async (req, res) => {
             await connection.rollback();
             connection.release();
         }
-                    console.error('Delete comment error:', error);
-                    res.status(500).json({ message: 'Internal server error' });
-                }
-            });
-        
-        // API for deleting a user account
-        app.delete('/api/users/:userId', async (req, res) => {
-            const { userId } = req.params;
-            const { username } = req.body; // Assuming username is passed for authorization
-        
-            if (!username) {
-                return res.status(401).json({ message: 'Authorization information (username) is required.' });
-            }
-        
-            const parsedUserId = parseInt(userId, 10);
-            if (isNaN(parsedUserId)) {
-                return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
-            }
-        
-            const connection = await pool.getConnection();
-            try {
-                await connection.beginTransaction();
-        
-                // 1. Get the user to verify authorization
-                const [users] = await connection.execute(
-                    'SELECT id, username FROM users WHERE id = ?',
-                    [parsedUserId]
-                );
-        
-                if (users.length === 0) {
-                    await connection.rollback();
-                    connection.release();
-                    return res.status(404).json({ message: 'User not found.' });
-                }
-        
-                const targetUser = users[0];
-        
-                // 2. Authorize: check if the requesting user is the target user
-                if (targetUser.username !== username) {
-                    await connection.rollback();
-                    connection.release();
-                    return res.status(403).json({ message: 'You are not authorized to delete this account.' });
-                }
-        
-                        // 3. Delete related data from user_artists first
-                        await connection.execute(
-                            'DELETE FROM user_artists WHERE user_id = ?',
-                            [parsedUserId]
-                        );
-                
-                        // 4. Delete the user
-                        const [deleteResult] = await connection.execute(
-                            'DELETE FROM users WHERE id = ?',
-                            [parsedUserId]
-                        );        
-                if (deleteResult.affectedRows === 0) {
-                    await connection.rollback();
-                    connection.release();
-                    return res.status(404).json({ message: 'User not found after authorization check.' });
-                }
-        
-                await connection.commit();
-                connection.release();
-                res.status(200).json({ message: 'User account deleted successfully.' });
-        
-            } catch (error) {
-                if (connection) {
-                    await connection.rollback();
-                    connection.release();
-                }
-                console.error('Delete user error:', error);
-                res.status(500).json({ message: 'Internal server error' });
-            }
-        });
+        console.error('Delete comment error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for deleting a user account
+app.delete('/api/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const { username } = req.body; // Assuming username is passed for authorization
+
+    if (!username) {
+        return res.status(401).json({ message: 'Authorization information (username) is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. Get the user to verify authorization
+        const [users] = await connection.execute(
+            'SELECT id, username FROM users WHERE id = ?',
+            [parsedUserId]
+        );
+
+        if (users.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const targetUser = users[0];
+
+        // 2. Authorize: check if the requesting user is the target user
+        if (targetUser.username !== username) {
+            await connection.rollback();
+            connection.release();
+            return res.status(403).json({ message: 'You are not authorized to delete this account.' });
+        }
+
+        // 3. Delete related data from user_artists first
+        await connection.execute(
+            'DELETE FROM user_artists WHERE user_id = ?',
+            [parsedUserId]
+        );
+
+        // 4. Delete the user
+        const [deleteResult] = await connection.execute(
+            'DELETE FROM users WHERE id = ?',
+            [parsedUserId]
+        );
+        if (deleteResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ message: 'User not found after authorization check.' });
+        }
+
+        await connection.commit();
+        connection.release();
+        res.status(200).json({ message: 'User account deleted successfully.' });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error('Delete user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 // API for fetching a single user's profile
 app.get('/api/users/:userId', async (req, res) => {
     const { userId } = req.params;
@@ -841,7 +844,7 @@ app.get('/api/users/:userId', async (req, res) => {
 
     try {
         const connection = await pool.getConnection();
-        
+
         // Fetch user details
         const [userRows] = await connection.execute(
             'SELECT id, username, email, nickname, bio, created_at FROM users WHERE id = ?',
@@ -1026,7 +1029,7 @@ app.put('/api/users/:userId', async (req, res) => {
         }
 
         if (updateResult.affectedRows === 0 && (!user_artists || user_artists.length === 0)) {
-             // If no user fields were updated and no artists were added/removed
+            // If no user fields were updated and no artists were added/removed
             await connection.rollback();
             connection.release();
             return res.status(200).json({ message: 'No changes made.' }); // Or 404/304 depending on desired behavior
@@ -1494,15 +1497,15 @@ async function startServer() {
         });
 
         // 서버 리스닝 시작
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
 
     } catch (error) {
         // DB 연결 실패 시 에러 출력 후 서버 시작 중단
         console.error('❌ DB 연결 설정 오류 또는 서버 시작 실패:', error.stack);
         console.log('🔥 서버가 종료됩니다. .env 파일의 DB 정보를 확인하세요.');
-        process.exit(1); 
+        process.exit(1);
     }
 }
 
