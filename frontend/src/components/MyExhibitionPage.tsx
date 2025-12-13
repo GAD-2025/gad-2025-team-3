@@ -30,7 +30,7 @@ interface Exhibition {
   shares: number;
   created_at: string;
   author: string;
-  room_number?: string;
+  room_number: string;
   room_creation_count?: number;
 }
 
@@ -90,9 +90,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser, res
     navigate(`/exhibition/${exhibition.id}`);
   };
 
-  const getRoomNumber = (index: number) => {
-    return `${100 + (index + 1)}`;
-  };
+
 
   if (loading) {
     return (
@@ -211,7 +209,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser, res
                           <p className="font-['EB_Garamond',serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-white w-[37.938px]">Room</p>
                         </div>
                         <div className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0" data-name="Container">
-                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-nowrap text-white whitespace-pre">{getRoomNumber(index)}</p>
+                          <p className="font-['EB_Garamond',serif] font-bold leading-[32px] not-italic relative shrink-0 text-[24px] text-nowrap text-white whitespace-pre">{exhibition.room_number}</p>
                         </div>
                       </div>
                     </div>
@@ -281,7 +279,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser, res
           isOpen={shareModalOpen}
           onClose={() => setShareModalOpen(false)}
           exhibition={{
-            room: selectedExhibition.room_number || getRoomNumber(exhibitions.indexOf(selectedExhibition)),
+            room: selectedExhibition.room_number,
             creationCount: selectedExhibition.room_creation_count,
             title: selectedExhibition.title,
             author: currentUser?.nickname || 'Unknown'
