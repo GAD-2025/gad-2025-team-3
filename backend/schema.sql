@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS exhibitions (
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
     shares INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     room_number VARCHAR(255),
     room_creation_count INT DEFAULT 1
