@@ -30,26 +30,6 @@ export default function CreateExhibitionCompletePage({
 
 
 
-  const count = uploadedImages.length;
-
-  const topCount = Math.ceil(count / 2);
-
-
-
-  const displayImagesTop = uploadedImages.slice(0, topCount);
-
-  const displayImagesBottom = uploadedImages.slice(topCount);
-
-
-
-  // Duplicate images for seamless loop if there are images
-
-  const scrollingImagesTop = displayImagesTop.length > 0 ? [...displayImagesTop, ...displayImagesTop] : [];
-
-  const scrollingImagesBottom = displayImagesBottom.length > 0 ? [...displayImagesBottom, ...displayImagesBottom] : [];
-
-
-
   useEffect(() => {
 
     // Generate random circles with wider spread
@@ -93,18 +73,6 @@ export default function CreateExhibitionCompletePage({
     generateCircles();
 
   }, []);
-
-
-
-  // Calculate total width for continuous scroll dynamically
-
-  const imageWidth = 140;
-
-  const gap = 18;
-
-  const totalWidthTop = (imageWidth + gap) * displayImagesTop.length;
-
-  const totalWidthBottom = (imageWidth + gap) * displayImagesBottom.length;
 
 
 
@@ -190,146 +158,30 @@ export default function CreateExhibitionCompletePage({
 
 
 
-      {/* Image Grid - Top Section with continuous horizontal scroll */}
-
-      <div className="absolute left-1/2 top-[153px] translate-x-[-50%] w-[800px] overflow-hidden">
-
-        <motion.div
-
-          className="flex gap-[18px] items-center"
-
-          animate={{
-
-            x: [-totalWidthTop, 0],
-
-          }}
-
-          transition={{
-
-            duration: 20,
-
-            repeat: Infinity,
-
-            ease: "linear",
-
-          }}
-
-        >
-
-                    {scrollingImagesTop.map((img, index) => (
-
-                      <div
-
-                        key={`top-${index}`}
-
-                        className="relative shrink-0 size-[140px]"
-
-                      >
-
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
-
-                          {img ? (
-
-                            <div className="absolute left-0 size-[140px] top-0">
-
-                              <img
-
-                                alt="Uploaded content"
-
-                                className="absolute inset-0 max-w-none object-50%-50% object-cover pointer-events-none size-full"
-
-                                src={img}
-
-                              />
-
-                            </div>
-
-                          ) : (
-
-                            <div className="absolute left-0 size-[140px] top-0 bg-[#E5E7EB]" />
-
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    ))}
-
-        </motion.div>
-
-      </div>
-
-
-
-      {/* Image Grid - Bottom Section with continuous horizontal scroll (opposite direction) */}
-
-      <div className="absolute left-1/2 top-[313px] translate-x-[-50%] w-[800px] overflow-hidden">
-
-        <motion.div
-
-          className="flex gap-[18px] items-center"
-
-          animate={{
-
-            x: [0, -totalWidthBottom],
-
-          }}
-
-          transition={{
-
-            duration: 25,
-
-            repeat: Infinity,
-
-            ease: "linear",
-
-          }}
-
-        >
-
-                    {scrollingImagesBottom.map((img, index) => (
-
-                      <div
-
-                        key={`bottom-${index}`}
-
-                        className="relative shrink-0 size-[140px]"
-
-                      >
-
-                        <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
-
-                          {img ? (
-
-                            <div className="absolute left-0 size-[140px] top-0">
-
-                              <img
-
-                                alt="Uploaded content"
-
-                                className="absolute inset-0 max-w-none object-50%-50% object-cover pointer-events-none size-full"
-
-                                src={img}
-
-                              />
-
-                            </div>
-
-                          ) : (
-
-                            <div className="absolute left-0 size-[140px] top-0 bg-[#E5E7EB]" />
-
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    ))}
-
-        </motion.div>
-
+      {/* Image Scroll Container */}
+      <div className="absolute top-[233px] left-0 right-0 flex justify-center">
+        <div className="flex gap-[18px] overflow-x-auto px-4">
+          {uploadedImages.map((img, index) => (
+            <div
+              key={`image-${index}`}
+              className="relative shrink-0 size-[140px]"
+            >
+              <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border relative size-[140px]">
+                {img ? (
+                  <div className="absolute left-0 size-[140px] top-0">
+                    <img
+                      alt="Uploaded content"
+                      className="absolute inset-0 max-w-none object-50%-50% object-cover pointer-events-none size-full"
+                      src={img}
+                    />
+                  </div>
+                ) : (
+                  <div className="absolute left-0 size-[140px] top-0 bg-[#E5E7EB]" />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
 
