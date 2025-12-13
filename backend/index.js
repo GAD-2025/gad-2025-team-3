@@ -12,14 +12,14 @@ const cron = require('node-cron'); // Add node-cron import
 require('dotenv').config();
 
 const app = express();
-app.use(cors({
+const corsOptions= {
     origin: ['http://localhost:5173', 'https://gad-2025-team-3.web.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
 app.use(express.json({ limit: '50mb' }));
-app.options('*', cors());
+app.use('*', cors(corsOptions));
 
 // Serve static files from img_save folder
 app.use('/uploads', express.static(path.join(__dirname, 'img_save')));
