@@ -33,9 +33,10 @@ interface ProfilePageProps {
   onNavigateToBadges: () => void;
   onNavigateToMyExhibition: () => void;
   onNavigateToEditProfile: () => void;
+  onLogout: () => void; // Add onLogout prop
 }
 
-export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile }: ProfilePageProps) {
+export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile, onLogout }: ProfilePageProps) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,10 +103,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('userId');
-    navigate('/login', { replace: true });
-  };
+
 
   const handleFeatureClick = (featureName: string) => {
     alert(`${featureName} 기능은 아직 구현되지 않았습니다.`);
@@ -533,7 +531,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             </div>
             {/* 로그아웃 */}
             <button
-              onClick={handleLogout}
+              onClick={onLogout}
               className="h-[56.2px] relative shrink-0 w-full cursor-pointer"
               data-name="Button"
             >

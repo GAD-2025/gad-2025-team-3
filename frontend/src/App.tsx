@@ -582,6 +582,7 @@ export default function App() {
                   onNavigateToBadges={() => navigate('/badges')}
                   onNavigateToMyExhibition={() => navigate('/myexhibition')}
                   onNavigateToEditProfile={() => navigate('/profile/edit')}
+                  onLogout={handleLogout} // Pass the global handleLogout
                 />
               )
             } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={() => fetchCurrentUser(currentUser!.id)} />} />
