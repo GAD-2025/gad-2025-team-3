@@ -9,6 +9,7 @@ interface FavoriteExhibitionCardProps {
   views: number;
   likes: number;
   roomId: number;
+  room_number: string;
   imageUrls: string[]; // imageUrls 속성 추가
   onNavigateToDetail: (id: number) => void;
   isEditMode: boolean;
@@ -23,6 +24,7 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   views,
   likes,
   roomId,
+  room_number,
   imageUrls,
   onNavigateToDetail,
   isEditMode,
@@ -64,9 +66,9 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
                 by {authorName}
               </p>
             </div>
-            {/* Room ID Box - Integrated into flex layout */}
-            <div className="border border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] flex-shrink-0">
-              {roomId}
+            {/* Room Number Box - Integrated into flex layout */}
+            <div className="border-2 border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] flex-shrink-0">
+              {room_number}
             </div>
           </div>
   

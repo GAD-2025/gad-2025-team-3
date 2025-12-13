@@ -157,25 +157,25 @@ export default function StatisticsPage({
         {/* Stats Grid */}
         <div className="p-6 border-b border-black h-[280px] relative">
           {/* Views */}
-          <div className="absolute top-6 left-6 w-[163px] h-[106px] border border-black p-4 flex flex-col justify-between">
+          <div className="absolute top-6 left-6 w-[163px] h-[106px] border-2 border-black p-4 flex flex-col justify-between">
             <p className="text-sm text-gray-500">조회수</p>
             <p className="font-['EB_Garamond',serif] font-bold text-3xl">{(statistics.total_views || 0).toLocaleString()}</p>
           </div>
           
           {/* Likes */}
-          <div className="absolute top-6 right-6 w-[163px] h-[106px] border border-black p-4 flex flex-col justify-between">
+          <div className="absolute top-6 right-6 w-[163px] h-[106px] border-2 border-black p-4 flex flex-col justify-between">
             <p className="text-sm text-gray-500">좋아요</p>
             <p className="font-['EB_Garamond',serif] font-bold text-3xl">{(statistics.total_likes || 0).toLocaleString()}</p>
           </div>
 
           {/* Shares */}
-          <div className="absolute bottom-6 left-6 w-[163px] h-[106px] border border-black p-4 flex flex-col justify-between">
+          <div className="absolute bottom-6 left-6 w-[163px] h-[106px] border-2 border-black p-4 flex flex-col justify-between">
             <p className="text-sm text-gray-500">공유</p>
             <p className="font-['EB_Garamond',serif] font-bold text-3xl">{(statistics.total_shares || 0).toLocaleString()}</p>
           </div>
 
           {/* Count (White bg) */}
-          <div className="absolute bottom-6 right-6 w-[163px] h-[106px] border border-black p-4 flex flex-col justify-between bg-white bg-opacity-90">
+          <div className="absolute bottom-6 right-6 w-[163px] h-[106px] border-2 border-black p-4 flex flex-col justify-between bg-white bg-opacity-90">
             <p className="text-sm text-gray-500">전시관 수</p>
             <p className="font-['EB_Garamond',serif] font-bold text-3xl">{statistics.exhibition_count || 0}</p>
           </div>
@@ -184,18 +184,7 @@ export default function StatisticsPage({
         {/* Activity Log */}
         <div className="p-6">
           <h2 className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic text-[18px] text-[#4a5565] mb-6">Activity Log</h2>
-          <div className="flex flex-col gap-6">
-            {activityLog.map((activity, index) => (
-              <div key={index} className="flex flex-col gap-2 pb-4 border-b border-gray-100 last:border-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">{activity.date}</span>
-                  <span className="text-xs font-serif border border-black px-2 py-0.5">{activity.number}</span>
-                </div>
-                <p className="font-bold text-sm">{activity.title}</p>
-                <p className="text-xs text-gray-500">{activity.subtitle}</p>
-              </div>
-            ))}
-          </div>
+          {/* Activity items will be rendered here once data is available */}
         </div>
 
       </div>

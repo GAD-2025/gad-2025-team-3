@@ -418,6 +418,7 @@ app.get('/api/exhibitions/:id', async (req, res) => {
                 e.likes, 
                 e.shares, 
                 e.created_at,
+                e.room_number,
                 e.hashtags,
                 u.nickname as author
             FROM 
@@ -1255,6 +1256,7 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
                 e.title,
                 e.views,
                 e.likes,
+                e.room_number,
                 e.id as roomId,
                 u.nickname as authorName
             FROM 

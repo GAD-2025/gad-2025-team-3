@@ -51,7 +51,12 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
       if (prevSelected.includes(artistId)) {
         return prevSelected.filter(id => id !== artistId);
       } else {
-        return [...prevSelected, artistId];
+        if (prevSelected.length < 5) {
+          return [...prevSelected, artistId];
+        } else {
+          alert('최대 5개까지 선택할 수 있습니다.'); // 제한 초과 시 알림
+          return prevSelected;
+        }
       }
     });
   };

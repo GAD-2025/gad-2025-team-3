@@ -20,6 +20,7 @@ interface FavoriteExhibition {
   views: number;
   likes: number;
   roomId: number;
+  room_number: string;
   imageUrls: string[]; // imageUrls 속성 추가
 }
 

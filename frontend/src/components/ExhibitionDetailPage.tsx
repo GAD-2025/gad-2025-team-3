@@ -489,11 +489,11 @@ export default function ExhibitionDetailPage({
                     <div className="h-[54.7px] relative shrink-0 w-[59.538px]" data-name="Container">
                       <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col h-[54.7px] items-center justify-center pb-[4px] pt-0 px-0 relative w-[59.538px]">
-                        <div className="box-border content-stretch flex items-start justify-center mb-[-4px] relative shrink-0 w-full" data-name="Container">
-                          <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">Room</p>
-                        </div>
-                        <div className="box-border content-stretch flex gap-[10px] items-center justify-center mb-[-4px] relative shrink-0 w-full" data-name="Container">
+                        <div className="box-border content-stretch flex gap-[10px] items-center justify-center relative shrink-0 w-full" data-name="Container">
                           <p className="font-['EB_Garamond',serif] font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black">{exhibitionData.room_number}</p>
+                        </div>
+                        <div className="box-border content-stretch flex items-start justify-center relative shrink-0 w-full" data-name="Container">
+                          <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">Room</p>
                         </div>
                       </div>
                     </div>
