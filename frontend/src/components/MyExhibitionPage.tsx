@@ -38,9 +38,10 @@ interface MyExhibitionPageProps {
   onBack: () => void;
   onCreateNew: () => void;
   currentUser: User | null;
+  resetExhibitionFormState: () => void;
 }
 
-export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: MyExhibitionPageProps) {
+export default function MyExhibitionPage({ onBack, onCreateNew, currentUser, resetExhibitionFormState }: MyExhibitionPageProps) {
   const navigate = useNavigate();
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
@@ -142,7 +143,10 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser }: M
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col h-[120.8px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
             <button 
-              onClick={onCreateNew}
+              onClick={() => {
+                resetExhibitionFormState(); // Call reset before navigating
+                onCreateNew();
+              }}
               className="h-[71.2px] relative shrink-0 w-full cursor-pointer group" 
               data-name="Button"
             >

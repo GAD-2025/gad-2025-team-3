@@ -25,7 +25,6 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
-  profile_picture_url: string; // 필수로 변경
   user_artists: string[]; // Change to user_artists
 }
 

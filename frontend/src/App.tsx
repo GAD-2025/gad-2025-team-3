@@ -37,7 +37,7 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
-  profile_picture_url: string; // 필수로 변경
+  user_artists: string[];
 }
 
 // Re-defining SignupData directly in App.tsx as context is being removed for this flow
@@ -77,26 +77,31 @@ export default function App() {
   const [signupStep, setSignupStep] = useState(1);
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  const fetchCurrentUser = async (userId: number) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      const userData: User = await response.json();
+      setCurrentUser(userData);
+      localStorage.setItem('currentUser', JSON.stringify(userData)); // Update localStorage with full data
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      setCurrentUser(null);
+      localStorage.removeItem('userId');
+      localStorage.removeItem('currentUser');
+      navigate('/login');
+    }
+  };
   
   // Effect to load user from localStorage on initial render
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        // Add a check for a crucial property to ensure the object is a valid user
-        if (user && user.id) {
-          setCurrentUser(user);
-          navigate('/main'); // Go to main page if logged in
-        } else {
-          // If the parsed object is not a valid user, treat it as a logout
-          throw new Error("Invalid user object in localStorage");
-        }
-      } catch (error) {
-        console.error("Failed to parse or validate user from localStorage", error);
-        localStorage.removeItem('currentUser');
-        navigate('/login'); // Fallback to login if stored data is corrupt or invalid
-      }
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      // If userId is in localStorage, fetch the full user data
+      fetchCurrentUser(parseInt(storedUserId, 10));
     } else {
       navigate('/login'); // Go to login if no user is stored
     }
@@ -105,8 +110,8 @@ export default function App() {
   // Effect to save/remove user from localStorage when currentUser state changes
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('userId', currentUser.id.toString()); // currentUser.id 저장
-      localStorage.setItem('currentUser', JSON.stringify(currentUser)); // currentUser 객체도 저장 (다른 곳에서 사용할 경우를 대비)
+      localStorage.setItem('userId', currentUser.id.toString());
+      localStorage.setItem('currentUser', JSON.stringify(currentUser)); 
     } else {
       localStorage.removeItem('userId');
       localStorage.removeItem('currentUser');
@@ -153,6 +158,17 @@ export default function App() {
   const [hashtags, setHashtags] = useState<string[]>([]); // hashtags 상태 추가
 
   const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionData | null>(null);
+
+  const resetExhibitionFormState = () => {
+    setUploadedFiles([]);
+    setExhibitionTitle('');
+    setDescription('');
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setIsPublic(true);
+    setHashtags([]);
+  };
+
 
   // General input change handler for text/email/password inputs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -451,13 +467,6 @@ export default function App() {
 
       const result = await response.json();
       console.log('Exhibition created successfully:', result);
-      // Reset exhibition creation states
-      // setExhibitionTitle(''); // Removed this line
-      setDescription('');
-      setStartDate(undefined);
-      setEndDate(undefined);
-      setIsPublic(true);
-      // setUploadedFiles([]); // Removed this line
       navigate('/create-exhibition/complete');
 
     } catch (error: any) {
@@ -468,8 +477,8 @@ export default function App() {
 
 
   const handleLoginSuccess = (user: User) => {
-    setCurrentUser(user);
-    localStorage.setItem('userId', user.id.toString()); // 로그인 성공 시 userId 저장
+    localStorage.setItem('userId', user.id.toString());
+    fetchCurrentUser(user.id); // Fetch full user data after login
     navigate('/main');
   };
 
@@ -563,7 +572,7 @@ export default function App() {
                   onNavigateToEditProfile={() => navigate('/profile/edit')}
                 />
               )
-            } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={setCurrentUser} />} />
+            } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={() => fetchCurrentUser(currentUser!.id)} />} />
       <Route path="/profile/:userId" element={<OtherUserProfilePage />} />
       <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
       <Route path="/myexhibition" element={
@@ -571,6 +580,7 @@ export default function App() {
           onBack={() => navigate('/main')}
           onCreateNew={() => navigate('/create-exhibition')}
           currentUser={currentUser}
+          resetExhibitionFormState={resetExhibitionFormState}
         />
       } />
       <Route path="/create-exhibition" element={
@@ -606,7 +616,10 @@ export default function App() {
                       />      } />
       <Route path="/create-exhibition/complete" element={
         <CreateExhibitionCompletePage 
-          onNavigateToGallery={() => navigate('/myexhibition')}
+          onNavigateToGallery={() => {
+            resetExhibitionFormState(); // Clear state when navigating away from complete page
+            navigate('/myexhibition');
+          }}
           uploadedImages={uploadedFiles}
           exhibitionTitle={exhibitionTitle}
         />

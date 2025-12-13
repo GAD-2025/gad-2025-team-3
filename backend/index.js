@@ -859,7 +859,6 @@ app.get('/api/users/:userId', async (req, res) => {
             email: user.email,
             nickname: user.nickname,
             bio: user.bio,
-            profileIcon: user.profileIcon,
             created_at: user.created_at,
             exhibition_count,
             follower_count,

@@ -19,7 +19,7 @@ export default function SignupStep4({ username, onNext, onBack, formData, handle
     const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'all' || artist.type === filterType;
     return matchesSearch && matchesFilter;
-  });
+  }).sort((a, b) => a.name.localeCompare(b.name));
 
   const isFormValid = formData.selectedArtists.length > 0;
 

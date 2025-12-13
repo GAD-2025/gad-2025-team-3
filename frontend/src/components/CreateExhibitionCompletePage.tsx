@@ -192,7 +192,7 @@ export default function CreateExhibitionCompletePage({
 
       {/* Image Grid - Top Section with continuous horizontal scroll */}
 
-      <div className="absolute left-1/2 top-[153px] translate-x-[-45%] w-[800px] overflow-hidden">
+      <div className="absolute left-1/2 top-[153px] translate-x-[-50%] w-[800px] overflow-hidden">
 
         <motion.div
 
@@ -264,7 +264,7 @@ export default function CreateExhibitionCompletePage({
 
       {/* Image Grid - Bottom Section with continuous horizontal scroll (opposite direction) */}
 
-      <div className="absolute left-1/2 top-[313px] translate-x-[-45%] w-[800px] overflow-hidden">
+      <div className="absolute left-1/2 top-[313px] translate-x-[-50%] w-[800px] overflow-hidden">
 
         <motion.div
 
@@ -356,7 +356,7 @@ export default function CreateExhibitionCompletePage({
 
                     </p>
 
-          <p className="font-['Pretendard',sans-serif] leading-[20px] relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">쇼케이스를 성공적으로 업로드했어요</p>
+          <p className="font-['Pretendard',sans-serif] leading-[20px] relative shrink-0 text-[#4a5565] text-[14px] tracking-[-0.28px]">{exhibitionTitle} 쇼케이스를 성공적으로 업로드했어요</p>
 
         </div>
 

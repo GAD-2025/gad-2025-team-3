@@ -9,7 +9,6 @@ interface User {
   email: string;
   nickname: string;
   bio: string;
-  profileIcon?: string; // profileIcon 필드를 optional로 변경
   user_artists: string[]; // user_artists 필드 추가
 }
 
@@ -23,7 +22,6 @@ interface EditProfilePageProps {
 export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: EditProfilePageProps) {
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState('profile_1_s');
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const [nicknameValid, setNicknameValid] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
@@ -35,16 +33,15 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
 
   useEffect(() => {
     if (currentUser) {
+      console.log("currentUser in EditProfilePage:", currentUser); // Debug log
+      console.log("currentUser.user_artists in EditProfilePage:", currentUser.user_artists); // Debug log
       setNickname(currentUser.nickname);
       setBio(currentUser.bio);
-      setSelectedIcon(currentUser.profileIcon || 'profile_1_s');
       setSelectedArtists(currentUser.user_artists || []); // user_artists 초기값 설정
     }
   }, [currentUser]);
 
-  const handleIconSelect = (icon: string) => {
-    setSelectedIcon(icon);
-  };
+
 
   const handleArtistToggle = (artistId: string) => {
     setSelectedArtists(prevSelected => {
@@ -65,7 +62,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
     const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'all' || artist.type === filterType;
     return matchesSearch && matchesFilter;
-  });
+  }).sort((a, b) => a.name.localeCompare(b.name));
 
   const handleSave = async () => {
     if (!currentUser) {
@@ -87,7 +84,6 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
         body: JSON.stringify({
           nickname,
           bio,
-          profileIcon: selectedIcon,
           username: currentUser.username,
           user_artists: selectedArtists, // user_artists 데이터 함께 전송
         }),
@@ -185,23 +181,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
       <div className="relative shrink-0 w-full" data-name="Container">
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[23.99px] items-start pb-0 pt-[23.99px] px-[23.99px] relative w-full">
-            {/* Profile Icon Section */}
-            <div className="content-stretch flex flex-col gap-[7.997px] items-start relative shrink-0 w-full" data-name="Container">
-              <div className="content-stretch flex h-[15.007px] items-start relative shrink-0 w-full" data-name="Label">
-                <p className="basis-0 font-['Pretendard',sans-serif] grow leading-[18px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px]">프로필 아이콘</p>
-              </div>
-              <div className="flex justify-around w-full">
-                {['profile_1_s', 'profile_2_s', 'profile_3_s', 'profile_4_s'].map((icon) => (
-                  <div
-                    key={icon}
-                    className={`w-16 h-16 overflow-hidden cursor-pointer border-2 ${selectedIcon === icon ? 'border-pink-500' : 'border-transparent'}`}
-                    onClick={() => handleIconSelect(icon)}
-                  >
-                    <Profile prop1={icon as any} className="w-full h-full" />
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             {/* Nickname Section */}
             <div className="content-stretch flex flex-col gap-[7.997px] items-start relative shrink-0 w-full" data-name="Container">
@@ -331,6 +311,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
                 <div className="grid grid-cols-2 gap-[12px] w-full mt-[23.99px]" data-name="Artist Grid">
                     {filteredArtists.map((artist) => {
                         const isSelected = selectedArtists.includes(artist.id);
+                        console.log(`Comparing Artist ID: ${artist.id} with Selected Artists:`, selectedArtists, `Is Selected: ${isSelected}`);
                         return (
                         <button
                             key={artist.id}
