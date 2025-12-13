@@ -452,6 +452,7 @@ export default function App() {
       uploadedFiles,
       hashtags, // 추가
     });
+    console.log('Uploaded files before sending to backend:', uploadedFiles);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/exhibitions`, {

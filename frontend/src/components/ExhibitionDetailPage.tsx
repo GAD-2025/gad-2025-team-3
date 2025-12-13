@@ -151,9 +151,10 @@ export default function ExhibitionDetailPage({
 
     const originalIsLiked = isLiked;
     const originalLikes = parseInt(exhibitionData.likes, 10);
+    const safeOriginalLikes = isNaN(originalLikes) ? 0 : originalLikes;
 
     const newIsLiked = !originalIsLiked;
-    const newLikes = newIsLiked ? originalLikes + 1 : originalLikes - 1;
+    const newLikes = newIsLiked ? safeOriginalLikes + 1 : safeOriginalLikes - 1;
     
     setIsLiked(newIsLiked);
     setExhibitionData({ ...exhibitionData, likes: String(newLikes) });

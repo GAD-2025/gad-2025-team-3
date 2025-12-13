@@ -453,6 +453,7 @@ app.get('/api/exhibitions/:id', async (req, res) => {
         );
         connection.release();
         console.error('DEBUG: Query executed and connection released for /api/exhibitions/:id');
+        console.log('Fetched exhibition data:', rows[0]);
 
         if (rows.length === 0) {
             console.error('DEBUG: Exhibition not found for /api/exhibitions/:id');
@@ -1163,13 +1164,15 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
 
     try {
         const connection = await pool.getConnection();
+        console.log(`DEBUG: Checking like status for userId: ${parsedUserId}, exhibitionId: ${parsedExhibitionId}`);
         const [rows] = await connection.execute(
             'SELECT * FROM exhibition_likes WHERE user_id = ? AND exhibition_id = ?',
             [parsedUserId, parsedExhibitionId]
         );
         connection.release();
-
-        res.status(200).json({ isLiked: rows.length > 0 });
+        const isLikedStatus = rows.length > 0;
+        console.log(`DEBUG: isLiked: ${isLikedStatus}`);
+        res.status(200).json({ isLiked: isLikedStatus });
 
     } catch (error) {
         console.error('Check is-liked error:', error);
