@@ -390,6 +390,33 @@ export default function ExhibitionDetailPage({
     return <div className="flex justify-center items-center h-screen">No exhibition data found.</div>;
   }
 
+  const timeSince = (dateString: string) => {
+    const date = new Date(dateString);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) {
+        return Math.floor(interval) + "년 전";
+    }
+    interval = seconds / 2592000;
+    if (interval > 1) {
+        return Math.floor(interval) + "달 전";
+    }
+    interval = seconds / 86400;
+    if (interval > 1) {
+        return Math.floor(interval) + "일 전";
+    }
+    interval = seconds / 3600;
+    if (interval > 1) {
+        return Math.floor(interval) + "시간 전";
+    }
+    interval = seconds / 60;
+    if (interval > 1) {
+        return Math.floor(interval) + "분 전";
+    }
+    return "방금 전";
+  };
+
   const totalImages = exhibitionData.imageUrls.length;
   const isFirstImage = currentImageIndex === 0;
   const isLastImage = currentImageIndex === totalImages - 1;
@@ -618,9 +645,9 @@ export default function ExhibitionDetailPage({
                               <p className="font-['Playfair_Display',serif] font-normal leading-[16.5px] text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
                             </div>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0 flex-shrink-0" data-name="Text">
+                          <div className="h-[16.5px] relative shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
-                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] top-[-0.2px] tracking-[-0.24px] whitespace-pre">{new Date(comment.created_at).toLocaleString()}</p>
+                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] top-[-0.2px] tracking-[-0.24px] whitespace-pre">{timeSince(comment.created_at)}</p>
                             </div>
                           </div>
                         </div>
