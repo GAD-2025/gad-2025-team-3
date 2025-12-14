@@ -60,7 +60,7 @@ export default function MyExhibitionPage({ onBack, onCreateNew, currentUser, res
       setLoading(true);
       setError(null);
       try {
-        const url = `http://localhost:8080/api/exhibitions?userId=${currentUser.id}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/exhibitions?userId=${currentUser.id}`;
         const response = await fetch(url, { credentials: 'include' });
         if (!response.ok) {
           throw new Error('Failed to fetch exhibitions');

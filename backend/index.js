@@ -1,5 +1,5 @@
 console.log("--- SERVER CODE UPDATED ---");
-const express = require('express');
+const express = require('express'); // ⬅️ express 모듈 로드
 const cors = require('cors');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
@@ -11,15 +11,33 @@ const cron = require('node-cron'); // Add node-cron import
 // 1. 🟢 필수 수정: .env 파일 경로 명시
 require('dotenv').config();
 
-const app = express();
+// 🚨 1단계 해결: app 변수 정의 및 초기화 (이 부분이 없었거나 아래쪽에 있었습니다!)
+const app = express(); 
+
 const corsOptions= {
     origin: ['http://localhost:5173', 'https://gad-2025-team-3.web.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
-app.use(express.json({ limit: '50mb' }));
-app.use('*', cors(corsOptions));
+app.use(express.json({ limit: '50mb' })); // ⬅️ 이제 app을 사용할 수 있습니다.
+// app.use(cors(corsOptions)); // Commented out for debugging CORS
+
+app.use((req, res, next) => {
+    const allowedOrigins = ['http://localhost:5173', 'https://gad-2025-team-3.web.app'];
+    const origin = req.headers.origin;
+
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true'); // Required for credentials to be sent
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+}); 
 
 // Serve static files from img_save folder
 app.use('/uploads', express.static(path.join(__dirname, 'img_save')));
@@ -632,7 +650,7 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
-            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.author = u.nickname WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
+            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
             [id]
         );
         connection.release();
@@ -670,14 +688,14 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
         const authorNickname = userRows[0].nickname;
 
         const [result] = await connection.execute(
-            'INSERT INTO comments (exhibition_id, author, content) VALUES (?, ?, ?)',
-            [id, authorNickname, content]
+            'INSERT INTO comments (exhibition_id, user_id, author, content) VALUES (?, ?, ?, ?)',
+            [id, userId, authorNickname, content]
         );
 
         const newCommentId = result.insertId;
         // Fetch the new comment along with the user's current nickname
         const [newCommentRows] = await connection.execute(
-            'SELECT c.id, c.author, c.content, c.created_at FROM comments c WHERE c.id = ?',
+            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?',
             [newCommentId]
         );
         connection.release();
@@ -702,9 +720,9 @@ app.delete('/api/comments/:commentId', async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // 1. Get the comment's author (nickname) and the requesting user's nickname
+        // 1. Get the comment's user_id
         const [comments] = await connection.execute(
-            'SELECT author FROM comments WHERE id = ?',
+            'SELECT user_id FROM comments WHERE id = ?',
             [commentId]
         );
 
@@ -713,22 +731,10 @@ app.delete('/api/comments/:commentId', async (req, res) => {
             connection.release();
             return res.status(404).json({ message: 'Comment not found.' });
         }
-        const commentAuthorNickname = comments[0].author;
+        const commentOwnerUserId = comments[0].user_id;
 
-        const [users] = await connection.execute(
-            'SELECT nickname FROM users WHERE id = ?',
-            [userId]
-        );
-
-        if (users.length === 0) {
-            await connection.rollback();
-            connection.release();
-            return res.status(401).json({ message: 'Unauthorized: User not found.' });
-        }
-        const requestingUserNickname = users[0].nickname;
-
-        // 2. Authorize: check if the requesting user's nickname matches the comment's author nickname
-        if (commentAuthorNickname !== requestingUserNickname) {
+        // 2. Authorize: check if the requesting user's ID matches the comment's owner user_id
+        if (commentOwnerUserId !== userId) {
             await connection.rollback();
             connection.release();
             return res.status(403).json({ message: 'You are not authorized to delete this comment.' });
@@ -1456,7 +1462,7 @@ app.get('/api/users/:userId/statistics', async (req, res) => {
 // ----------------------------------------------------------------------------------
 
 // 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 
 async function startServer() {
     try {
@@ -1466,6 +1472,10 @@ async function startServer() {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
+            port: process.env.DB_PORT,
+
+            charset: 'utf8mb4',
+
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0

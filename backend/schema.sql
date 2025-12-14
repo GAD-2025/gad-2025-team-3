@@ -68,10 +68,12 @@ CREATE TABLE IF NOT EXISTS user_favorites (
 CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exhibition_id INT NOT NULL,
+    user_id INT NOT NULL,
     author VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (exhibition_id) REFERENCES exhibitions(id) ON DELETE CASCADE
+    FOREIGN KEY (exhibition_id) REFERENCES exhibitions(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_follows (
