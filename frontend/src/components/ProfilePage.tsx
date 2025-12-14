@@ -33,10 +33,13 @@ interface ProfilePageProps {
   onNavigateToBadges: () => void;
   onNavigateToMyExhibition: () => void;
   onNavigateToEditProfile: () => void;
+  onNavigateToFollowers: () => void;
+  onNavigateToFollowing: () => void; // Add onNavigateToFollowing prop
   onLogout: () => void; // Add onLogout prop
 }
 
-export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile, onLogout }: ProfilePageProps) {
+export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile, onNavigateToFollowers, onNavigateToFollowing, onLogout }: ProfilePageProps) {
+  console.log('ProfilePage component rendered');
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -197,7 +200,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                     </div>
                   </div>
                   {/* 팔로워 */}
-                  <div className="relative shrink-0" data-name="Container">
+                  <button className="relative shrink-0" data-name="Container" onClick={onNavigateToFollowers}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로워</p>
@@ -206,9 +209,9 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.follower_count}</p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                   {/* 팔로잉 */}
-                  <div className="relative shrink-0" data-name="Container">
+                  <button className="relative shrink-0" data-name="Container" onClick={onNavigateToFollowing}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">팔로잉</p>
@@ -217,7 +220,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.following_count}</p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
         </div>

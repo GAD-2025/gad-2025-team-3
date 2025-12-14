@@ -22,6 +22,8 @@ import ExhibitionDetailPage from './components/ExhibitionDetailPage';
 import FavoritesPage from './components/FavoritesPage';
 import EditProfilePage from './components/EditProfilePage';
 import OtherUserProfilePage from './components/OtherUserProfilePage'; // Import the new component
+import FollowerPage from './components/FollowerPage'; // Import FollowerPage
+import FollowingPage from './components/FollowingPage'; // Import FollowingPage
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -73,6 +75,7 @@ const normalizeDateToMidnight = (date: Date) => {
 
 
 export default function App() {
+  console.log('App component rendered');
   const navigate = useNavigate();
   const [signupStep, setSignupStep] = useState(1);
   
@@ -582,11 +585,15 @@ export default function App() {
                   onNavigateToBadges={() => navigate('/badges')}
                   onNavigateToMyExhibition={() => navigate('/myexhibition')}
                   onNavigateToEditProfile={() => navigate('/profile/edit')}
+                  onNavigateToFollowers={() => navigate(`/profile/${currentUser!.id}/followers`)}
+                  onNavigateToFollowing={() => navigate(`/profile/${currentUser!.id}/following`)} // Add this line
                   onLogout={handleLogout} // Pass the global handleLogout
                 />
               )
             } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={() => fetchCurrentUser(currentUser!.id)} />} />
       <Route path="/profile/:userId" element={<OtherUserProfilePage />} />
+      <Route path="/profile/:userId/followers" element={<FollowerPage onBack={() => navigate(-1)} />} />
+      <Route path="/profile/:userId/following" element={<FollowingPage onBack={() => navigate(-1)} />} />
       <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
       <Route path="/myexhibition" element={
         <MyExhibitionPage 

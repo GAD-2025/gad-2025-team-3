@@ -1327,6 +1327,84 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
     }
 });
 
+// API for fetching a user's followers
+app.get('/api/users/:userId/followers', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followerRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.follower_id
+            WHERE 
+                uf.followed_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followerRows);
+    } catch (error) {
+        console.error('Fetch followers error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching a user's following
+app.get('/api/users/:userId/following', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followingRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.followed_id
+            WHERE 
+                uf.follower_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followingRows);
+    } catch (error) {
+        console.error('Fetch following error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // API for following a user
 app.post('/api/users/:followedId/follow', async (req, res) => {
     const { followedId } = req.params;
