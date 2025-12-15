@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'react-feather';
 import { SignupData } from '../App'; // Import SignupData from App.tsx
 import svgPaths from "../imports/svg-pbzr8ku87j";
@@ -14,8 +14,20 @@ interface SignupStep1Props {
 export default function SignupStep1({ onNext, onBack, formData, handleCheckboxChange, handleAllAgree }: SignupStep1Props) {
   const [modalOpen, setModalOpen] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (modalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [modalOpen]);
+
   // Directly use formData from props
   const allRequiredChecked = formData.age14 && formData.terms && formData.privacy;
+  const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
   const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
 
   const handleNext = () => {
