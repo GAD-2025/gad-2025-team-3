@@ -28,7 +28,6 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
   // Directly use formData from props
   const allRequiredChecked = formData.age14 && formData.terms && formData.privacy;
   const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
-  const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
 
   const handleNext = () => {
     if (allRequiredChecked) {
