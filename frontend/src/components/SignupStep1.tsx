@@ -330,11 +330,10 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
       {/* Modal Overlay */}
       {modalOpen && (
         <>
-          <div 
-            className="fixed bg-[rgba(0,0,0,0.6)] inset-0 z-40"
-            onClick={() => setModalOpen(null)}
-          />
-          <div className="fixed bg-white box-border content-stretch flex flex-col items-center left-1/2 p-px top-1/2 translate-x-[-50%] translate-y-[-50%] w-[345px] max-w-[90vw] z-50" data-name="Container">
+                    <div
+                      className="fixed inset-0 flex items-center justify-center bg-black/40 z-40"
+                      onClick={() => setModalOpen(null)}
+                    />          <div className="bg-white box-border content-stretch flex flex-col items-center w-[345px] max-w-[90vw] z-50" data-name="Container">
             <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
             
             {/* Modal Header */}
