@@ -379,7 +379,7 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
                         <div className="absolute inset-1/4" data-name="Vector">
                           <div className="absolute inset-[-8.33%]">
                             <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                              <path d="M0.832986 0.832986L10.8288 10.8288" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66597" />
+                              <path d="M0.832986 0.832986L10.8288 10.8288" id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66597" />
                             </svg>
                           </div>
                         </div>
