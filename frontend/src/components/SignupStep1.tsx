@@ -39,7 +39,7 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="자인 페이지 생성">
       {/* Header */}
       <div className="box-border content-stretch flex flex-col h-[70.083px] items-start pb-[1.108px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
-        <div aria-hidden="true" className={`absolute border-[0px_0px_1.108px] ${modalOpen ? 'border-transparent' : 'border-black'} border-solid inset-0 pointer-events-none`} />
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
         <div className="h-[68.976px] relative shrink-0 w-full" data-name="Container">
           <div className="flex flex-row items-center size-full">
             <div className="box-border content-stretch flex h-[68.976px] items-center justify-between px-[23.99px] py-0 relative w-full">
@@ -64,7 +64,7 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
 
       {/* Progress Steps */}
       <div className="h-[64px] relative shrink-0 w-full" data-name="Container">
-        <div aria-hidden="true" className={`absolute border-[0px_0px_1.108px] ${modalOpen ? 'border-transparent' : 'border-black'} border-solid inset-0 pointer-events-none`} />
+        <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col h-[64px] items-start pb-[1.108px] pt-[23.99px] px-[23.99px] relative w-full">
             <div className="content-stretch flex gap-[15.993px] h-[15.007px] items-center relative shrink-0 w-full" data-name="Container">
