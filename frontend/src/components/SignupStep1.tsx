@@ -17,11 +17,14 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
   useEffect(() => {
     if (modalOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('modal-open');
     } else {
       document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
     }
     return () => {
       document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
     };
   }, [modalOpen]);
 
