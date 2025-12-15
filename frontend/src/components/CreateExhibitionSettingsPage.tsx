@@ -233,7 +233,7 @@ export default function CreateExhibitionSettingsPage({
                             <span className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${!isPublic || !startDate ? 'text-[#99a1af]' : 'text-[#99a1af]'}`}>
                               {startDate ? formatDate(startDate) : '시작일'}
                             </span>
-                            <CalendarIcon className={`size-4 ${!isPublic ? 'text-[#99a1af]' : 'text-[#4a5565]'}`} />
+                            <CalendarIcon className={`size-4 text-[#99a1af]`} />
                           </div>
                         </div>
                         <div aria-hidden="true" className={`absolute border-[1.6px] ${!isPublic ? 'border-[#99a1af]' : 'border-black'} border-solid inset-0 pointer-events-none`} />
