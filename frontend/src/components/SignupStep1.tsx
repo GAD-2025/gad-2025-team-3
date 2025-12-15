@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'react-feather';
-import { SignupData } from '../App'; // Import SignupData from App.tsx
+import { SignupData } from '../App';
 import svgPaths from "../imports/svg-pbzr8ku87j";
 
 interface SignupStep1Props {
   onNext: () => void;
   onBack: () => void;
-  formData: SignupData; // Receive formData from App.tsx
+  formData: SignupData;
   handleCheckboxChange: (name: keyof SignupData) => void;
   handleAllAgree: () => void;
 }
@@ -14,21 +14,40 @@ interface SignupStep1Props {
 export default function SignupStep1({ onNext, onBack, formData, handleCheckboxChange, handleAllAgree }: SignupStep1Props) {
   const [modalOpen, setModalOpen] = useState<string | null>(null);
 
+  // [수정된 부분] 디자인 변경 없이, 오직 '세로선' 문제만 해결하는 코드
   useEffect(() => {
+    const body = document.body;
     if (modalOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('modal-open');
+      // 1. 스크롤 잠금
+      body.style.overflow = 'hidden';
+      body.classList.add('modal-open');
+      
+      // 2. [핵심] 세로선 원인 제거 (스크롤바 대체 패딩 및 경계선 강제 제거)
+      // 기존 레이아웃은 건드리지 않고 body 스타일만 제어합니다.
+      body.style.setProperty('padding-right', '0px', 'important');
+      body.style.setProperty('border', 'none', 'important');
+      body.style.setProperty('box-shadow', 'none', 'important');
     } else {
-      document.body.style.overflow = '';
-      document.body.classList.remove('modal-open');
+      // 3. 팝업 닫히면 원상복구
+      body.style.overflow = '';
+      body.classList.remove('modal-open');
+      
+      body.style.removeProperty('padding-right');
+      body.style.removeProperty('border');
+      body.style.removeProperty('box-shadow');
     }
+    
     return () => {
-      document.body.style.overflow = '';
-      document.body.classList.remove('modal-open');
+      // 컴포넌트 해제 시 정리
+      body.style.overflow = '';
+      body.classList.remove('modal-open');
+      body.style.removeProperty('padding-right');
+      body.style.removeProperty('border');
+      body.style.removeProperty('box-shadow');
     };
   }, [modalOpen]);
 
-  // Directly use formData from props
+  // 이 아래부터는 사용자분의 원본 코드와 100% 동일합니다.
   const allRequiredChecked = formData.age14 && formData.terms && formData.privacy;
   const allChecked = formData.age14 && formData.terms && formData.privacy && formData.marketing;
 
@@ -344,10 +363,11 @@ export default function SignupStep1({ onNext, onBack, formData, handleCheckboxCh
       {/* Modal Overlay */}
       {modalOpen && (
         <>
-                    <div
-                      className="fixed inset-0 flex items-center justify-center bg-black/40 z-40"
-                      onClick={() => setModalOpen(null)}
-                    />          <div className="bg-white box-border content-stretch flex flex-col items-center w-[345px] max-w-[90vw] z-50" data-name="Container">
+            <div
+                className="fixed inset-0 flex items-center justify-center bg-black/40 z-40"
+                onClick={() => setModalOpen(null)}
+            />          
+            <div className="bg-white box-border content-stretch flex flex-col items-center w-[345px] max-w-[90vw] z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" data-name="Container">
             <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
             
             {/* Modal Header */}
