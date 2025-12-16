@@ -3,3 +3,7 @@ node_modules
 .env
 backend/img_save/
 frontend/build
+
+backend 2/
+database/
+frontend 2/
