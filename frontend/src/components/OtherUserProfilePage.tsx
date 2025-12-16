@@ -152,7 +152,7 @@ export default function OtherUserProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white max-w-[393px] mx-auto flex flex-col">
+    <div className="min-h-screen bg-white max-w-[393px] mx-auto flex flex-col pb-16">
       {/* Header */}
       <div className="relative w-full h-[70px] border-b-[0.8px] border-black flex items-center justify-between px-[20px]">
         <button onClick={() => navigate(-1)} className="size-[20px] flex items-center justify-center">

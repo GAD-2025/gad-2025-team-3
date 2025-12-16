@@ -145,7 +145,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, currentUser, onNa
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col items-center w-full max-w-[393px] mx-auto" data-name="Favorites">
+    <div className="bg-white h-screen flex flex-col items-center w-full max-w-[393px] mx-auto pb-16" data-name="Favorites">
         {/* 내부 콘텐츠는 h-full로 전체 높이를 사용하도록 설정 */}
         <div className="bg-white h-full flex flex-col w-full"> 
             

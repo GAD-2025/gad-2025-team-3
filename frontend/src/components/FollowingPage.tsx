@@ -128,7 +128,7 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
   const usersToDisplay = activeTab === 'followers' ? followers : following;
 
   return (
-    <div className="bg-white flex flex-col w-full h-screen max-w-[393px] mx-auto">
+    <div className="bg-white flex flex-col w-full h-screen max-w-[393px] mx-auto pb-16">
       {/* Header */}
       <div className="flex items-center justify-between h-[70.083px] border-b-[1.108px] border-black px-[20px] shrink-0">
         <button onClick={onBack} className="p-2">

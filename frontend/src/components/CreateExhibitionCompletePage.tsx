@@ -78,7 +78,7 @@ export default function CreateExhibitionCompletePage({
 
   return (
 
-    <div className="bg-white relative w-full min-h-screen max-w-[393px] mx-auto overflow-hidden" data-name="디자인 페이지 생성">
+    <div className="bg-white relative w-full min-h-screen max-w-[393px] mx-auto overflow-hidden pb-16" data-name="디자인 페이지 생성">
 
       {/* Background Gradient */}
 

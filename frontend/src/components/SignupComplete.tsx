@@ -85,7 +85,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
   };
 
   return (
-    <div className="bg-white relative w-full min-h-screen max-w-[393px] mx-auto overflow-hidden" data-name="디자인 페이지 생성">
+    <div className="bg-white relative w-full min-h-screen max-w-[393px] mx-auto overflow-hidden pb-16" data-name="디자인 페이지 생성">
       {/* Gradient Background */}
       <div className="absolute bg-gradient-to-b from-[rgba(255,255,255,0.2)] h-[851px] left-0 to-[88.462%] to-[rgba(254,238,251,0.2)] top-0 w-full" />
       

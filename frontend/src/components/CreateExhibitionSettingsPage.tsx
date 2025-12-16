@@ -98,7 +98,7 @@ export default function CreateExhibitionSettingsPage({
     normalizeDateToMidnight(startDate) <= normalizeDateToMidnight(endDate); // 시작일이 종료일보다 이르거나 같아야 함
 
   return (
-    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto" data-name="디자인 페이지 생성">
+    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto pb-16" data-name="디자인 페이지 생성">
       {/* Header */}
       <div className="box-border content-stretch flex flex-col h-[70.083px] items-center justify-between pb-[1.108px] pt-0 px-0 relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.108px] border-black border-solid inset-0 pointer-events-none" />

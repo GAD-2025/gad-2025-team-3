@@ -132,7 +132,7 @@ export default function StatisticsPage({
 
   // 정상 화면 (디자인 원본 유지)
   return (
-    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto">
+    <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto pb-16">
       {/* Header */}
       <div className="box-border content-stretch flex flex-col h-[70px] items-center justify-between pb-[1px] relative w-full border-b border-black">
         <div className="flex flex-row items-center w-full h-full px-6 justify-between">
