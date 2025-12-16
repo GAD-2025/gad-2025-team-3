@@ -592,8 +592,8 @@ export default function App() {
               )
             } />      <Route path="/profile/edit" element={<EditProfilePage onBack={() => navigate('/profile')} currentUser={currentUser} onUpdateUser={() => fetchCurrentUser(currentUser!.id)} />} />
       <Route path="/profile/:userId" element={<OtherUserProfilePage />} />
-      <Route path="/profile/:userId/followers" element={<FollowerPage onBack={() => navigate(-1)} />} />
-      <Route path="/profile/:userId/following" element={<FollowingPage onBack={() => navigate(-1)} />} />
+      <Route path="/profile/:userId/followers" element={<FollowingPage onBack={() => navigate(-1)} initialTab="followers" />} />
+      <Route path="/profile/:userId/following" element={<FollowingPage onBack={() => navigate(-1)} initialTab="following" />} />
       <Route path="/badges" element={<BadgesPage onBack={() => navigate('/profile')} />} />
       <Route path="/myexhibition" element={
         <MyExhibitionPage 

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronLeft } from 'react-feather';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
-interface Following {
+interface User {
   id: number;
   nickname: string;
   bio: string;
@@ -10,13 +10,23 @@ interface Following {
 
 interface FollowingPageProps {
   onBack: () => void;
+  initialTab?: 'following' | 'followers';
 }
 
-export default function FollowingPage({ onBack }: FollowingPageProps) {
+export default function FollowingPage({ onBack, initialTab = 'followers' }: FollowingPageProps) {
   const { userId } = useParams<{ userId: string }>();
-  const [following, setFollowing] = useState<Following[]>([]);
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(initialTab);
+  
+  const [followers, setFollowers] = useState<User[]>([]);
+  const [following, setFollowing] = useState<User[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     if (!userId) {
@@ -25,74 +35,138 @@ export default function FollowingPage({ onBack }: FollowingPageProps) {
       return;
     }
 
-    const fetchFollowing = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/following`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch following users.');
-        }
-        const data: Following[] = await response.json();
-        setFollowing(data);
+        const [followersRes, followingRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/followers`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/following`)
+        ]);
+
+        if (!followersRes.ok) throw new Error('Failed to fetch followers.');
+        if (!followingRes.ok) throw new Error('Failed to fetch following users.');
+
+        const followersData: User[] = await followersRes.json();
+        const followingData: User[] = await followingRes.json();
+
+        setFollowers(followersData);
+        setFollowing(followingData);
+
       } catch (err: any) {
-        console.error("Error fetching following users:", err);
-        setError(err.message || "Failed to load following users.");
+        console.error("Error fetching follow data:", err);
+        setError(err.message || "Failed to load data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFollowing();
+    fetchData();
   }, [userId]);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">로딩 중...</div>;
-  }
+  const followingIds = useMemo(() => new Set(following.map(u => u.id)), [following]);
 
-  if (error) {
-    return <div className="flex justify-center items-center h-screen">오류: {error}</div>;
-  }
+  const handleFollowToggle = (userToToggle: User) => {
+    const isCurrentlyFollowing = followingIds.has(userToToggle.id);
+
+    if (isCurrentlyFollowing) {
+      setFollowing(prev => prev.filter(u => u.id !== userToToggle.id));
+    } else {
+      setFollowing(prev => [...prev, userToToggle]);
+    }
+    // Note: This is a UI-only state change as requested.
+    // In a real app, you would make an API call here.
+  };
+
+  const handleUserClick = (clickedUserId: number) => {
+    navigate(`/profile/${clickedUserId}`);
+  };
+
+  const renderUserList = (users: User[]) => {
+    if (loading) {
+      return <div className="text-center p-10 font-pretendard">로딩 중...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center p-10 font-pretendard text-red-500">오류: {error}</div>;
+    }
+
+    if (users.length === 0) {
+      return <p className="text-center text-gray-500 mt-10 font-pretendard">{activeTab === 'following' ? '팔로우하는 사람이 없습니다.' : '팔로워가 없습니다.'}</p>;
+    }
+
+    return (
+      <div className="divide-y divide-gray-200">
+        {users.map((user) => {
+          const isFollowing = followingIds.has(user.id);
+          return (
+            <div key={user.id} className="flex items-center justify-between p-4">
+              <div className="flex items-center cursor-pointer" onClick={() => handleUserClick(user.id)}>
+                <div className="w-12 h-12 bg-[#FF69B4] shrink-0 rounded-full"></div>
+                <div className="ml-4">
+                  <p className="font-pretendard font-semibold text-black">{user.nickname}</p>
+                  <p className="font-pretendard text-sm text-gray-500">{user.bio}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleFollowToggle(user)}
+                className={`font-pretendard px-3 py-1 text-sm rounded-md transition-colors shrink-0 ${
+                  isFollowing
+                    ? 'bg-white text-black border border-black'
+                    : 'bg-black text-white border border-black'
+                }`}
+              >
+                {isFollowing ? '팔로잉' : '팔로우'}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const usersToDisplay = activeTab === 'followers' ? followers : following;
 
   return (
-    <div className="bg-white content-stretch flex flex-col items-start relative size-full">
-      <div className="border-b-[1.108px] border-black border-l-0 border-r-0 border-solid border-t-0 content-stretch flex flex-col h-[70.083px] items-start pb-[1.108px] pt-0 px-0 relative shrink-0 w-full">
-        <div className="content-stretch flex h-[68.976px] items-center justify-between px-[23.99px] py-0 relative shrink-0 w-full">
-          <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors">
-            <ChevronLeft className="size-5 text-black" />
-          </button>
-          <div className="h-[20.996px] relative shrink-0 w-[73.545px]">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start justify-center relative size-full">
-              <p className="font-['Cormorant_Garamond:Bold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[16px] text-black text-center tracking-[-1px]">
-                Following
-              </p>
-            </div>
-          </div>
-          <div className="h-0 relative shrink-0 w-[19.992px]">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid size-full" />
-          </div>
-        </div>
+    <div className="bg-white flex flex-col w-full h-screen max-w-[393px] mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between h-[70.083px] border-b-[1.108px] border-black px-[20px] shrink-0">
+        <button onClick={onBack} className="p-2">
+          <ChevronLeft className="size-5 text-black" />
+        </button>
+        <h1 className="font-garamond font-bold text-[18px]">
+          {activeTab === 'followers' ? 'Followers' : 'Following'}
+        </h1>
+        <div className="w-9"></div> {/* Spacer */}
       </div>
-      <div className="content-stretch flex flex-col gap-[8px] h-[781px] items-start pb-0 pt-[23.99px] px-[23.99px] relative shrink-0 w-full">
-        <div className="h-[24px] relative shrink-0 w-[68px]">
-          <p className="absolute font-['Pretendard:Regular',sans-serif] leading-[18px] left-0 not-italic text-[#4a5565] text-[12px] top-[-0.5px] tracking-[-0.24px]">
-            내가 팔로우한 사람들
-          </p>
-        </div>
-        <div className="content-stretch flex flex-col gap-[12px] items-start relative shrink-0">
-          {following.length > 0 ? (
-            following.map((user) => (
-              <div key={user.id} className="border border-black border-solid content-stretch flex font-['Pretendard:Regular',sans-serif] gap-[8px] h-[49px] items-center not-italic px-[14px] py-0 relative shrink-0 w-[345px]">
-                <p className="leading-[20px] relative shrink-0 text-[14px] text-black tracking-[-0.28px]">
-                  {user.nickname}
-                </p>
-                <p className="flex-[1_0_0] leading-[18px] min-h-px min-w-px overflow-ellipsis overflow-hidden relative shrink-0 text-[#99a1af] text-[12px] tracking-[-0.24px] whitespace-nowrap">
-                  {user.bio}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">팔로우하는 사람이 없습니다.</p>
-          )}
-        </div>
+
+      {/* Tab Bar */}
+      <div className="flex shrink-0">
+        <button
+          onClick={() => setActiveTab('followers')}
+          className={`w-1/2 py-3 text-center font-pretendard text-sm font-semibold ${
+            activeTab === 'followers'
+              ? 'bg-black text-white'
+              : 'bg-white text-black border-b'
+          }`}
+        >
+          팔로워
+        </button>
+        <button
+          onClick={() => setActiveTab('following')}
+          className={`w-1/2 py-3 text-center font-pretendard text-sm font-semibold ${
+            activeTab === 'following'
+              ? 'bg-black text-white'
+              : 'bg-white text-black border-b'
+          }`}
+        >
+          팔로잉
+        </button>
+      </div>
+
+      {/* User List */}
+      <div className="flex-1 overflow-y-auto">
+        {renderUserList(usersToDisplay)}
       </div>
     </div>
   );

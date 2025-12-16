@@ -205,22 +205,22 @@ export default function OtherUserProfilePage() {
             전시관
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px]">
+        <button onClick={() => navigate(`/profile/${userId}/followers`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
           <p className="font-garamond font-bold text-[20px] text-black">
             {profile.follower_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
             팔로워
           </p>
-        </div>
-        <div className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px]">
+        </button>
+        <button onClick={() => navigate(`/profile/${userId}/following`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
           <p className="font-garamond font-bold text-[20px] text-black">
             {profile.following_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
             팔로잉
           </p>
-        </div>
+        </button>
       </div>
 
       {/* Exhibitions Section */}
