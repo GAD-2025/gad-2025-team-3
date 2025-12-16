@@ -626,7 +626,7 @@ export default function ExhibitionDetailPage({
           <div className="size-full">
             <div className="box-border content-stretch flex flex-col gap-[16px] items-start px-[24px] pb-[24px] pt-[24px] relative w-full">
               <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Comments <span class="text-[12px]">{comments.length}</span></p>
+                <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Comments <span className="text-[12px]">{comments.length}</span></p>
               </div>
               <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
                 {comments.map((comment) => (

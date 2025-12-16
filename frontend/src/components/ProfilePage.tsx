@@ -315,7 +315,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                           <g id="Icon">
                             <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
+                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                           </g>
                         </svg>
                       </div>
@@ -479,7 +479,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                   <g id="Icon">
                     <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
+                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                   </g>
                 </svg>
               </div>
