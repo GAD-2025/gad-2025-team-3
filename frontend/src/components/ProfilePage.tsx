@@ -100,10 +100,8 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         throw new Error(errorData.message || '회원 탈퇴에 실패했습니다.');
       }
 
-      alert('회원 탈퇴가 완료되었습니다.');
       setIsDeleteModalOpen(false);
-      localStorage.removeItem('userId');
-      navigate('/login', { replace: true });
+      onLogout(); // Use the onLogout prop to handle state and navigation
     } catch (error: any) {
       console.error('회원 탈퇴 오류:', error);
       alert(`회원 탈퇴 중 오류가 발생했습니다: ${error.message}`);
