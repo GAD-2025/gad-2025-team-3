@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ChevronLeft } from 'react-feather';
 import { useParams, useNavigate } from 'react-router-dom';
+import RandomProfileIcon from './RandomProfileIcon';
 
 interface User {
   id: number;
@@ -12,6 +13,11 @@ interface FollowingPageProps {
   onBack: () => void;
   initialTab?: 'following' | 'followers';
 }
+
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
+};
 
 export default function FollowingPage({ onBack, initialTab = 'followers' }: FollowingPageProps) {
   const { userId } = useParams<{ userId: string }>();
@@ -102,7 +108,9 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
           return (
             <div key={user.id} className="flex items-center justify-between p-4">
               <div className="flex items-center cursor-pointer" onClick={() => handleUserClick(user.id)}>
-                <div className="w-12 h-12 bg-[#FF69B4] shrink-0 rounded-full"></div>
+                <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden">
+                  <RandomProfileIcon profileType={getProfileIconType(user.id)} />
+                </div>
                 <div className="ml-4">
                   <p className="font-pretendard font-semibold text-black">{user.nickname}</p>
                   <p className="font-pretendard text-sm text-gray-500">{user.bio}</p>

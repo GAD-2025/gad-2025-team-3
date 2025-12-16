@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, MoreHorizontal, Eye, Heart } from 'react-feather';
 
+import RandomProfileIcon from './RandomProfileIcon';
+
 const imgVector = "https://www.figma.com/api/mcp/asset/17230c9d-b51c-4f6c-8709-020e63dabafc";
 const imgVector1 = "https://www.figma.com/api/mcp/asset/97d0d129-9271-4777-b20c-52bc716c23b6";
 const imgVector2 = "https://www.figma.com/api/mcp/asset/f6ac66b0-5973-489f-9f9f-2bd2f63b3f1d";
@@ -14,7 +16,7 @@ interface UserProfile {
   id: number;
   username: string;
   nickname: string;
-  profile_picture_url: string;
+  profile_picture_url: string; // Reverted
   follower_count: number;
   following_count: number;
   // Add other relevant user profile fields as needed
@@ -41,6 +43,11 @@ const isValidUrl = (url: string | undefined): boolean => {
   } catch (e) {
     return false;
   }
+};
+
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
 };
 
 export default function OtherUserProfilePage() {
@@ -168,11 +175,7 @@ export default function OtherUserProfilePage() {
       <div className="flex flex-col items-center p-[24px] border-b-[1.6px] border-black">
         {/* Profile Picture Placeholder - imgVector5 from Figma output is a generic shape, I'll use profile_picture_url if available */}
         <div className="relative size-[80px] rounded-full overflow-hidden mb-[16px]">
-          <img
-            src={profile.profile_picture_url || imgVector5} // Using imgVector5 as fallback for profile picture
-            alt="Profile"
-            className="object-cover size-full"
-          />
+          <RandomProfileIcon profileType={getProfileIconType(profile.id)} />
         </div>
         <p className="font-pretendard font-semibold text-[20px] text-black mb-[4px]">
           {profile.nickname}

@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, Edit } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
+import RandomProfileIcon from './RandomProfileIcon';
 
 import settingsSvgPaths from "../imports/svg-menh3de8oj";
 
 import ARTISTS from '../constants/artists';
 
 const imgVector = "https://www.figma.com/api/mcp/asset/e8366257-d3f7-496c-ba98-71a545e4dc82";
-const imgVector1 = "https://www.figma.com/api/mcp/asset/99b7134c-b0b4-4e4e-a71c-b1c4312b788c";
-const imgVector2 = "https://www.figma.com/api/mcp/asset/cb0a7f1b-62a6-47b5-a237-362fe7cc1897";
-const imgVector3 = "https://www.figma.com/api/mcp/asset/9499547c-84d7-44d9-a4e4-33d989ba1e04";
 const imgVector5 = "https://www.figma.com/api/mcp/asset/fe295aee-1db6-4175-9fc4-0b5a276c1746"; // OtherUserProfilePage와 통일된 기본 이미지
 
 interface User {
@@ -25,7 +23,7 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
-  user_artists: string[]; // Change to user_artists
+  user_artists: string[]; 
 }
 
 interface ProfilePageProps {
@@ -34,13 +32,20 @@ interface ProfilePageProps {
   onNavigateToMyExhibition: () => void;
   onNavigateToEditProfile: () => void;
   onNavigateToFollowers: () => void;
-  onNavigateToFollowing: () => void; // Add onNavigateToFollowing prop
-  onLogout: () => void; // Add onLogout prop
+  onNavigateToFollowing: () => void; 
+  onLogout: () => void; 
 }
+
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
+};
 
 export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile, onNavigateToFollowers, onNavigateToFollowing, onLogout }: ProfilePageProps) {
   console.log('ProfilePage component rendered');
   const navigate = useNavigate();
+  
+  // 1. 모든 Hooks는 무조건 맨 위에 선언! (순서 중요)
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,12 +111,24 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
     }
   };
 
-
-
   const handleFeatureClick = (featureName: string) => {
     alert(`${featureName} 기능은 아직 구현되지 않았습니다.`);
   };
 
+  const renderProfileIcon = () => {
+    if (user) {
+      return <RandomProfileIcon profileType={getProfileIconType(user.id)} />;
+    }
+    return (
+      <img
+        src={imgVector5}
+        alt="Profile"
+        className="object-cover size-full rounded-full"
+      />
+    );
+  };
+
+  // 2. return(화면 그리기)이나 if문은 Hooks 선언이 다 끝난 뒤에!
   if (loading) {
     return <div className="flex justify-center items-center h-screen">로딩 중...</div>;
   }
@@ -123,15 +140,6 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
   if (!user) {
     return <div className="flex justify-center items-center h-screen">사용자 프로필을 찾을 수 없습니다.</div>;
   }
-
-  const renderProfileImage = () => {
-    return (
-        <img
-                    src={user.profile_picture_url || imgVector5} // Fallback image
-                    alt="Profile"
-                    className="object-cover size-full rounded-full"
-                />    );
-  };
 
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto pb-16" data-name="디자인 페이지 생성">
@@ -160,7 +168,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
               <div className="relative shrink-0 size-[80px] bg-[#fef7fc] overflow-clip rounded-full" data-name="profile">
-                {renderProfileImage()}
+                {renderProfileIcon()}
               </div>
 
               {/* Profile Details */}
