@@ -41,7 +41,7 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
   
     return (
       <div
-        className={`relative w-full border-[1.6px] border-black overflow-hidden flex flex-row cursor-pointer h-40
+        className={`relative w-full border-[1.6px] border-black overflow-hidden flex flex-row cursor-pointer h-40 flex-shrink-0
                     ${isEditMode && isSelected ? 'border-blue-500 shadow-md' : 'transition-all duration-200'}`}
         onClick={handleClick}
       >
