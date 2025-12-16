@@ -72,16 +72,40 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
 
   const followingIds = useMemo(() => new Set(following.map(u => u.id)), [following]);
 
-  const handleFollowToggle = (userToToggle: User) => {
+  const handleFollowToggle = async (userToToggle: User) => {
+    const loggedInUserId = localStorage.getItem('userId');
+    if (!loggedInUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const originalFollowingState = [...following];
     const isCurrentlyFollowing = followingIds.has(userToToggle.id);
 
+    // Optimistic UI update
     if (isCurrentlyFollowing) {
       setFollowing(prev => prev.filter(u => u.id !== userToToggle.id));
     } else {
       setFollowing(prev => [...prev, userToToggle]);
     }
-    // Note: This is a UI-only state change as requested.
-    // In a real app, you would make an API call here.
+
+    try {
+      const method = isCurrentlyFollowing ? 'DELETE' : 'POST';
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userToToggle.id}/follow`, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followerId: parseInt(loggedInUserId, 10) }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update follow status');
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+      // Revert optimistic update on error
+      setFollowing(originalFollowingState);
+      alert("팔로우/언팔로우 상태를 업데이트하는 데 실패했습니다.");
+    }
   };
 
   const handleUserClick = (clickedUserId: number) => {
