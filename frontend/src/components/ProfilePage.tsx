@@ -189,7 +189,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 {/* Stats */}
                 <div className="content-stretch flex gap-[20px] items-start relative shrink-0 w-full" data-name="Container">
                   {/* 전시관 */}
-                  <div className="relative shrink-0" data-name="Container">
+                  <button className="relative shrink-0" data-name="Container" onClick={onNavigateToMyExhibition}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
@@ -198,7 +198,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.exhibition_count}</p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                   {/* 팔로워 */}
                   <button className="relative shrink-0" data-name="Container" onClick={onNavigateToFollowers}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
