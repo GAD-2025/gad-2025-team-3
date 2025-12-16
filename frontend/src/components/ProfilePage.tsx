@@ -417,7 +417,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
       </div>
 
       {/* Support Section */}
-      <div className="h-[268.2px] relative shrink-0 w-full" data-name="Container">
+      <div className="h-[202.4px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="absolute content-stretch flex gap-[12px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
           <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
@@ -480,37 +480,6 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
               <div className="h-[21px] relative shrink-0 w-[54.1px]" data-name="Text">
                 <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-[54.1px]">
                   <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">문의하기</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="relative shrink-0 size-[20px]" data-name="Icon">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-              <g id="Icon">
-                <path d="M7.5 15L12.5 10L7.5 5" id="Vector" stroke="var(--stroke-0, #99A1AF)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-              </g>
-            </svg>
-          </div>
-        </button>
-        {/* Design System */}
-        <button
-          onClick={() => handleFeatureClick('Design System')}
-          className="absolute box-border content-stretch flex h-[56.2px] items-center justify-between left-[24px] px-[17.6px] py-[1.6px] top-[186.4px] w-[342px] cursor-pointer"
-          data-name="Button"
-        >
-          <div aria-hidden="true" className="absolute border-black border-[1.6px] border-solid inset-0 pointer-events-none" />
-          <div className="h-[21px] relative shrink-0 w-[124.05px]" data-name="Container">
-            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[12px] h-[21px] items-center relative w-[124.05px]">
-              <div className="relative shrink-0 size-[20px]" data-name="Icon">
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                  <g id="Icon">
-                    <path d={settingsSvgPaths.p2898e700} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                  </g>
-                </svg>
-              </div>
-              <div className="basis-0 grow h-[21px] min-h-px min-w-px relative shrink-0" data-name="Text">
-                <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[21px] relative w-full">
-                  <p className="font-pretendard leading-[20px] left-0 not-italic relative shrink-0 text-[14px] text-black text-nowrap top-[-0.2px] tracking-[-0.28px] whitespace-pre">Design System</p>
                 </div>
               </div>
             </div>

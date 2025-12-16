@@ -161,10 +161,7 @@ export default function OtherUserProfilePage() {
         <p className="font-garamond font-bold text-[18px] text-black">
           Profile
         </p>
-        {/* More Options Icon */}
-        <div className="size-[20px] flex items-center justify-center">
-            <MoreHorizontal className="size-5 text-black" />
-        </div>
+        <div className="w-5" />
       </div>
 
       {/* Profile Info Section */}
