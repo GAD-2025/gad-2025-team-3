@@ -603,12 +603,11 @@ export default function ExhibitionDetailPage({
                 <p className="font-['EB_Garamond',serif] leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Gallery</p>
               </div>
               <div className="overflow-y-auto w-full">
-                <div className="flex flex-wrap gap-[8px] w-full h-full">
+                <div className="grid grid-cols-3 gap-2 w-full">
                   {exhibitionData.imageUrls.map((imageUrl, index) => (
                     <div
                       key={index}
-                      className="relative bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
-                      style={{ width: '109px', height: '109px' }}
+                      className="relative bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer aspect-square"
                       onClick={() => {
                         setCurrentImageIndex(index);
                         setShowImagePopup(true);
