@@ -30,6 +30,7 @@ interface ExhibitionData {
 
 interface Comment {
   id: number;
+  user_id: number;
   author: string;
   content: string;
   created_at: string;
@@ -636,9 +637,9 @@ export default function ExhibitionDetailPage({
                       <div className="box-border content-stretch flex flex-col gap-[4px] h-auto items-start pl-[17.6px] pr-0 py-0 relative w-full">
                         <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
                           <div className="h-[16.5px] relative shrink-0 flex-shrink-0 max-w-full" data-name="Text">
-                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
+                            <button onClick={() => navigate(`/profile/${comment.user_id}`)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
                               <p className="font-['EB_Garamond',serif] leading-[16px] not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
-                            </div>
+                            </button>
                           </div>
                           <div className="h-[16.5px] relative shrink-0 w-[2.913px] flex-shrink-0" data-name="Text">
                             <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">

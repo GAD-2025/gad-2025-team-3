@@ -650,7 +650,7 @@ app.get('/api/exhibitions/:id/comments', async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const [rows] = await connection.execute(
-            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
+            'SELECT c.id, c.user_id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.exhibition_id = ? ORDER BY c.created_at DESC',
             [id]
         );
         connection.release();
@@ -695,7 +695,7 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
         const newCommentId = result.insertId;
         // Fetch the new comment along with the user's current nickname
         const [newCommentRows] = await connection.execute(
-            'SELECT c.id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?',
+            'SELECT c.id, c.user_id, u.nickname as author, c.content, c.created_at FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?',
             [newCommentId]
         );
         connection.release();
