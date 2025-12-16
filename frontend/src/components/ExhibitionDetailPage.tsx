@@ -634,21 +634,17 @@ export default function ExhibitionDetailPage({
                     <div aria-hidden="true" className="absolute border-[0px_0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
                     <div className="size-full">
                       <div className="box-border content-stretch flex flex-col gap-[4px] h-auto items-start pl-[17.6px] pr-0 py-0 relative w-full">
-                        <div className="content-stretch flex gap-[8px] h-[16.5px] items-center relative shrink-0 w-full" data-name="Container">
-                          <div className="h-[16.5px] relative shrink-0 flex-shrink-0 max-w-full" data-name="Text">
-                            <button onClick={() => navigate(`/profile/${comment.user_id}`)} className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
-                              <p className="font-['EB_Garamond',serif] leading-[16px] not-italic text-[12px] text-black text-nowrap top-[-0.2px] tracking-[0.3px] whitespace-pre">{comment.author}</p>
+                        <div className="content-stretch flex gap-[8px] items-baseline relative shrink-0 w-full" data-name="Container">
+                          <div className="shrink-0" data-name="Text">
+                            <button onClick={() => navigate(`/profile/${comment.user_id}`)} className="">
+                              <p className="font-['EB_Garamond',serif] leading-none not-italic text-[12px] text-black text-nowrap tracking-[0.3px] whitespace-pre">{comment.author}</p>
                             </button>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0 w-[2.913px] flex-shrink-0" data-name="Text">
-                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative w-[2.913px]">
-                              <p className="font-['Playfair_Display',serif] font-normal leading-[16.5px] text-[#99a1af] text-[11px] text-nowrap top-[-0.2px] whitespace-pre">·</p>
-                            </div>
+                          <div className="shrink-0" data-name="Text">
+                            <p className="font-['Playfair_Display',serif] font-normal leading-none text-[#99a1af] text-[11px] text-nowrap whitespace-pre">·</p>
                           </div>
-                          <div className="h-[16.5px] relative shrink-0" data-name="Text">
-                            <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[16.5px] relative">
-                              <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[#99a1af] text-[12px] top-[-0.2px] tracking-[-0.24px] whitespace-pre">{timeSince(comment.created_at)}</p>
-                            </div>
+                          <div className="shrink-0" data-name="Text">
+                            <p className="font-['Pretendard',sans-serif] leading-none not-italic text-[#99a1af] text-[12px] tracking-[-0.24px] whitespace-pre">{timeSince(comment.created_at)}</p>
                           </div>
                         </div>
                         <div className="relative w-full flex justify-between" data-name="Paragraph">
