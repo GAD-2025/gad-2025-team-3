@@ -1,22 +1,20 @@
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import svgPaths from "../imports/svg-75d091w3ip";
+import RandomProfileIcon from './RandomProfileIcon';
 
 interface SignupCompleteProps {
   username: string;
+  userId: number;
 }
 
-export default function SignupComplete({ username }: SignupCompleteProps) {
-  const navigate = useNavigate();
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
+};
 
-  // Randomly select one of 4 profile types and save it
-  const profileType = useMemo(() => {
-    const types: Array<'profile_1_l' | 'profile_2_l' | 'profile_3_l' | 'profile_4_l'> = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
-    const selectedType = types[Math.floor(Math.random() * types.length)];
-    localStorage.setItem('profileType', selectedType); // Save to localStorage
-    return selectedType;
-  }, []);
+export default function SignupComplete({ username, userId }: SignupCompleteProps) {
+  const navigate = useNavigate();
 
   // Automatically navigate to the main page after a delay
   useEffect(() => {
@@ -27,62 +25,6 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
     // Cleanup the timer if the component unmounts
     return () => clearTimeout(timer);
   }, [navigate]);
-
-  // Render profile icon based on selected type
-  const renderProfileIcon = () => {
-    // ... (rest of the rendering logic is the same)
-    if (profileType === 'profile_1_l') {
-      return (
-        <div className="absolute flex inset-0 items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full" data-name="Vector">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={svgPaths.p123d8e00} fill="var(--fill-0, #F360C0)" id="Vector" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (profileType === 'profile_2_l') {
-      return (
-        <div className="absolute flex inset-0 items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full" data-name="Vector">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={svgPaths.p123d8e00} fill="var(--fill-0, #F360C0)" id="Vector" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (profileType === 'profile_3_l') {
-      return (
-        <div className="absolute flex inset-0 items-center justify-center">
-          <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-            <div className="relative size-full" data-name="Vector">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-                <path d={svgPaths.p123d8e00} fill="var(--fill-0, #F360C0)" id="Vector" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    // profile_4_l
-    return (
-      <div className="absolute flex inset-0 items-center justify-center">
-        <div className="flex-none h-[128.514px] rotate-[330deg] w-[208.835px]">
-          <div className="relative size-full" data-name="Vector">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209 129">
-              <path d={svgPaths.p123d8e00} fill="var(--fill-0, #F360C0)" id="Vector" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="bg-white relative w-full min-h-screen max-w-[393px] mx-auto overflow-hidden pb-16" data-name="디자인 페이지 생성">
@@ -132,7 +74,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
       <div className="absolute content-stretch flex flex-col gap-[16px] items-center left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         {/* Profile Icon */}
         <motion.div 
-          className="bg-[#fef7fc] overflow-clip relative shrink-0 size-[128px]" 
+          className="bg-[#fef7fc] overflow-clip relative shrink-0 size-[128px] rounded-full" 
           data-name="Profile"
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -143,7 +85,7 @@ export default function SignupComplete({ username }: SignupCompleteProps) {
             duration: 0.8,
           }}
         >
-          {renderProfileIcon()}
+          <RandomProfileIcon profileType={getProfileIconType(userId)} />
         </motion.div>
 
         {/* Text Content */}

@@ -561,7 +561,13 @@ export default function App() {
           )}
         </>
       } />
-      <Route path="/signup-complete" element={<SignupComplete username={signupData.nickname} />} />
+      <Route path="/signup-complete" element={
+        currentUser ? (
+          <SignupComplete username={currentUser.nickname} userId={currentUser.id} />
+        ) : (
+          <Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />
+        )
+      } />
       <Route path="/main" element={
         <MainPage 
           onNavigateToProfile={() => navigate('/profile')}
