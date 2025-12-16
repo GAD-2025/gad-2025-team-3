@@ -16,6 +16,7 @@ interface UserProfile {
   id: number;
   username: string;
   nickname: string;
+  bio: string;
   profile_picture_url: string; // Reverted
   follower_count: number;
   following_count: number;
@@ -182,6 +183,9 @@ export default function OtherUserProfilePage() {
         </p>
         <p className="font-pretendard text-[12px] text-[#4a5565] mb-[16px]">
           @{profile.username}
+        </p>
+        <p className="font-pretendard text-[14px] text-black text-center mb-[16px]">
+          {profile.bio || 'K-POP을 사랑하는 팬입니다🩷'}
         </p>
 
         {/* Follow Button */}

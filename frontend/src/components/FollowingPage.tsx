@@ -113,7 +113,7 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
                 </div>
                 <div className="ml-4">
                   <p className="font-pretendard font-semibold text-black">{user.nickname}</p>
-                  <p className="font-pretendard text-sm text-gray-500">{user.bio}</p>
+                  <p className="font-pretendard text-sm text-gray-500">{user.bio || 'K-POP을 사랑하는 팬입니다🩷'}</p>
                 </div>
               </div>
               <button
