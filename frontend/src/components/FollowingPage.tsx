@@ -142,7 +142,7 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
         <button onClick={onBack} className="p-2">
           <ChevronLeft className="size-5 text-black" />
         </button>
-        <h1 className="font-garamond font-bold text-[18px]">
+        <h1 className="font-apple-garamond font-bold text-[18px]">
           {activeTab === 'followers' ? 'Followers' : 'Following'}
         </h1>
         <div className="w-9"></div> {/* Spacer */}

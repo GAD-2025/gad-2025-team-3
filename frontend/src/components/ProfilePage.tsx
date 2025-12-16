@@ -152,7 +152,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
               <ChevronLeft className="size-5 text-black" />
             </button>
-            <p className="font-garamond font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
+            <p className="font-apple-garamond font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
             {/* Empty Container to balance the header */}
             <div className="h-[0] shrink-0 w-[20px]" data-name="Container" />
           </div>
@@ -264,7 +264,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] items-start p-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
             </div>
             {/* 비밀번호 변경 */}
             <button
@@ -348,7 +348,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-auto items-start pb-[24px] pt-[24px] px-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
             </div>
             {/* 개인정보 처리방침 */}
             <button
@@ -428,7 +428,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
       <div className="h-[202.4px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="absolute content-stretch flex gap-[12px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
-          <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
+          <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
         </div>
         {/* 자주 묻는 질문 */}
         <button
@@ -507,7 +507,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-[0] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
             </div>
             {/* 로그아웃 */}
             <button

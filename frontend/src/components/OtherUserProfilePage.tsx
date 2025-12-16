@@ -165,7 +165,7 @@ export default function OtherUserProfilePage() {
         <button onClick={() => navigate(-1)} className="size-[20px] flex items-center justify-center">
           <ChevronLeft className="size-5 text-black" />
         </button>
-        <p className="font-garamond font-bold text-[18px] text-black">
+        <p className="font-apple-garamond font-bold text-[18px] text-black">
           Profile
         </p>
         <div className="w-5" />
@@ -198,7 +198,7 @@ export default function OtherUserProfilePage() {
       {/* Stats Section */}
       <div className="grid grid-cols-3 gap-[12px] p-[24px] border-b-[1.6px] border-black">
         <div className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px]">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {userExhibitions.length}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -206,7 +206,7 @@ export default function OtherUserProfilePage() {
           </p>
         </div>
         <button onClick={() => navigate(`/profile/${userId}/followers`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {profile.follower_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -214,7 +214,7 @@ export default function OtherUserProfilePage() {
           </p>
         </button>
         <button onClick={() => navigate(`/profile/${userId}/following`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {profile.following_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -225,7 +225,7 @@ export default function OtherUserProfilePage() {
 
       {/* Exhibitions Section */}
       <div className="flex flex-col gap-[12px] p-[24px]">
-        <p className="font-garamond text-[16px] text-[#4a5565] mb-[12px]">
+        <p className="font-apple-garamond text-[16px] text-[#4a5565] mb-[12px]">
           Exhibition
         </p>
         <div className="grid grid-cols-2 gap-[16px] items-start relative w-full">
