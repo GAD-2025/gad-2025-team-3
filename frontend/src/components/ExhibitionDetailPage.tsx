@@ -727,12 +727,12 @@ export default function ExhibitionDetailPage({
 
       {showImagePopup && (
         <div
-          className="fixed inset-0 flex flex-col items-center justify-center z-[100] p-4"
+          className="fixed inset-0 flex flex-col items-center justify-center z-[100] p-2"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
           onClick={() => setShowImagePopup(false)} // Close when clicking outside the image
         >
           <div
-            className="relative max-w-[393px] max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col items-center"
+            className="relative max-h-[calc(100vh-1rem)] overflow-y-auto flex flex-col items-center w-full"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
           >
             <div className="content-stretch flex h-[44px] items-center justify-between relative shrink-0 w-full mb-4 px-2 flex-shrink-0" data-name="Container">
@@ -751,8 +751,10 @@ export default function ExhibitionDetailPage({
             </div>
             
             <div className="bg-white border-[1.6px] border-black border-solid content-stretch flex flex-col items-start p-0 relative shrink-0 w-full max-w-full overflow-hidden" data-name="Container">
-              <div className="bg-[rgba(0,0,0,0.6)] content-stretch flex items-center justify-center relative shrink-0 w-full h-full" data-name="Container">
-                <img src={currentImage} alt="Enlarged Exhibition Image" className="w-full h-auto max-h-full" />
+              <div className="bg-black relative w-full h-[300px] overflow-hidden" data-name="Container">
+                <div className="w-full h-full"> {/* This div will act as the aspect ratio container */}
+                  <img src={currentImage} alt="Enlarged Exhibition Image" className="absolute top-0 left-0 w-full h-full object-contain" />
+                </div>
               </div>
             </div>
 

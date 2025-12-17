@@ -89,7 +89,8 @@ app.post('/api/upload', upload.array('files', 20), (req, res) => {
         }
 
         const fileUrls = req.files.map(file => {
-            return `https://route.nois.club:3003/uploads/${file.filename}`;
+            const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3003}`;
+            return `${baseUrl}/uploads/${file.filename}`;
         });
 
         res.status(200).json({ urls: fileUrls });
