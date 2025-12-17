@@ -9,7 +9,7 @@ const fs = require('fs');
 const cron = require('node-cron'); // Add node-cron import
 
 // 1. 🟢 필수 수정: .env 파일 경로 명시
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // 🚨 1단계 해결: app 변수 정의 및 초기화 (이 부분이 없었거나 아래쪽에 있었습니다!)
 const app = express(); 
@@ -20,6 +20,7 @@ const corsOptions= {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 
