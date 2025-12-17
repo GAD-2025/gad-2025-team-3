@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // useState 임포트 추가
 import { ChevronLeft, Search } from 'react-feather'; // Search 아이콘 임포트 추가
 import { SignupData } from '../App';
-import ARTISTS from '../constants/artists'; // ARTISTS 배열 임포트
+import ARTISTS, { Artist } from '../constants/artists'; // ARTISTS 배열 임포트
 
 interface SignupStep4Props {
   username: string;
@@ -15,8 +15,13 @@ export default function SignupStep4({ username, onNext, onBack, formData, handle
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'group' | 'solo'>('all');
 
-  const filteredArtists = ARTISTS.filter(artist => {
-    const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredArtists = ARTISTS.filter((artist: Artist) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const matchesName = artist.name.toLowerCase().includes(lowerCaseSearchTerm);
+    const matchesAlias = artist.aliases?.some(alias =>
+      alias.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+    const matchesSearch = matchesName || matchesAlias;
     const matchesFilter = filterType === 'all' || artist.type === filterType;
     return matchesSearch && matchesFilter;
   }).sort((a, b) => a.name.localeCompare(b.name));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Search } from 'react-feather';
-import ARTISTS from '../constants/artists';
+import ARTISTS, { Artist } from '../constants/artists';
 
 interface User {
   id: number;
@@ -53,8 +53,13 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
     });
   };
 
-  const filteredArtists = ARTISTS.filter(artist => {
-    const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredArtists = ARTISTS.filter((artist: Artist) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const matchesName = artist.name.toLowerCase().includes(lowerCaseSearchTerm);
+    const matchesAlias = artist.aliases?.some(alias =>
+      alias.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+    const matchesSearch = matchesName || matchesAlias;
     const matchesFilter = filterType === 'all' || artist.type === filterType;
     return matchesSearch && matchesFilter;
   }).sort((a, b) => a.name.localeCompare(b.name));
@@ -329,7 +334,7 @@ export default function EditProfilePage({ onBack, currentUser, onUpdateUser }: E
                       isSelected ? 'bg-[#F360C0]' : 'bg-white'
                     }`}
                   >
-                    <div aria-hidden="true" className="absolute border-[1.108px] border-black border-solid inset-0 pointer-events-none" />
+                    <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                     <div className="flex items-center justify-center size-full px-[16px] py-[12px]">
                       <p className={`font-['Pretendard',sans-serif] leading-[20px] not-italic text-[14px] tracking-[-0.28px] ${
                         isSelected ? 'text-white' : 'text-black'
