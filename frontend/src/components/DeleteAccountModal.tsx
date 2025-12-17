@@ -6,7 +6,7 @@ interface DeleteAccountModalProps {
 }
 
 export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountModalProps) {
-  const [selectedReason, setSelectedReason] = useState<string>("");
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
   const [otherReason, setOtherReason] = useState<string>("");
 
   const reasons = [
@@ -18,13 +18,10 @@ export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountM
   ];
 
   const handleConfirm = () => {
-    const finalReason = selectedReason === "기타" ? otherReason : selectedReason;
-    // if (finalReason) { // reason은 이제 백엔드에서 사용하지 않으므로 체크 불필요
-      onDelete(); // finalReason 전달 안함
-    // }
+    onDelete();
   };
 
-  const isConfirmDisabled = !selectedReason || (selectedReason === "기타" && !otherReason.trim());
+  const isConfirmDisabled = selectedReasons.length === 0 || (selectedReasons.includes("기타") && !otherReason.trim());
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -51,14 +48,20 @@ export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountM
               >
                 <div className="relative flex items-center justify-center">
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="deleteReason"
                     value={reason}
-                    checked={selectedReason === reason}
-                    onChange={(e) => setSelectedReason(e.target.value)}
+                    checked={selectedReasons.includes(reason)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedReasons([...selectedReasons, reason]);
+                      } else {
+                        setSelectedReasons(selectedReasons.filter((r) => r !== reason));
+                      }
+                    }}
                     className="appearance-none w-5 h-5 border-[1.6px] border-black bg-white cursor-pointer checked:bg-[#F360C0] checked:border-[#F360C0]"
                   />
-                  {selectedReason === reason && (
+                  {selectedReasons.includes(reason) && (
                     <svg
                       className="absolute pointer-events-none"
                       width="12"
@@ -84,7 +87,7 @@ export default function DeleteAccountModal({ onClose, onDelete }: DeleteAccountM
           </div>
 
           {/* Other Reason Input */}
-          {selectedReason === "기타" && (
+          {selectedReasons.includes("기타") && (
             <div className="mt-4">
               <textarea
                 value={otherReason}

@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, Edit } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import DeleteAccountModal from "./DeleteAccountModal";
+import RandomProfileIcon from './RandomProfileIcon';
 
 import settingsSvgPaths from "../imports/svg-menh3de8oj";
 
 import ARTISTS from '../constants/artists';
 
 const imgVector = "https://www.figma.com/api/mcp/asset/e8366257-d3f7-496c-ba98-71a545e4dc82";
-const imgVector1 = "https://www.figma.com/api/mcp/asset/99b7134c-b0b4-4e4e-a71c-b1c4312b788c";
-const imgVector2 = "https://www.figma.com/api/mcp/asset/cb0a7f1b-62a6-47b5-a237-362fe7cc1897";
-const imgVector3 = "https://www.figma.com/api/mcp/asset/9499547c-84d7-44d9-a4e4-33d989ba1e04";
 const imgVector5 = "https://www.figma.com/api/mcp/asset/fe295aee-1db6-4175-9fc4-0b5a276c1746"; // OtherUserProfilePage와 통일된 기본 이미지
 
 interface User {
@@ -25,7 +23,7 @@ interface User {
   total_views: number;
   total_likes: number;
   total_shares: number;
-  user_artists: string[]; // Change to user_artists
+  user_artists: string[]; 
 }
 
 interface ProfilePageProps {
@@ -34,13 +32,20 @@ interface ProfilePageProps {
   onNavigateToMyExhibition: () => void;
   onNavigateToEditProfile: () => void;
   onNavigateToFollowers: () => void;
-  onNavigateToFollowing: () => void; // Add onNavigateToFollowing prop
-  onLogout: () => void; // Add onLogout prop
+  onNavigateToFollowing: () => void; 
+  onLogout: () => void; 
 }
+
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
+};
 
 export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMyExhibition, onNavigateToEditProfile, onNavigateToFollowers, onNavigateToFollowing, onLogout }: ProfilePageProps) {
   console.log('ProfilePage component rendered');
   const navigate = useNavigate();
+  
+  // 1. 모든 Hooks는 무조건 맨 위에 선언! (순서 중요)
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,10 +100,8 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         throw new Error(errorData.message || '회원 탈퇴에 실패했습니다.');
       }
 
-      alert('회원 탈퇴가 완료되었습니다.');
       setIsDeleteModalOpen(false);
-      localStorage.removeItem('userId');
-      navigate('/login', { replace: true });
+      onLogout(); // Use the onLogout prop to handle state and navigation
     } catch (error: any) {
       console.error('회원 탈퇴 오류:', error);
       alert(`회원 탈퇴 중 오류가 발생했습니다: ${error.message}`);
@@ -106,12 +109,24 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
     }
   };
 
-
-
   const handleFeatureClick = (featureName: string) => {
     alert(`${featureName} 기능은 아직 구현되지 않았습니다.`);
   };
 
+  const renderProfileIcon = () => {
+    if (user) {
+      return <RandomProfileIcon profileType={getProfileIconType(user.id)} />;
+    }
+    return (
+      <img
+        src={imgVector5}
+        alt="Profile"
+        className="object-cover size-full rounded-full"
+      />
+    );
+  };
+
+  // 2. return(화면 그리기)이나 if문은 Hooks 선언이 다 끝난 뒤에!
   if (loading) {
     return <div className="flex justify-center items-center h-screen">로딩 중...</div>;
   }
@@ -124,15 +139,6 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
     return <div className="flex justify-center items-center h-screen">사용자 프로필을 찾을 수 없습니다.</div>;
   }
 
-  const renderProfileImage = () => {
-    return (
-        <img
-                    src={user.profile_picture_url || imgVector5} // Fallback image
-                    alt="Profile"
-                    className="object-cover size-full rounded-full"
-                />    );
-  };
-
   return (
     <div className="bg-white content-stretch flex flex-col items-start relative w-full min-h-screen max-w-[393px] mx-auto pb-16" data-name="디자인 페이지 생성">
       {/* Header */}
@@ -144,7 +150,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             <button onClick={onBack} className="relative shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:bg-gray-100 rounded transition-colors" data-name="Button">
               <ChevronLeft className="size-5 text-black" />
             </button>
-            <p className="font-garamond font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
+            <p className="font-apple-garamond font-bold leading-[28px] not-italic relative shrink-0 text-[18px] text-black text-center text-nowrap whitespace-pre">Profile</p>
             {/* Empty Container to balance the header */}
             <div className="h-[0] shrink-0 w-[20px]" data-name="Container" />
           </div>
@@ -160,7 +166,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
             <div className="content-stretch flex gap-[16px] items-start relative shrink-0 w-full" data-name="Container">
               {/* Profile Image */}
               <div className="relative shrink-0 size-[80px] bg-[#fef7fc] overflow-clip rounded-full" data-name="profile">
-                {renderProfileImage()}
+                {renderProfileIcon()}
               </div>
 
               {/* Profile Details */}
@@ -189,7 +195,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 {/* Stats */}
                 <div className="content-stretch flex gap-[20px] items-start relative shrink-0 w-full" data-name="Container">
                   {/* 전시관 */}
-                  <div className="relative shrink-0" data-name="Container">
+                  <button className="relative shrink-0" data-name="Container" onClick={onNavigateToMyExhibition}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Text">
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.24px] w-[31.888px]">전시관</p>
@@ -198,7 +204,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <p className="font-pretendard leading-[18px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[-0.24px] whitespace-pre">{user.exhibition_count}</p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                   {/* 팔로워 */}
                   <button className="relative shrink-0" data-name="Container" onClick={onNavigateToFollowers}>
                     <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[4px] items-center relative">
@@ -256,7 +262,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] items-start p-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Account</p>
             </div>
             {/* 비밀번호 변경 */}
             <button
@@ -309,7 +315,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                           <g id="Icon">
                             <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
+                            <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                           </g>
                         </svg>
                       </div>
@@ -340,7 +346,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-auto items-start pb-[24px] pt-[24px] px-[24px] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 2">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Privacy</p>
             </div>
             {/* 개인정보 처리방침 */}
             <button
@@ -420,7 +426,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
       <div className="h-[202.4px] relative shrink-0 w-full" data-name="Container">
         <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
         <div className="absolute content-stretch flex gap-[12px] items-center left-[24px] top-[24.32px] w-[342px]" data-name="Heading 2">
-          <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
+          <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Support</p>
         </div>
         {/* 자주 묻는 질문 */}
         <button
@@ -473,7 +479,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                 <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
                   <g id="Icon">
                     <path d={settingsSvgPaths.p24d83580} id="Vector" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
-                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeLineWidth="1.66667" />
+                    <path d={settingsSvgPaths.pd919a80} id="Vector_2" stroke="var(--stroke-0, black)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.66667" />
                   </g>
                 </svg>
               </div>
@@ -499,7 +505,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
         <div className="size-full">
           <div className="box-border content-stretch flex flex-col gap-[12px] h-[178.4px] items-start px-[24px] py-[0] relative w-full">
             <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Heading 3">
-              <p className="font-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
+              <p className="font-apple-garamond leading-[24px] not-italic relative shrink-0 text-[#4a5565] text-[16px] text-nowrap whitespace-pre">Danger Zone</p>
             </div>
             {/* 로그아웃 */}
             <button

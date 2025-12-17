@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, MoreHorizontal, Eye, Heart } from 'react-feather';
 
+import RandomProfileIcon from './RandomProfileIcon';
+
 const imgVector = "https://www.figma.com/api/mcp/asset/17230c9d-b51c-4f6c-8709-020e63dabafc";
 const imgVector1 = "https://www.figma.com/api/mcp/asset/97d0d129-9271-4777-b20c-52bc716c23b6";
 const imgVector2 = "https://www.figma.com/api/mcp/asset/f6ac66b0-5973-489f-9f9f-2bd2f63b3f1d";
@@ -14,7 +16,8 @@ interface UserProfile {
   id: number;
   username: string;
   nickname: string;
-  profile_picture_url: string;
+  bio: string;
+  profile_picture_url: string; // Reverted
   follower_count: number;
   following_count: number;
   // Add other relevant user profile fields as needed
@@ -41,6 +44,11 @@ const isValidUrl = (url: string | undefined): boolean => {
   } catch (e) {
     return false;
   }
+};
+
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
 };
 
 export default function OtherUserProfilePage() {
@@ -158,7 +166,7 @@ export default function OtherUserProfilePage() {
         <button onClick={() => navigate(-1)} className="size-[20px] flex items-center justify-center">
           <ChevronLeft className="size-5 text-black" />
         </button>
-        <p className="font-garamond font-bold text-[18px] text-black">
+        <p className="font-apple-garamond font-bold text-[18px] text-black">
           Profile
         </p>
         <div className="w-5" />
@@ -168,17 +176,16 @@ export default function OtherUserProfilePage() {
       <div className="flex flex-col items-center p-[24px] border-b-[1.6px] border-black">
         {/* Profile Picture Placeholder - imgVector5 from Figma output is a generic shape, I'll use profile_picture_url if available */}
         <div className="relative size-[80px] rounded-full overflow-hidden mb-[16px]">
-          <img
-            src={profile.profile_picture_url || imgVector5} // Using imgVector5 as fallback for profile picture
-            alt="Profile"
-            className="object-cover size-full"
-          />
+          <RandomProfileIcon profileType={getProfileIconType(profile.id)} />
         </div>
         <p className="font-pretendard font-semibold text-[20px] text-black mb-[4px]">
           {profile.nickname}
         </p>
         <p className="font-pretendard text-[12px] text-[#4a5565] mb-[16px]">
           @{profile.username}
+        </p>
+        <p className="font-pretendard text-[14px] text-black text-center mb-[16px]">
+          {profile.bio || 'K-POP을 사랑하는 팬입니다🩷'}
         </p>
 
         {/* Follow Button */}
@@ -195,7 +202,7 @@ export default function OtherUserProfilePage() {
       {/* Stats Section */}
       <div className="grid grid-cols-3 gap-[12px] p-[24px] border-b-[1.6px] border-black">
         <div className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px]">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {userExhibitions.length}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -203,7 +210,7 @@ export default function OtherUserProfilePage() {
           </p>
         </div>
         <button onClick={() => navigate(`/profile/${userId}/followers`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {profile.follower_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -211,7 +218,7 @@ export default function OtherUserProfilePage() {
           </p>
         </button>
         <button onClick={() => navigate(`/profile/${userId}/following`)} className="flex flex-col items-center justify-center border-[1.6px] border-black h-[74.7px] w-full">
-          <p className="font-garamond font-bold text-[20px] text-black">
+          <p className="font-apple-garamond font-bold text-[20px] text-black">
             {profile.following_count}
           </p>
           <p className="font-pretendard text-[12px] text-[#4a5565]">
@@ -222,7 +229,7 @@ export default function OtherUserProfilePage() {
 
       {/* Exhibitions Section */}
       <div className="flex flex-col gap-[12px] p-[24px]">
-        <p className="font-garamond text-[16px] text-[#4a5565] mb-[12px]">
+        <p className="font-apple-garamond text-[16px] text-[#4a5565] mb-[12px]">
           Exhibition
         </p>
         <div className="grid grid-cols-2 gap-[16px] items-start relative w-full">

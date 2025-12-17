@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ChevronLeft } from 'react-feather';
 import { useParams, useNavigate } from 'react-router-dom';
+import RandomProfileIcon from './RandomProfileIcon';
 
 interface User {
   id: number;
@@ -13,6 +14,11 @@ interface FollowingPageProps {
   initialTab?: 'following' | 'followers';
 }
 
+const getProfileIconType = (userId: number) => {
+  const profileTypes = ['profile_1_l', 'profile_2_l', 'profile_3_l', 'profile_4_l'];
+  return profileTypes[userId % profileTypes.length];
+};
+
 export default function FollowingPage({ onBack, initialTab = 'followers' }: FollowingPageProps) {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -20,9 +26,11 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
   
   const [followers, setFollowers] = useState<User[]>([]);
   const [following, setFollowing] = useState<User[]>([]);
+  const [loggedInUserFollowingIds, setLoggedInUserFollowingIds] = useState<Set<number>>(new Set());
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loggedInUserId = localStorage.getItem('userId');
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -39,10 +47,18 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
       setLoading(true);
       setError(null);
       try {
-        const [followersRes, followingRes] = await Promise.all([
+        const promises = [
           fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/followers`),
           fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/following`)
-        ]);
+        ];
+
+        if (loggedInUserId) {
+          promises.push(fetch(`${import.meta.env.VITE_API_URL}/api/users/${loggedInUserId}/following`));
+        }
+
+        const responses = await Promise.all(promises);
+
+        const [followersRes, followingRes, loggedInUserFollowingRes] = responses;
 
         if (!followersRes.ok) throw new Error('Failed to fetch followers.');
         if (!followingRes.ok) throw new Error('Failed to fetch following users.');
@@ -53,6 +69,12 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
         setFollowers(followersData);
         setFollowing(followingData);
 
+        if (loggedInUserFollowingRes) {
+          if (!loggedInUserFollowingRes.ok) throw new Error('Failed to fetch logged-in user following list.');
+          const loggedInUserFollowingData: User[] = await loggedInUserFollowingRes.json();
+          setLoggedInUserFollowingIds(new Set(loggedInUserFollowingData.map(u => u.id)));
+        }
+
       } catch (err: any) {
         console.error("Error fetching follow data:", err);
         setError(err.message || "Failed to load data.");
@@ -62,20 +84,49 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, loggedInUserId]);
 
-  const followingIds = useMemo(() => new Set(following.map(u => u.id)), [following]);
-
-  const handleFollowToggle = (userToToggle: User) => {
-    const isCurrentlyFollowing = followingIds.has(userToToggle.id);
-
-    if (isCurrentlyFollowing) {
-      setFollowing(prev => prev.filter(u => u.id !== userToToggle.id));
-    } else {
-      setFollowing(prev => [...prev, userToToggle]);
+  const handleFollowToggle = async (userToToggle: User) => {
+    if (!loggedInUserId) {
+      alert("로그인이 필요합니다.");
+      return;
     }
-    // Note: This is a UI-only state change as requested.
-    // In a real app, you would make an API call here.
+
+    const originalFollowingIds = new Set(loggedInUserFollowingIds);
+    const isCurrentlyFollowing = originalFollowingIds.has(userToToggle.id);
+
+    // Optimistic UI update
+    const newFollowingIds = new Set(originalFollowingIds);
+    if (isCurrentlyFollowing) {
+      newFollowingIds.delete(userToToggle.id);
+    } else {
+      newFollowingIds.add(userToToggle.id);
+    }
+    setLoggedInUserFollowingIds(newFollowingIds);
+
+    // If the user is on their own "following" list, also update that list view
+    if (activeTab === 'following' && loggedInUserId === userId) {
+        setFollowing(prev => isCurrentlyFollowing ? prev.filter(u => u.id !== userToToggle.id) : [...prev, userToToggle]);
+    }
+
+
+    try {
+      const method = isCurrentlyFollowing ? 'DELETE' : 'POST';
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userToToggle.id}/follow`, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followerId: parseInt(loggedInUserId, 10) }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update follow status');
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+      // Revert optimistic update on error
+      setLoggedInUserFollowingIds(originalFollowingIds);
+      alert("팔로우/언팔로우 상태를 업데이트하는 데 실패했습니다.");
+    }
   };
 
   const handleUserClick = (clickedUserId: number) => {
@@ -98,26 +149,30 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
     return (
       <div className="divide-y divide-gray-200">
         {users.map((user) => {
-          const isFollowing = followingIds.has(user.id);
+          const isFollowing = loggedInUserFollowingIds.has(user.id);
           return (
             <div key={user.id} className="flex items-center justify-between p-4">
               <div className="flex items-center cursor-pointer" onClick={() => handleUserClick(user.id)}>
-                <div className="w-12 h-12 bg-[#FF69B4] shrink-0 rounded-full"></div>
+                <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden">
+                  <RandomProfileIcon profileType={getProfileIconType(user.id)} />
+                </div>
                 <div className="ml-4">
                   <p className="font-pretendard font-semibold text-black">{user.nickname}</p>
-                  <p className="font-pretendard text-sm text-gray-500">{user.bio}</p>
+                  <p className="font-pretendard text-sm text-gray-500">{user.bio || 'K-POP을 사랑하는 팬입니다🩷'}</p>
                 </div>
               </div>
-              <button
-                onClick={() => handleFollowToggle(user)}
-                className={`font-pretendard px-3 py-1 text-sm rounded-md transition-colors shrink-0 ${
-                  isFollowing
-                    ? 'bg-white text-black border border-black'
-                    : 'bg-black text-white border border-black'
-                }`}
-              >
-                {isFollowing ? '팔로잉' : '팔로우'}
-              </button>
+              {loggedInUserId && user.id !== parseInt(loggedInUserId, 10) && (
+                <button
+                  onClick={() => handleFollowToggle(user)}
+                  className={`font-pretendard px-3 py-1 text-sm rounded-md transition-colors shrink-0 ${
+                    isFollowing
+                      ? 'bg-white text-black border border-black'
+                      : 'bg-black text-white border border-black'
+                  }`}
+                >
+                  {isFollowing ? '팔로잉' : '팔로우'}
+                </button>
+              )}
             </div>
           );
         })}
@@ -134,7 +189,7 @@ export default function FollowingPage({ onBack, initialTab = 'followers' }: Foll
         <button onClick={onBack} className="p-2">
           <ChevronLeft className="size-5 text-black" />
         </button>
-        <h1 className="font-garamond font-bold text-[18px]">
+        <h1 className="font-apple-garamond font-bold text-[18px]">
           {activeTab === 'followers' ? 'Followers' : 'Following'}
         </h1>
         <div className="w-9"></div> {/* Spacer */}
