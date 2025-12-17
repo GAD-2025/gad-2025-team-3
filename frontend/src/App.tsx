@@ -120,15 +120,25 @@ export default function App() {
 
   // Effect to handle navigation based on currentUser status
   useEffect(() => {
-    // If currentUser exists and we are on the login page or root, navigate to main
+    console.log('App useEffect triggered.');
+    console.log('currentUser:', currentUser);
+    console.log('location.pathname:', location.pathname);
+
     if (currentUser) {
       if (location.pathname === '/login' || location.pathname === '/') {
+        console.log('Logged in user, navigating to /main');
         navigate('/main');
       }
     } else {
-      // If no currentUser and not already on login/signup-complete, navigate to login
-      if (location.pathname !== '/login' && !location.pathname.startsWith('/signup')) { // Use startsWith for better path checking
+      const shouldRedirectToLogin = location.pathname !== '/login' && 
+                                   !location.pathname.startsWith('/signup') && 
+                                   !location.pathname.startsWith('/explore/search');
+      console.log('shouldRedirectToLogin:', shouldRedirectToLogin);
+      if (shouldRedirectToLogin) {
+        console.log('No user, redirecting to /login');
         navigate('/login');
+      } else {
+        console.log('No user, but path is allowed:', location.pathname);
       }
     }
   }, [currentUser, navigate, location.pathname]);

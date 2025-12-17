@@ -27,7 +27,13 @@ export default function ExploreSearchResultsPage({
 }: ExploreSearchResultsPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const initialSearchQuery = (location.state as { searchQuery?: string })?.searchQuery || '';
+  
+  // Read tag from URL query params
+  const queryParams = new URLSearchParams(location.search);
+  const tagFromUrl = queryParams.get('tag');
+
+  // Prioritize tag from URL, then searchQuery from state, then empty string
+  const initialSearchQuery = tagFromUrl ? `#${tagFromUrl}` : (location.state as { searchQuery?: string })?.searchQuery || '';
 
   const [inputSearchText, setInputSearchText] = useState(initialSearchQuery);
   const [submittedSearchText, setSubmittedSearchText] = useState(initialSearchQuery);
@@ -37,7 +43,10 @@ export default function ExploreSearchResultsPage({
 
   // Effect to redirect if submittedSearchText becomes empty
   useEffect(() => {
+    console.log('ExploreSearchResultsPage useEffect triggered.');
+    console.log('submittedSearchText:', submittedSearchText);
     if (submittedSearchText === '') {
+      console.log('submittedSearchText is empty, navigating to /explore/trending');
       navigate('/explore/trending');
     }
   }, [submittedSearchText, navigate]);

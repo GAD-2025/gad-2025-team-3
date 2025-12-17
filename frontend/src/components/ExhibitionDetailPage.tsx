@@ -177,6 +177,10 @@ export default function ExhibitionDetailPage({
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    navigate(`/explore/search?tag=${encodeURIComponent(tag)}`);
+  };
+
   const handleFavoriteClick = async () => {
     if (!id || !loggedInUserId || !exhibitionData) return;
   
@@ -585,9 +589,13 @@ export default function ExhibitionDetailPage({
               {exhibitionData.hashtags && exhibitionData.hashtags.length > 0 && (
                 <div key={hashtagRenderKey} className="flex flex-wrap gap-2 mt-4">
                   {exhibitionData.hashtags.map((tag, index) => (
-                    <span key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]">
+                    <button
+                      key={index}
+                      onClick={() => handleTagClick(tag.startsWith('#') ? tag.substring(1) : tag)}
+                      className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif] cursor-pointer hover:bg-[#f360c0] hover:text-white transition-colors"
+                    >
                       {tag}
-                    </span>
+                    </button>
                   ))}
                 </div>
               )}
