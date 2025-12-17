@@ -266,9 +266,11 @@ export default function OtherUserProfilePage() {
               </button>
             ))
           ) : (
-            <p className="font-pretendard text-[12px] text-[#4a5565]">
-              No exhibitions found.
-            </p>
+            <div className="flex flex-col items-start justify-center w-full py-4">
+              <p className="font-pretendard text-[16px] text-[#4a5565]">
+                전시관이 없습니다.
+              </p>
+            </div>
           )}
         </div>
       </div>
