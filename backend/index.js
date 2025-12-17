@@ -21,7 +21,7 @@ const corsOptions= {
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(express.json({ limit: '50mb' })); // ⬅️ 이제 app을 사용할 수 있습니다.
-// app.use(cors(corsOptions)); // Commented out for debugging CORS
+app.use(cors(corsOptions)); // Commented out for debugging CORS
 
 app.use((req, res, next) => {
     const allowedOrigins = ['http://localhost:5173', 'https://gad-2025-team-3.web.app'];
@@ -89,7 +89,7 @@ app.post('/api/upload', upload.array('files', 20), (req, res) => {
         }
 
         const fileUrls = req.files.map(file => {
-            return `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+            return `https://route.nois.club:3003/uploads/${file.filename}`;
         });
 
         res.status(200).json({ urls: fileUrls });
@@ -688,8 +688,8 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
         const authorNickname = userRows[0].nickname;
 
         const [result] = await connection.execute(
-            'INSERT INTO comments (exhibition_id, user_id, author, content) VALUES (?, ?, ?, ?)',
-            [id, userId, authorNickname, content]
+            'INSERT INTO comments (exhibition_id, user_id, content) VALUES (?, ?, ?)', // author 제거
+            [id, userId, content]
         );
 
         const newCommentId = result.insertId;
