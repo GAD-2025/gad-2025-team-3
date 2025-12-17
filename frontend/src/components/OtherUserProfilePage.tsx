@@ -20,6 +20,7 @@ interface UserProfile {
   profile_picture_url: string; // Reverted
   follower_count: number;
   following_count: number;
+  user_artists: string[]; // Added for selected artists
   // Add other relevant user profile fields as needed
 }
 
@@ -187,6 +188,19 @@ export default function OtherUserProfilePage() {
         <p className="font-pretendard text-[14px] text-black text-center mb-[16px]">
           {profile.bio || 'K-POP을 사랑하는 팬입니다🩷'}
         </p>
+
+        {profile.user_artists && profile.user_artists.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-[16px] justify-center">
+            {profile.user_artists.map((artist, index) => (
+              <span
+                key={index}
+                className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+              >
+                {artist}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Follow Button */}
         <button
