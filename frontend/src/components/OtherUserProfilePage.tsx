@@ -195,7 +195,7 @@ export default function OtherUserProfilePage() {
             isFollowing ? 'bg-black text-white' : 'bg-[#f360c0] text-white'
           } font-pretendard text-[14px]`}
         >
-          {isFollowing ? 'Following' : '팔로우'}
+          {isFollowing ? '팔로잉' : '팔로우'}
         </button>
       </div>
 

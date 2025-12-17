@@ -328,6 +328,444 @@ app.get('/api/exhibitions/:id/is-liked', async (req, res) => {
 });
 
 // 서버 시작
+// API for adding an exhibition to favorites
+app.post('/api/favorites', async (req, res) => {
+    const { userId, exhibitionId } = req.body;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute(
+            'INSERT INTO user_favorites (user_id, exhibition_id) VALUES (?, ?)',
+            [userId, exhibitionId]
+        );
+        connection.release();
+        res.status(201).json({ message: 'Exhibition added to favorites successfully.' });
+    } catch (error) {
+        console.error('Add to favorites error:', error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Exhibition already in favorites.' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for removing an exhibition from favorites
+app.delete('/api/favorites', async (req, res) => {
+    const { userId, exhibitionId } = req.body;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [result] = await connection.execute(
+            'DELETE FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [userId, exhibitionId]
+        );
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Favorite not found.' });
+        }
+        res.status(200).json({ message: 'Exhibition removed from favorites successfully.' });
+    } catch (error) {
+        console.error('Remove from favorites error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for checking if a user has favorited an exhibition
+app.get('/api/favorites/check', async (req, res) => {
+    const { userId, exhibitionId } = req.query;
+
+    if (!userId || !exhibitionId) {
+        return res.status(400).json({ message: 'User ID and Exhibition ID are required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    const parsedExhibitionId = parseInt(exhibitionId, 10);
+
+    if (isNaN(parsedUserId) || isNaN(parsedExhibitionId)) {
+        return res.status(400).json({ message: 'Invalid User ID or Exhibition ID format. Must be numbers.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT * FROM user_favorites WHERE user_id = ? AND exhibition_id = ?',
+            [parsedUserId, parsedExhibitionId]
+        );
+        connection.release();
+
+        res.status(200).json({ isFavorited: rows.length > 0 });
+
+    } catch (error) {
+        console.error('Check is-favorited error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching a user's favorite exhibitions
+app.get('/api/users/:userId/favorites', async (req, res) => {
+    console.log('>>> Received request for /api/users/:userId/favorites');
+    const { userId } = req.params;
+
+    if (!userId) {
+        console.log('User ID is missing.');
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        console.log('Invalid User ID format.');
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        console.log('Attempting to get DB connection...');
+        const connection = await pool.getConnection();
+        console.log('DB connection obtained.');
+        const [rows] = await connection.execute(
+            `
+            SELECT 
+                e.id,
+                e.title,
+                e.views,
+                e.likes,
+                e.room_number,
+                e.id as roomId,
+                u.nickname as authorName
+            FROM 
+                exhibitions e
+            JOIN 
+                user_favorites f ON e.id = f.exhibition_id
+            JOIN 
+                users u ON e.user_id = u.id
+            WHERE 
+                f.user_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        console.log('Fetched favorites successfully.');
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Fetch favorites error:', error);
+        if (error.code) {
+            console.error('MySQL Error Code:', error.code);
+        }
+        if (error.sqlMessage) {
+            console.error('MySQL Error Message:', error.sqlMessage);
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching a user's followers
+app.get('/api/users/:userId/followers', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followerRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.follower_id
+            WHERE 
+                uf.followed_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followerRows);
+    } catch (error) {
+        console.error('Fetch followers error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching a user's following
+app.get('/api/users/:userId/following', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followingRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.followed_id
+            WHERE 
+                uf.follower_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followingRows);
+    } catch (error) {
+        console.error('Fetch following error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching a user's following
+app.get('/api/users/:userId/following', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followingRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.followed_id
+            WHERE 
+                uf.follower_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followingRows);
+    } catch (error) {
+        console.error('Fetch following error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API to resolve exhibition ID by room number and optional creation count
+app.get('/api/exhibitions/by-room/:roomNumber/:generationCount?', async (req, res) => {
+    const { roomNumber, generationCount } = req.params;
+
+    if (!roomNumber) {
+        return res.status(400).json({ message: 'Room number is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        let query;
+        let params;
+
+        if (generationCount) {
+            query = `
+                SELECT id FROM exhibitions
+                WHERE room_number = ? AND room_creation_count = ?
+                LIMIT 1
+            `;
+            params = [roomNumber, parseInt(generationCount, 10)];
+        } else {
+            // If generationCount is not provided, get the latest one
+            query = `
+                SELECT id FROM exhibitions
+                WHERE room_number = ?
+                ORDER BY room_creation_count DESC, created_at DESC
+                LIMIT 1
+            `;
+            params = [roomNumber];
+        }
+
+        const [rows] = await connection.execute(query, params);
+        connection.release();
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Exhibition not found for this room.' });
+        }
+
+        res.status(200).json({ exhibitionId: rows[0].id });
+
+    } catch (error) {
+        console.error('Resolve by room error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// API for following a user
+app.post('/api/users/:followedId/follow', async (req, res) => {
+    const { followedId } = req.params;
+    const { followerId } = req.body; // The user who is following
+
+    if (!followerId || !followedId) {
+        return res.status(400).json({ message: 'Follower ID and Followed ID are required.' });
+    }
+
+    if (parseInt(followerId) === parseInt(followedId)) {
+        return res.status(400).json({ message: 'Cannot follow yourself.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute(
+            'INSERT INTO user_follows (follower_id, followed_id) VALUES (?, ?)',
+            [followerId, followedId]
+        );
+        connection.release();
+        res.status(201).json({ message: 'User followed successfully.' });
+    } catch (error) {
+        console.error('Follow user error:', error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Already following this user.' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for unfollowing a user
+app.delete('/api/users/:followedId/follow', async (req, res) => {
+    const { followedId } = req.params;
+    const { followerId } = req.body; // The user who is unfollowing
+
+    if (!followerId || !followedId) {
+        return res.status(400).json({ message: 'Follower ID and Followed ID are required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [result] = await connection.execute(
+            'DELETE FROM user_follows WHERE follower_id = ? AND followed_id = ?',
+            [followerId, followedId]
+        );
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Follow relationship not found.' });
+        }
+        res.status(200).json({ message: 'User unfollowed successfully.' });
+    } catch (error) {
+        console.error('Unfollow user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for checking if a user is following another
+app.get('/api/users/:userId/is-following/:targetUserId', async (req, res) => {
+    const { userId, targetUserId } = req.params;
+
+    if (!userId || !targetUserId) {
+        return res.status(400).json({ message: 'User ID and Target User ID are required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    const parsedTargetUserId = parseInt(targetUserId, 10);
+
+    if (isNaN(parsedUserId) || isNaN(parsedTargetUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            'SELECT * FROM user_follows WHERE follower_id = ? AND followed_id = ?',
+            [parsedUserId, parsedTargetUserId]
+        );
+        connection.release();
+        res.status(200).json({ isFollowing: rows.length > 0 });
+    } catch (error) {
+        console.error('Check is-following error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API for fetching aggregated user statistics
+app.get('/api/users/:userId/statistics', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `
+            SELECT
+                COUNT(e.id) AS exhibition_count,
+                SUM(e.views) AS total_views,
+                SUM(e.likes) AS total_likes,
+                SUM(e.shares) AS total_shares
+            FROM
+                exhibitions e
+            WHERE
+                e.user_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+
+        // If no exhibitions found, SUM returns null, COUNT returns 0
+        const stats = rows[0];
+        res.status(200).json({
+            exhibition_count: stats.exhibition_count || 0,
+            total_views: stats.total_views || 0,
+            total_likes: stats.total_likes || 0,
+            total_shares: stats.total_shares || 0,
+        });
+
+    } catch (error) {
+        console.error('Fetch user statistics error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// ----------------------------------------------------------------------------------
+
+// 3. 🟢 서버 시작 로직 수정 (DB 연결 테스트 포함)
+>>>>>>> 22926c9b88c21a5ba4389d173f89bc4be4293abe
 const PORT = process.env.PORT || 3003;
 async function startServer() {
     try {

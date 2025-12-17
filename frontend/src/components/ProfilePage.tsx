@@ -240,7 +240,7 @@ export default function ProfilePage({ onBack, onNavigateToBadges, onNavigateToMy
                     return (
                       <div key={index} className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[11.6px] pt-[5.6px] pb-[1.6px] relative flex items-center justify-center">
                         <p className="font-pretendard font-medium leading-[18px] not-italic text-[#f360c0] text-[12px] tracking-[-0.24px] whitespace-pre-wrap">
-                          #{artist ? artist.name : idolId}
+                          {artist ? artist.name : idolId}
                         </p>
                       </div>
                     );
