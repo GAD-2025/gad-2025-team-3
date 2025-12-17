@@ -293,7 +293,7 @@ export default function OtherUserProfilePage() {
                 {/* Exhibition Details */}
                 <div className="flex flex-col gap-[8px] p-[12px]">
                   <div className="h-auto overflow-clip relative w-full">
-                    <p className="font-pretendard leading-[18px] text-[12px] text-black tracking-[-0.24px] whitespace-normal text-left">{ex.title}</p>
+                    <p className="font-pretendard leading-[18px] text-[12px] text-black tracking-[-0.24px] text-left truncate">{ex.title}</p>
                   </div>
 
                   {/* Views and Likes */}
