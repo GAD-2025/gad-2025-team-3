@@ -14,8 +14,29 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 // 🚨 1단계 해결: app 변수 정의 및 초기화 (이 부분이 없었거나 아래쪽에 있었습니다!)
 const app = express(); 
 
-const corsOptions= {
-    origin: ['http://localhost:5173', 'https://gad-2025-team-3.web.app'],
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, curl, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        // Allow any localhost/127.0.0.1 with any port (for development)
+        if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow Firebase hosting URLs (both .web.app and .firebaseapp.com)
+        const allowedOrigins = [
+            'https://gad-2025-team-3.web.app',
+            'https://gad-2025-team-3.firebaseapp.com'
+        ];
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        // Block other origins
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
