@@ -18,6 +18,7 @@ interface Exhibition {
   likes: number;
   createdAt: string;
   thumbnail: string;
+  room_number: string;
 }
 
 export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }: ExploreMainPageProps) {
@@ -235,12 +236,17 @@ export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }:
                 <button
                   key={exhibition.id} 
                   onClick={() => onExhibitionClick(String(exhibition.id))} 
-                  className="flex flex-col relative shrink-0 w-full cursor-pointer hover:opacity-80 transition-opacity border-[1.6px] border-black" 
+                  className="flex flex-col relative shrink-0 w-full cursor-pointer hover:opacity-80 transition-opacity border-[1.6px] border-black relative" 
                   data-name="Container"
                 >
                   {/* Image Placeholder */}
                   <div className="h-[160px] w-full bg-gray-50">
                     <img src={exhibition.thumbnail} alt={exhibition.title} className="w-full h-full object-cover" />
+                  </div>
+                  
+                  {/* Room Number Box */}
+                  <div className="absolute top-2 right-2 border-[1.6px] border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] bg-white">
+                    {exhibition.room_number}
                   </div>
                   
                   {/* Title and Author */}

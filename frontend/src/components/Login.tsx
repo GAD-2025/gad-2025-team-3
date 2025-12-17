@@ -157,7 +157,7 @@ export default function Login({ onLogin, onSignup, onFindId, onFindPassword }: L
 
               {/* Bottom Links */}
               <div className="absolute h-[48px] top-[275.6px] left-0 right-0 mx-auto max-w-[342px]" data-name="Container">
-                <div className="content-stretch flex items-center justify-between w-full h-full">
+                <div className="content-stretch flex items-center justify-center gap-x-6 w-full h-full">
                   <button onClick={onFindId} className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0 cursor-pointer hover:opacity-70 transition-opacity" data-name="Button">
                     <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#4a5565] text-[14px] text-nowrap tracking-[-0.28px] whitespace-pre">아이디 찾기</p>
                   </button>
