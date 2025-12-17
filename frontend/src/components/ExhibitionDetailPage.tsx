@@ -725,7 +725,7 @@ export default function ExhibitionDetailPage({
             isOpen={isShareModalOpen}
             onClose={() => setShareModalOpen(false)}
             exhibition={{
-              room: exhibitionData.room_number,
+              room: String(exhibitionData.id),
               creationCount: exhibitionData.room_creation_count,
               title: exhibitionData.title,
               author: exhibitionData.author
