@@ -695,8 +695,8 @@ app.post('/api/exhibitions/:id/comments', async (req, res) => {
         const authorNickname = userRows[0].nickname;
 
         const [result] = await connection.execute(
-            'INSERT INTO comments (exhibition_id, user_id, content) VALUES (?, ?, ?)', // author 제거
-            [id, userId, content]
+            'INSERT INTO comments (exhibition_id, user_id, content, author) VALUES (?, ?, ?, ?)',
+            [id, userId, content, authorNickname]
         );
 
         const newCommentId = result.insertId;
