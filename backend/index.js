@@ -1406,6 +1406,92 @@ app.get('/api/users/:userId/following', async (req, res) => {
     }
 });
 
+// API for fetching a user's following
+app.get('/api/users/:userId/following', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const parsedUserId = parseInt(userId, 10);
+    if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: 'Invalid User ID format. Must be a number.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+
+        const [followingRows] = await connection.execute(
+            `
+            SELECT 
+                u.id,
+                u.nickname,
+                u.bio
+            FROM 
+                users u
+            JOIN 
+                user_follows uf ON u.id = uf.followed_id
+            WHERE 
+                uf.follower_id = ?
+            `,
+            [parsedUserId]
+        );
+        connection.release();
+        res.status(200).json(followingRows);
+    } catch (error) {
+        console.error('Fetch following error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// API to resolve exhibition ID by room number and optional creation count
+app.get('/api/exhibitions/by-room/:roomNumber/:generationCount?', async (req, res) => {
+    const { roomNumber, generationCount } = req.params;
+
+    if (!roomNumber) {
+        return res.status(400).json({ message: 'Room number is required.' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        let query;
+        let params;
+
+        if (generationCount) {
+            query = `
+                SELECT id FROM exhibitions
+                WHERE room_number = ? AND room_creation_count = ?
+                LIMIT 1
+            `;
+            params = [roomNumber, parseInt(generationCount, 10)];
+        } else {
+            // If generationCount is not provided, get the latest one
+            query = `
+                SELECT id FROM exhibitions
+                WHERE room_number = ?
+                ORDER BY room_creation_count DESC, created_at DESC
+                LIMIT 1
+            `;
+            params = [roomNumber];
+        }
+
+        const [rows] = await connection.execute(query, params);
+        connection.release();
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Exhibition not found for this room.' });
+        }
+
+        res.status(200).json({ exhibitionId: rows[0].id });
+
+    } catch (error) {
+        console.error('Resolve by room error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 // API for following a user
 app.post('/api/users/:followedId/follow', async (req, res) => {
     const { followedId } = req.params;

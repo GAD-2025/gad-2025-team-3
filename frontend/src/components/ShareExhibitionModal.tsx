@@ -26,7 +26,7 @@ export default function ShareExhibitionModal({ isOpen, onClose, exhibition, onSh
 
   if (!isOpen) return null;
 
-  const shareUrl = `https://showcase.hotel/room/${exhibition.room}${exhibition.creationCount ? `/${exhibition.creationCount}` : ''}`;
+  const shareUrl = `https://gad-2025-team-3.web.app/room/${exhibition.room}${exhibition.creationCount ? `/${exhibition.creationCount}` : ''}`;
 
   const showMessage = (msg: string) => {
     setMessage(msg);

@@ -24,6 +24,7 @@ import EditProfilePage from './components/EditProfilePage';
 import OtherUserProfilePage from './components/OtherUserProfilePage'; // Import the new component
 import FollowerPage from './components/FollowerPage'; // Import FollowerPage
 import FollowingPage from './components/FollowingPage'; // Import FollowingPage
+import RoomResolver from './components/RoomResolver'; // Import the new component
 // Removed: import { SignupProvider, SignupData } from './components/SignupContext';
 
 // Define a type for the user object for better type safety
@@ -689,6 +690,8 @@ export default function App() {
           currentUser={currentUser}
         />
       } />
+      <Route path="/room/:roomNumber" element={<RoomResolver />} />
+      <Route path="/room/:roomNumber/:generationCount" element={<RoomResolver />} />
       <Route path="*" element={<Login onLogin={handleLoginSuccess} onSignup={() => navigate('/signup')} />} />
       </Routes>
     </div>
