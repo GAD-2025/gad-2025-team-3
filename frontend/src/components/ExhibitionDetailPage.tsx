@@ -178,7 +178,7 @@ export default function ExhibitionDetailPage({
   };
 
   const handleTagClick = (tag: string) => {
-    navigate(`/explore/search?tag=${encodeURIComponent(tag)}`);
+    navigate(`/explore/search?tag=${encodeURIComponent(tag)}`, { state: { fromExhibition: `/exhibition/${id}` } });
   };
 
   const handleFavoriteClick = async () => {

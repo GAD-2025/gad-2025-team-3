@@ -1446,7 +1446,7 @@ app.get('/api/users/:userId/following', async (req, res) => {
 });
 
 // API to resolve exhibition ID by room number and optional creation count
-app.get('/api/exhibitions/by-room/:roomNumber/:generationCount?', async (req, res) => {
+app.get('/api/exhibitions/by-room/:roomNumber/:generationCount', async (req, res) => {
     const { roomNumber, generationCount } = req.params;
 
     if (!roomNumber) {

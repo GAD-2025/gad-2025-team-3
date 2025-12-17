@@ -677,7 +677,7 @@ export default function App() {
         />
       } />      <Route path="/explore/search" element={
         <ExploreSearchResultsPage 
-          onBack={() => navigate('/explore/trending')} 
+          onBack={() => navigate(-1)} 
           onExhibitionClick={(data) => {
             setSelectedExhibition(data);
             navigate(`/exhibition/${data.id}`);
