@@ -20,24 +20,8 @@ const corsOptions= {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
-app.use(express.json({ limit: '50mb' })); // ⬅️ 이제 app을 사용할 수 있습니다.
-app.use(cors(corsOptions)); // Commented out for debugging CORS
-
-app.use((req, res, next) => {
-    const allowedOrigins = ['http://localhost:5173', 'https://gad-2025-team-3.web.app'];
-    const origin = req.headers.origin;
-
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true'); // Required for credentials to be sent
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-}); 
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '50mb' }));
 
 // Serve static files from img_save folder
 app.use('/uploads', express.static(path.join(__dirname, 'img_save')));
