@@ -231,7 +231,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                         <p className="font-['Pretendard',sans-serif] font-semibold leading-[28px] not-italic relative shrink-0 text-[20px] text-black text-nowrap tracking-[-0.4px] whitespace-pre">파일을 선택하세요</p>
                       </div>
                       <div className="content-stretch flex items-start relative shrink-0" data-name="Paragraph">
-                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[-0.24px] whitespace-pre">이미지, 영상 최대 50MB</p>
+                        <p className="font-['Pretendard',sans-serif] leading-[18px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[-0.24px] whitespace-pre">이미지 최대 50MB</p>
                       </div>
                     </div>
                   </div>
@@ -239,7 +239,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                   <input
                     id="file-upload"
                     type="file"
-                    accept="image/*,video/*"
+                    accept="image/*"
                     multiple
                     onChange={handleFileSelect}
                     className="hidden"
@@ -308,7 +308,7 @@ export default function CreateExhibitionUploadPage({ onBack, onNext, uploadedFil
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*,video/*"
+                    accept="image/*"
                     multiple
                     onChange={handleFileSelect}
                     className="hidden"
