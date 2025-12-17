@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronLeft } from 'react-feather';
+import { ChevronLeft, Eye, Heart } from 'react-feather';
 import svgPaths from "../imports/svg-jbhf0egdok";
 
 // Define the type for a single exhibition based on the backend response
@@ -187,7 +187,7 @@ export default function ExploreSearchResultsPage({
                                         </div>
                                       </div>
                                       <div className="h-full relative shrink-0" data-name="Container">
-                                        <div aria-hidden="true" className="absolute border-[0.8px] border-black border-solid inset-0 pointer-events-none" />
+                                        <div aria-hidden="true" className="absolute border-[1.6px] border-black border-solid inset-0 pointer-events-none" />
                                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] h-full items-center justify-center px-[9px] py-[4px] relative">
                                           <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[12px] text-black text-nowrap tracking-[0.3px] whitespace-pre">{exhibition.room_number}</p>
                                         </div>
@@ -203,9 +203,14 @@ export default function ExploreSearchResultsPage({
                                       <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[0.3px]">by {exhibition.author}</p>
                                     </div>
                                   </div>
-                                  <div className="relative shrink-0" data-name="Text">
-                                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center justify-center relative">
-                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic relative shrink-0 text-[#4a5565] text-[12px] text-nowrap tracking-[0.3px] whitespace-pre">조회 {exhibition.views}</p>
+                                  <div className="flex items-center gap-3"> {/* 아이콘과 텍스트를 묶는 컨테이너 */}
+                                    <div className="flex items-center gap-1"> {/* 조회수 아이콘과 텍스트 */}
+                                      <Eye size={12} color="#4A5565" />
+                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic text-[#4a5565] text-[12px] tracking-[0.3px] whitespace-pre">{exhibition.views}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1"> {/* 좋아요 아이콘과 텍스트 */}
+                                      <Heart size={12} color="#4A5565" />
+                                      <p className="font-['EB_Garamond',serif] leading-[16px] not-italic text-[#4a5565] text-[12px] tracking-[0.3px] whitespace-pre">{exhibition.likes}</p>
                                     </div>
                                   </div>
                                 </div>

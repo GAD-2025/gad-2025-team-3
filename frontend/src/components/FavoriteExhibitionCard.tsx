@@ -67,7 +67,7 @@ const FavoriteExhibitionCard: React.FC<FavoriteExhibitionCardProps> = ({
               </p>
             </div>
             {/* Room Number Box - Integrated into flex layout */}
-            <div className="border-2 border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] flex-shrink-0">
+            <div className="border-[1.6px] border-black px-2 py-1 text-xs font-['EB_Garamond:Regular',serif] flex-shrink-0">
               {room_number}
             </div>
           </div>
