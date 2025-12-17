@@ -190,15 +190,42 @@ export default function OtherUserProfilePage() {
         </p>
 
         {profile.user_artists && profile.user_artists.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-[16px] justify-center">
-            {profile.user_artists.map((artist, index) => (
-              <span
-                key={index}
-                className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
-              >
-                {artist}
-              </span>
-            ))}
+          <div className="flex flex-col gap-2 mb-[16px] items-center"> {/* Changed to flex-col to manage rows */}
+            {profile.user_artists.length === 5 ? (
+              <>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {profile.user_artists.slice(0, 3).map((artist, index) => (
+                    <span
+                      key={index}
+                      className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                    >
+                      {artist}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {profile.user_artists.slice(3, 5).map((artist, index) => (
+                    <span
+                      key={index + 3} // Adjust key to be unique
+                      className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                    >
+                      {artist}
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-wrap gap-2 justify-center">
+                {profile.user_artists.map((artist, index) => (
+                  <span
+                    key={index}
+                    className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                  >
+                    {artist}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
