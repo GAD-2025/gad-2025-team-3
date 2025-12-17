@@ -252,7 +252,7 @@ export default function ExploreMainPage({ onBack, onExhibitionClick, onSearch }:
                   {/* Title and Author */}
                   <div className="flex flex-col gap-[8px] p-[12px]">
                     <div className="h-auto overflow-clip relative shrink-0 w-full" data-name="Heading 3">
-                      <div className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[12px] text-black tracking-[-0.24px] whitespace-normal text-left">{exhibition.title}</div>
+                      <div className="font-['Pretendard',sans-serif] leading-[18px] not-italic text-[12px] text-black tracking-[-0.24px] text-left truncate">{exhibition.title}</div>
                     </div>
                     <div className="content-stretch flex h-[13.5px] items-start relative shrink-0 w-full" data-name="Container">
                       <p className="font-['EB_Garamond',serif] leading-[16px] min-h-px min-w-px not-italic relative shrink-0 text-[#4a5565] text-[12px] tracking-[-0.4px]">by {exhibition.author}</p>

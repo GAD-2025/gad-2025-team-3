@@ -62,6 +62,7 @@ export default function ExhibitionDetailPage({
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [hashtagRenderKey, setHashtagRenderKey] = useState(0); // New state to force re-render of hashtags
   const commentTextareaRef = useRef<HTMLTextAreaElement>(null); // Added useRef for textarea
+  const [isTitleExpanded, setIsTitleExpanded] = useState(false); // State for title expansion
 
   // Derived state for the current image URL
   const currentImage = exhibitionData?.imageUrls[currentImageIndex] || '';
@@ -81,13 +82,6 @@ export default function ExhibitionDetailPage({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [optionsMenuRef]);
-
-  const truncateTitle = (title: string, maxLength: number) => {
-    if (title.length > maxLength) {
-      return title.substring(0, maxLength) + '...';
-    }
-    return title;
-  };
 
   const fetchExhibitionAndComments = async () => {
     if (!id) {
@@ -178,7 +172,7 @@ export default function ExhibitionDetailPage({
   };
 
   const handleTagClick = (tag: string) => {
-    navigate(`/explore/search?tag=${encodeURIComponent(tag)}`);
+    navigate(`/explore/search?tag=${encodeURIComponent(tag)}`, { state: { fromExhibition: `/exhibition/${id}` } });
   };
 
   const handleFavoriteClick = async () => {
@@ -495,17 +489,24 @@ export default function ExhibitionDetailPage({
           </div>
         </div>
 
-        <div className="h-[159.9px] relative shrink-0 w-full" data-name="Container">
+        <div className="relative shrink-0 w-full" data-name="Container">
           <div aria-hidden="true" className="absolute border-[0px_0px_1.6px] border-black border-solid inset-0 pointer-events-none" />
           <div className="size-full">
-            <div className="box-border content-stretch flex flex-col gap-[16px] h-[159.9px] items-start pb-[1.6px] pt-[24px] px-[24px] relative w-full">
-              <div className="h-[61px] relative shrink-0 w-full" data-name="Container">
+            <div className="box-border content-stretch flex flex-col gap-[16px] items-start pb-[16px] pt-[24px] px-[24px] relative w-full">
+              <div className="relative shrink-0 w-full" data-name="Container">
                 <div className="size-full">
-                  <div className="content-stretch flex h-[61px] items-start justify-between relative w-full">
-                    <div className="basis-0 grow min-h-px min-w-px relative shrink-0" data-name="Container">
+                  <div className="content-stretch flex items-start justify-between relative w-full gap-x-4">
+                    <div className="basis-0 grow min-h-px min-w-px relative shrink-0 max-w-[calc(100% - 96px)]" data-name="Container">
                       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[8px] items-start relative w-full">
-                        <div className="h-[35px] relative shrink-0 w-full" data-name="Heading 1">
-                          <p className="absolute font-['Pretendard',sans-serif] font-semibold leading-[32px] left-0 not-italic text-[24px] text-black text-nowrap top-[-0.6px] tracking-[-0.48px] whitespace-pre">{truncateTitle(exhibitionData.title, 13)}</p>
+                        <div className="relative shrink-0 w-full" data-name="Heading 1">
+                          <p
+                            className={`font-['Pretendard',sans-serif] font-semibold leading-[32px] not-italic text-[24px] text-black tracking-[-0.48px] ${
+                              exhibitionData.title.length > 13 && !isTitleExpanded ? 'truncate cursor-pointer' : 'whitespace-normal'
+                            }`}
+                            onClick={() => setIsTitleExpanded(!isTitleExpanded)}
+                          >
+                            {exhibitionData.title}
+                          </p>
                         </div>
                         <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full" data-name="Paragraph">
                           <p

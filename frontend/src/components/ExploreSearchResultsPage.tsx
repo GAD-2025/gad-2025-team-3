@@ -183,7 +183,7 @@ export default function ExploreSearchResultsPage({
                                     <div className="content-stretch flex h-[23.1px] items-center justify-between relative w-full">
                                       <div className="basis-0 grow min-h-px min-w-px relative shrink-0" data-name="Heading 3">
                                         <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex gap-[10px] items-center relative w-full">
-                                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black text-nowrap tracking-[-0.28px] whitespace-pre">{exhibition.title}</p>
+                                          <p className="font-['Pretendard',sans-serif] leading-[20px] not-italic relative shrink-0 text-[14px] text-black tracking-[-0.28px] truncate">{exhibition.title}</p>
                                         </div>
                                       </div>
                                       <div className="h-full relative shrink-0" data-name="Container">

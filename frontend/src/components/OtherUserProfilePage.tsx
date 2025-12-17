@@ -20,6 +20,7 @@ interface UserProfile {
   profile_picture_url: string; // Reverted
   follower_count: number;
   following_count: number;
+  user_artists: string[]; // Added for selected artists
   // Add other relevant user profile fields as needed
 }
 
@@ -188,6 +189,46 @@ export default function OtherUserProfilePage() {
           {profile.bio || 'K-POP을 사랑하는 팬입니다🩷'}
         </p>
 
+        {profile.user_artists && profile.user_artists.length > 0 && (
+          <div className="flex flex-col gap-2 mb-[16px] items-center"> {/* Changed to flex-col to manage rows */}
+            {profile.user_artists.length === 5 ? (
+              <>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {profile.user_artists.slice(0, 3).map((artist, index) => (
+                    <span
+                      key={index}
+                      className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                    >
+                      {artist}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {profile.user_artists.slice(3, 5).map((artist, index) => (
+                    <span
+                      key={index + 3} // Adjust key to be unique
+                      className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                    >
+                      {artist}
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-wrap gap-2 justify-center">
+                {profile.user_artists.map((artist, index) => (
+                  <span
+                    key={index}
+                    className="bg-white border-[#f360c0] border-[1.6px] border-solid px-[13.6px] py-[5px] text-[12px] text-[#f360c0] font-['Pretendard',sans-serif]"
+                  >
+                    {artist}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Follow Button */}
         <button
           onClick={handleFollowToggle}
@@ -252,7 +293,7 @@ export default function OtherUserProfilePage() {
                 {/* Exhibition Details */}
                 <div className="flex flex-col gap-[8px] p-[12px]">
                   <div className="h-auto overflow-clip relative w-full">
-                    <p className="font-pretendard leading-[18px] text-[12px] text-black tracking-[-0.24px] whitespace-normal text-left">{ex.title}</p>
+                    <p className="font-pretendard leading-[18px] text-[12px] text-black tracking-[-0.24px] text-left truncate">{ex.title}</p>
                   </div>
 
                   {/* Views and Likes */}
@@ -266,9 +307,11 @@ export default function OtherUserProfilePage() {
               </button>
             ))
           ) : (
-            <p className="font-pretendard text-[12px] text-[#4a5565]">
-              No exhibitions found.
-            </p>
+            <div className="flex flex-col items-start justify-center w-full py-4">
+              <p className="font-pretendard text-[16px] text-[#4a5565]">
+                전시관이 없습니다.
+              </p>
+            </div>
           )}
         </div>
       </div>
