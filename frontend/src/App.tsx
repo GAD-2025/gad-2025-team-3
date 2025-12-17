@@ -134,7 +134,8 @@ export default function App() {
             const shouldRedirectToLogin = location.pathname !== '/login' &&
                                          !location.pathname.startsWith('/signup') &&
                                          !location.pathname.startsWith('/explore/search') &&
-                                         !location.pathname.startsWith('/room');      console.log('shouldRedirectToLogin:', shouldRedirectToLogin);
+                                         !location.pathname.startsWith('/room') &&
+                                         !location.pathname.startsWith('/exhibition');      console.log('shouldRedirectToLogin:', shouldRedirectToLogin);
       if (shouldRedirectToLogin) {
         console.log('No user, redirecting to /login');
         navigate('/login');
