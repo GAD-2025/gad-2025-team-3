@@ -131,10 +131,10 @@ export default function App() {
         navigate('/main');
       }
     } else {
-      const shouldRedirectToLogin = location.pathname !== '/login' && 
-                                   !location.pathname.startsWith('/signup') && 
-                                   !location.pathname.startsWith('/explore/search');
-      console.log('shouldRedirectToLogin:', shouldRedirectToLogin);
+            const shouldRedirectToLogin = location.pathname !== '/login' &&
+                                         !location.pathname.startsWith('/signup') &&
+                                         !location.pathname.startsWith('/explore/search') &&
+                                         !location.pathname.startsWith('/room');      console.log('shouldRedirectToLogin:', shouldRedirectToLogin);
       if (shouldRedirectToLogin) {
         console.log('No user, redirecting to /login');
         navigate('/login');
